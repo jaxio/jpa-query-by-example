@@ -15,8 +15,11 @@
  */
 package org.querybyexample.jpa.it;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -26,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.querybyexample.jpa.PropertySelector;
+import org.querybyexample.jpa.Ranges;
 import org.querybyexample.jpa.SearchParameters;
 import org.querybyexample.jpa.app.Account;
 import org.querybyexample.jpa.app.AccountQueryByExample;
@@ -52,13 +56,13 @@ public class AccountQueryByExampleIT {
 
     @Test
     @Rollback
-    public void defaultSearch() {        
+    public void defaultSearch() {
         List<Account> accounts = accountDao.find(new Account(), new SearchParameters());
         for (Account account : accounts) {
             log.info("Got account " + account.getUsername());
         }
-   }
-    
+    }
+
     @Test
     @Rollback
     public void findDemoOrAdmin() {
@@ -67,12 +71,33 @@ public class AccountQueryByExampleIT {
         List<String> possibleValues = new ArrayList<String>();
         possibleValues.add("demo");
         possibleValues.add("admin");
-        ps.setSelected(possibleValues);        
+        ps.setSelected(possibleValues);
         sp.addPropertySelector(ps);
+
+        List<Account> accounts = accountDao.find(new Account(), sp);
+        for (Account account : accounts) {
+            log.info("Got account " + account.getUsername());
+        }
+    }
+
+    @Test
+    @Rollback
+    public void findByRangeAndFetchJoinAddress() throws ParseException {
+        SearchParameters sp = new SearchParameters();
+        
+        // date range
+        Ranges.RangeDate<Account> rangeBirthday = Ranges.RangeDate.newRangeDate(Account_.birthDate);
+        rangeBirthday.setFrom(DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse("01/01/1972"));
+        rangeBirthday.setTo(DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse("01/01/1982"));
+        sp.addRange(rangeBirthday);
+        
+        // fetch join address 
+        sp.addLeftJoinAttribute(Account_.homeAddress);
         
         List<Account> accounts = accountDao.find(new Account(), sp);
         for (Account account : accounts) {
             log.info("Got account " + account.getUsername());
         }
-   }    
+    }
+
 }

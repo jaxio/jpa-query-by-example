@@ -15,6 +15,8 @@
  */
 package org.querybyexample.jpa.app;
 
+import java.util.Date;
+
 import javax.persistence.metamodel.ListAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
@@ -28,7 +30,7 @@ public abstract class Account_ {
     public static volatile SingularAttribute<Account, String> password;
     public static volatile SingularAttribute<Account, String> email;
     public static volatile SingularAttribute<Account, Boolean> isEnabled;
-    public static volatile SingularAttribute<Account, Integer> version;
+    public static volatile SingularAttribute<Account, Date> birthDate;
 
     // Technical attributes for query by example
     public static volatile SingularAttribute<Account, Integer> addressId;
