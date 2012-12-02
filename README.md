@@ -9,7 +9,7 @@ The source is the doc. The best way to understand how it works is to study our i
 
 Here is the SQL file: [create.sql](https://github.com/jaxio/jpa-query-by-example/blob/master/src/test/resources/create.sql)
 
-Here are the entities: [create.sql](https://github.com/jaxio/jpa-query-by-example/blob/master/src/test/java/org/querybyexample/jpa/app)
+Here are the [entities and the QBE entry point](https://github.com/jaxio/jpa-query-by-example/blob/master/src/test/java/org/querybyexample/jpa/app)
 
 Here is the associated integration tests: [AccountQueryByExampleIT](https://github.com/jaxio/jpa-query-by-example/blob/master/src/test/java/org/querybyexample/jpa/it/AccountQueryByExampleIT.java)
 
