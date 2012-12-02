@@ -1,6 +1,6 @@
 ## Query By Example for JPA 2
 
-This API allows you to construct Query By Example using the JPA 2 Criteria API.4.
+This API allows you to construct Query By Example using the JPA 2 Criteria API.
 
 Note that the API does not depend on spring framework. Only the integration tests do.
 However, the API has a small dependency on Hibernate 4.
