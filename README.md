@@ -8,5 +8,8 @@ More doc to come. For the moment, check the [AccountQueryByExampleIT](https://gi
 Provided by Jaxio/SpringFuse team
 
 http://www.jaxio.com
+
+
 http://www.springfuse.com
+
 @springfuse
