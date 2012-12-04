@@ -134,7 +134,7 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 			return getNamedQueryUtil().findByNamedQuery(sp);
 		}
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-		CriteriaQuery<E> criteriaQuery = builder.createQuery(type);
+		CriteriaQuery<E> criteriaQuery = builder.createQuery(type).distinct(true);
 		Root<E> root = criteriaQuery.from(type);
 
 		// predicate
