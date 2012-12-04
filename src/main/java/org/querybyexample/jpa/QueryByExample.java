@@ -22,6 +22,7 @@ import static org.querybyexample.jpa.ByRangeUtil.byRanges;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -121,6 +122,21 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 		return find(entity, new SearchParameters());
 	}
 
+	public List<E> find(SearchParameters sp) {
+		return find(newInstance(), sp);
+	}
+
+	/**
+	 * as per JPA contract you need to have no-arg constructors, therefore we can instanciate it
+	 */
+	private E newInstance() {
+		try {
+			return type.newInstance();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * Find and load a list of E instance.
 	 * 
@@ -134,7 +150,11 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 			return getNamedQueryUtil().findByNamedQuery(sp);
 		}
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-		CriteriaQuery<E> criteriaQuery = builder.createQuery(type).distinct(true);
+		CriteriaQuery<E> criteriaQuery = builder.createQuery(type);
+		
+		if (sp.isDistinct()) {
+			criteriaQuery.distinct(true);
+		}
 		Root<E> root = criteriaQuery.from(type);
 
 		// predicate
@@ -143,10 +163,10 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 			criteriaQuery = criteriaQuery.where(predicate);
 		}
 
-		// left join
-		if (sp.hasLeftJoinAttributes()) {
-			for (SingularAttribute<?, ?> arg : sp.getLeftJoinAttributes()) {
-				root.fetch((SingularAttribute<E, ?>) arg, JoinType.LEFT);
+		// join fetch
+		for(Map.Entry<JoinType, List<SingularAttribute<?, ?>>> joins : sp.getJoinAttributes().entrySet()) {
+			for (SingularAttribute<?, ?> join : joins.getValue()) {
+				root.fetch((SingularAttribute<E, ?>) join, joins.getKey());
 			}
 		}
 

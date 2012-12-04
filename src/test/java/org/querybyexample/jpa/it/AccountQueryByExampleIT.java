@@ -71,7 +71,7 @@ public class AccountQueryByExampleIT {
 	@Rollback
 	public void all() {
 		assertThat(accountQBE.find(new Account())).hasSize(6);
-		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(6);
+		assertThat(accountQBE.find(new SearchParameters())).hasSize(6);
 	}
 
 	@Test
@@ -147,40 +147,40 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void byPropertySelector() {
-		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username)))).hasSize(6);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username, "demo", "demo")))).hasSize(1);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username, "demo", "admin")))).hasSize(2);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username, "unknown", "admin")))).hasSize(1);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username, "unknown", "invalid")))).isEmpty();
+		assertThat(accountQBE.find(new SearchParameters(property(username)))).hasSize(6);
+		assertThat(accountQBE.find(new SearchParameters(property(username, "demo", "demo")))).hasSize(1);
+		assertThat(accountQBE.find(new SearchParameters(property(username, "demo", "admin")))).hasSize(2);
+		assertThat(accountQBE.find(new SearchParameters(property(username, "unknown", "admin")))).hasSize(1);
+		assertThat(accountQBE.find(new SearchParameters(property(username, "unknown", "invalid")))).isEmpty();
 	}
 
 	@Test
 	@Rollback
-	public void byDateRangeSelectorBetween() throws ParseException {
-		assertThat(accountQBE.find(new Account(), new SearchParameters(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
+	public void byDateRangeSelectorBetween() {
+		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
+		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
 	}
 
 	@Test
 	@Rollback
-	public void byDateRangeSelectorFrom() throws ParseException {
-		assertThat(accountQBE.find(new Account(), new SearchParameters(fromRangeDate(birthDate, getDate("01/01/1970"))))).hasSize(2);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(fromRangeDate(birthDate, getDate("01/01/2100"))))).isEmpty();
+	public void byDateRangeSelectorFrom() {
+		assertThat(accountQBE.find(new SearchParameters(fromRangeDate(birthDate, getDate("01/01/1970"))))).hasSize(2);
+		assertThat(accountQBE.find(new SearchParameters(fromRangeDate(birthDate, getDate("01/01/2100"))))).isEmpty();
 
 	}
 
 	@Test
 	@Rollback
-	public void byDateRangeSelectorTo() throws ParseException {
-		assertThat(accountQBE.find(new Account(), new SearchParameters(toRangeDate(birthDate, getDate("01/01/1970"))))).isEmpty();
-		assertThat(accountQBE.find(new Account(), new SearchParameters(toRangeDate(birthDate, getDate("01/01/2100"))))).hasSize(2);
+	public void byDateRangeSelectorTo() {
+		assertThat(accountQBE.find(new SearchParameters(toRangeDate(birthDate, getDate("01/01/1970"))))).isEmpty();
+		assertThat(accountQBE.find(new SearchParameters(toRangeDate(birthDate, getDate("01/01/2100"))))).hasSize(2);
 	}
 
 	@Test
 	@Rollback
-	public void byEntitySelector() throws ParseException {
-		assertThat(accountQBE.find(new Account(), new SearchParameters(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
+	public void byEntitySelector() {
+		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
+		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
 	}
 
 	@Test
@@ -189,22 +189,28 @@ public class AccountQueryByExampleIT {
 		Address address1 = entityManager.find(Address.class, 1);
 		Address address2 = entityManager.find(Address.class, 2);
 
-		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId)))).hasSize(6);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId, address1)))).hasSize(1);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId, address2)))).hasSize(1);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId, address1, address1)))).hasSize(1);
-		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId, address1, address2)))).hasSize(2);
+		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId)))).hasSize(6);
+		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address1)))).hasSize(1);
+		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address2)))).hasSize(1);
+		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address1, address1)))).hasSize(1);
+		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address1, address2)))).hasSize(2);
 	}
 
 	@Test
 	@Rollback
 	public void leftJoinHomeAddress() {
-		assertThat(accountQBE.find(new Account(), new SearchParameters().leftJoin(homeAddress))).hasSize(6);
+		assertThat(accountQBE.find(new SearchParameters().leftJoin(homeAddress))).hasSize(6);
 	}
 
 	@Test
 	@Rollback
-	public void byManyToOneProperty() throws ParseException {
+	public void innerJoinHomeAddress() {
+		assertThat(accountQBE.find(new SearchParameters().innerJoin(homeAddress))).hasSize(6);
+	}
+
+	@Test
+	@Rollback
+	public void byManyToOneProperty() {
 		Address address = new Address();
 		address.setCity("Paris");
 
@@ -212,11 +218,19 @@ public class AccountQueryByExampleIT {
 		example.setHomeAddress(address);
 
 		assertThat(accountQBE.find(example)).hasSize(1);
+
+		Address invalidAddress = new Address();
+		invalidAddress.setCity("even");
+
+		Account noMatch = new Account();
+		noMatch.setHomeAddress(invalidAddress);
+
+		assertThat(accountQBE.find(noMatch)).isEmpty();
 	}
 
 	@Test
 	@Rollback
-	public void byManyToOnePropertyEndingLike() throws ParseException {
+	public void byManyToOnePropertyEndingLike() {
 		Account example = new Account();
 		example.setHomeAddress(new Address());
 		example.getHomeAddress().setCity("ris");
@@ -230,72 +244,80 @@ public class AccountQueryByExampleIT {
 		Account adminOnly = new Account();
 		adminOnly.addRole(entityManager.find(Role.class, 1));
 		assertThat(accountQBE.find(adminOnly)).hasSize(1);
+		assertThat(accountQBE.find(adminOnly, new SearchParameters().distinct())).hasSize(1);
 
 		Account users = new Account();
 		users.addRole(entityManager.find(Role.class, 2));
 		assertThat(accountQBE.find(users)).hasSize(3);
+		assertThat(accountQBE.find(users, new SearchParameters().distinct())).hasSize(3);
 
 		Account userOrAdmin = new Account();
 		userOrAdmin.addRole(entityManager.find(Role.class, 1));
 		userOrAdmin.addRole(entityManager.find(Role.class, 2));
-		assertThat(accountQBE.find(userOrAdmin)).hasSize(3);
+		assertThat(accountQBE.find(userOrAdmin)).hasSize(4);
+		assertThat(accountQBE.find(userOrAdmin, new SearchParameters().distinct())).hasSize(3);
 
 		Account unassigned = new Account();
 		unassigned.addRole(entityManager.find(Role.class, 3));
 		assertThat(accountQBE.find(unassigned)).isEmpty();
+		assertThat(accountQBE.find(unassigned, new SearchParameters().distinct())).isEmpty();
 	}
 
 	@Test
 	@Rollback
 	public void orderByFieldname() {
-		List<Account> accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username"));
+		List<Account> accounts = accountQBE.find(new SearchParameters().orderBy("username"));
 		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username", ASC));
+		accounts = accountQBE.find(new SearchParameters().orderBy("username", ASC));
 		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username", DESC));
+		accounts = accountQBE.find(new SearchParameters().orderBy("username", DESC));
 		assertThat(first(accounts).getUsername()).isEqualTo("user");
 
-		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(new OrderBy("username", DESC)));
+		accounts = accountQBE.find(new SearchParameters().orderBy(new OrderBy("username", DESC)));
 		assertThat(first(accounts).getUsername()).isEqualTo("user");
 	}
 
 	@Test
 	@Rollback
 	public void orderByAttribute() {
-		List<Account> accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username));
+		List<Account> accounts = accountQBE.find(new SearchParameters().orderBy(username));
 		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username, ASC));
+		accounts = accountQBE.find(new SearchParameters().orderBy(username, ASC));
 		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username, DESC));
+		accounts = accountQBE.find(new SearchParameters().orderBy(username, DESC));
 		assertThat(first(accounts).getUsername()).isEqualTo("user");
 
-		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(new OrderBy(username, DESC)));
+		accounts = accountQBE.find(new SearchParameters().orderBy(new OrderBy(username, DESC)));
 		assertThat(first(accounts).getUsername()).isEqualTo("user");
 	}
 
 	@Test
 	@Rollback
 	public void bySearchPattern() {
-		assertThat(accountQBE.find(new Account(), new SearchParameters().searchPattern("admin"))).hasSize(1);
-		assertThat(accountQBE.find(new Account(), new SearchParameters().searchPattern("min").anywhere())).hasSize(1);
-		assertThat(accountQBE.find(new Account(), new SearchParameters().searchPattern("no_match").anywhere())).isEmpty();
+		assertThat(accountQBE.find(new SearchParameters().searchPattern("admin"))).hasSize(1);
+		assertThat(accountQBE.find(new SearchParameters().searchPattern("min").anywhere())).hasSize(1);
+		assertThat(accountQBE.find(new SearchParameters().searchPattern("no_match").anywhere())).isEmpty();
 	}
 
 	@Test
 	@Rollback
 	public void maxResults() {
-		assertThat(accountQBE.find(new Account(), new SearchParameters().maxResults(4))).hasSize(4);
+		assertThat(accountQBE.find(new SearchParameters().maxResults(4))).hasSize(4);
 	}
 
 	private Account first(List<Account> accounts) {
 		return accounts.iterator().next();
 	}
 
-	private Date getDate(String from) throws ParseException {
-		return DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse(from);
+	private Date getDate(String from) {
+		try {
+			return DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse(from);
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

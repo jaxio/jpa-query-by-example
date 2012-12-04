@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.JoinType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.Validate;
@@ -73,7 +74,7 @@ public class SearchParameters implements Serializable {
 	private int firstResult = 0;
 
 	// Joins
-	private List<SingularAttribute<?, ?>> leftJoinAttributes = new ArrayList<SingularAttribute<?, ?>>();
+	private Map<JoinType, List<SingularAttribute<?, ?>>> joinAttributes = new HashMap<JoinType, List<SingularAttribute<?, ?>>>();
 
 	// ranges
 	private List<Range<?, ?>> ranges = new ArrayList<Range<?, ?>>();
@@ -89,6 +90,8 @@ public class SearchParameters implements Serializable {
 	// cache
 	private Boolean cacheable = true;
 	private String cacheRegion;
+	// distinct
+	private Boolean distinct;
 
 	public SearchParameters() {
 
@@ -531,23 +534,47 @@ public class SearchParameters implements Serializable {
 	// Fetch associated entity using a LEFT Join
 	// -----------------------------------------
 
+	private List<SingularAttribute<?, ?>> getJoinAttributes(JoinType inner) {
+		List<SingularAttribute<?, ?>> left = joinAttributes.get(inner);
+		if (left == null) {
+			left = new ArrayList<SingularAttribute<?, ?>>();
+			joinAttributes.put(inner, left);
+		}
+		return left;
+	}
+
+	/**
+	 * Returns the attribute (x-to-one association) which must be fetched with an inner join.
+	 */
+	public List<SingularAttribute<?, ?>> getInnerJoinAttributes() {
+		return getJoinAttributes(JoinType.INNER);
+	}
+
 	/**
 	 * Returns the attribute (x-to-one association) which must be fetched with a left join.
 	 */
 	public List<SingularAttribute<?, ?>> getLeftJoinAttributes() {
-		return leftJoinAttributes;
-	}
-
-	public boolean hasLeftJoinAttributes() {
-		return !leftJoinAttributes.isEmpty();
+		return getJoinAttributes(JoinType.LEFT);
 	}
 
 	/**
 	 * The passed attribute (x-to-one association) will be fetched with a left join.
 	 */
 	public SearchParameters leftJoin(SingularAttribute<?, ?> xToOneAttribute) {
-		leftJoinAttributes.add(xToOneAttribute);
+		getLeftJoinAttributes().add(xToOneAttribute);
 		return this;
+	}
+
+	/**
+	 * The passed attribute (x-to-one association) will be fetched with a inner join.
+	 */
+	public SearchParameters innerJoin(SingularAttribute<?, ?> xToOneAttribute) {
+		getInnerJoinAttributes().add(xToOneAttribute);
+		return this;
+	}
+
+	public Map<JoinType, List<SingularAttribute<?, ?>>> getJoinAttributes() {
+		return joinAttributes;
 	}
 
 	// -----------------------------------
@@ -595,6 +622,24 @@ public class SearchParameters implements Serializable {
 
 	public String getCacheRegion() {
 		return cacheRegion;
+	}
+
+	// -----------------------------------
+	// Distinct
+	// -----------------------------------
+
+	public boolean isDistinct() {
+		return distinct != null && distinct != false;
+	}
+
+	public SearchParameters distinct() {
+		distinct = true;
+		return this;
+	}
+
+	public SearchParameters indistinct() {
+		distinct = false;
+		return this;
 	}
 
 	@Override
