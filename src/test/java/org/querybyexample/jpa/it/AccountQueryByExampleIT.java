@@ -44,7 +44,6 @@ import javax.persistence.PersistenceContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.querybyexample.jpa.OrderBy;
-import org.querybyexample.jpa.OrderByDirection;
 import org.querybyexample.jpa.SearchParameters;
 import org.querybyexample.jpa.app.Account;
 import org.querybyexample.jpa.app.AccountQueryByExample;
@@ -71,8 +70,8 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void all() {
-		assertThat(accountQBE.find(new Account())).hasSize(53);
-		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(53);
+		assertThat(accountQBE.find(new Account())).hasSize(6);
+		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(6);
 	}
 
 	@Test
@@ -148,7 +147,7 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void byPropertySelector() {
-		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username)))).hasSize(53);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username)))).hasSize(6);
 		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username, "demo", "demo")))).hasSize(1);
 		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username, "demo", "admin")))).hasSize(2);
 		assertThat(accountQBE.find(new Account(), new SearchParameters(property(username, "unknown", "admin")))).hasSize(1);
@@ -190,7 +189,7 @@ public class AccountQueryByExampleIT {
 		Address address1 = entityManager.find(Address.class, 1);
 		Address address2 = entityManager.find(Address.class, 2);
 
-		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId)))).hasSize(53);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId)))).hasSize(6);
 		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId, address1)))).hasSize(1);
 		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId, address2)))).hasSize(1);
 		assertThat(accountQBE.find(new Account(), new SearchParameters(entitySelector(addressId, address1, address1)))).hasSize(1);
@@ -200,7 +199,7 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void leftJoinHomeAddress() {
-		assertThat(accountQBE.find(new Account(), new SearchParameters().leftJoin(homeAddress))).hasSize(53);
+		assertThat(accountQBE.find(new Account(), new SearchParameters().leftJoin(homeAddress))).hasSize(6);
 	}
 
 	@Test
@@ -228,50 +227,54 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void byManyToMany() {
-		Account example = new Account();
-		example.addRole(entityManager.find(Role.class, 1));
-		example.addRole(entityManager.find(Role.class, 2));
+		Account adminOnly = new Account();
+		adminOnly.addRole(entityManager.find(Role.class, 1));
+		assertThat(accountQBE.find(adminOnly)).hasSize(1);
 
-		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(4);
+		Account users = new Account();
+		users.addRole(entityManager.find(Role.class, 2));
+		assertThat(accountQBE.find(users)).hasSize(3);
+
+		Account userOrAdmin = new Account();
+		userOrAdmin.addRole(entityManager.find(Role.class, 1));
+		userOrAdmin.addRole(entityManager.find(Role.class, 2));
+		assertThat(accountQBE.find(userOrAdmin)).hasSize(3);
+
+		Account unassigned = new Account();
+		unassigned.addRole(entityManager.find(Role.class, 3));
+		assertThat(accountQBE.find(unassigned)).isEmpty();
 	}
 
 	@Test
 	@Rollback
 	public void orderByFieldname() {
 		List<Account> accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username"));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
+		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
 		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username", ASC));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
+		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
 		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username", DESC));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
+		assertThat(first(accounts).getUsername()).isEqualTo("user");
 
 		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(new OrderBy("username", DESC)));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
+		assertThat(first(accounts).getUsername()).isEqualTo("user");
 	}
 
 	@Test
 	@Rollback
 	public void orderByAttribute() {
 		List<Account> accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
+		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
 		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username, ASC));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
+		assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
 		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username, DESC));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
+		assertThat(first(accounts).getUsername()).isEqualTo("user");
 
 		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(new OrderBy(username, DESC)));
-		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
-	}
-
-	@Test
-	@Rollback
-	public void orderByDesc() {
-		List<Account> list = accountQBE.find(new Account(), new SearchParameters().orderBy("username", OrderByDirection.DESC));
-		assertThat(list.iterator().next().getUsername()).isEqualTo("user50");
+		assertThat(first(accounts).getUsername()).isEqualTo("user");
 	}
 
 	@Test
@@ -285,7 +288,11 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void maxResults() {
-		assertThat(accountQBE.find(new Account(), new SearchParameters().maxResults(7))).hasSize(7);
+		assertThat(accountQBE.find(new Account(), new SearchParameters().maxResults(4))).hasSize(4);
+	}
+
+	private Account first(List<Account> accounts) {
+		return accounts.iterator().next();
 	}
 
 	private Date getDate(String from) throws ParseException {
