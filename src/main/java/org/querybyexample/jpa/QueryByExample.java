@@ -288,8 +288,8 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 	protected <R> Predicate getPredicate(Root<E> root, CriteriaQuery<R> query, CriteriaBuilder builder, E entity, SearchParameters sp) {
 		return JpaUtil.andPredicate(builder, //
 				byRanges(root, query, builder, sp.getRanges(), type), //
-				byPropertySelectors(root, builder, sp.getPropertySelectors()), //
-				byEntitySelectors(root, builder, sp.getEntitySelectors()), //
+				byPropertySelectors(root, builder, sp.getProperties()), //
+				byEntitySelectors(root, builder, sp.getEntities()), //
 				getByExamplePredicate(root, entity, sp, builder), //
 				byPatternUtil.byPattern(root, query, builder, sp, type), //
 				getExtraPredicate(root, query, builder, entity, sp));

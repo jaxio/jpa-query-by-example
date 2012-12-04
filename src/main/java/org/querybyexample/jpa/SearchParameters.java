@@ -16,9 +16,13 @@
 package org.querybyexample.jpa;
 
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.querybyexample.jpa.Ranges.RangeDate.rangeDate;
+import static org.querybyexample.jpa.Ranges.RangeLocalDate.rangeLocalDate;
+import static org.querybyexample.jpa.Ranges.RangeLocalDateTime.rangeLocalDateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +32,8 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 
 /**
  * The SearchParameters is used to pass search parameters to the DAO layer.
@@ -80,10 +86,10 @@ public class SearchParameters implements Serializable {
 	private List<Range<?, ?>> ranges = new ArrayList<Range<?, ?>>();
 
 	// property selectors
-	private List<PropertySelector<?, ?>> propertySelectors = new ArrayList<PropertySelector<?, ?>>();
+	private List<PropertySelector<?, ?>> properties = new ArrayList<PropertySelector<?, ?>>();
 
 	// entity selectors
-	private List<EntitySelector<?, ? extends Identifiable<?>, ?>> entitySelectors = new ArrayList<EntitySelector<?, ? extends Identifiable<?>, ?>>();
+	private List<EntitySelector<?, ? extends Identifiable<?>, ?>> entities = new ArrayList<EntitySelector<?, ? extends Identifiable<?>, ?>>();
 
 	// pattern to match against all strings.
 	private String searchPattern;
@@ -433,6 +439,21 @@ public class SearchParameters implements Serializable {
 		return this;
 	}
 
+	public SearchParameters range(SingularAttribute<?, LocalDate> field, LocalDate from, LocalDate to) {
+		addRange(rangeLocalDate(field, from, to));
+		return this;
+	}
+
+	public SearchParameters range(SingularAttribute<?, LocalDateTime> field, LocalDateTime from, LocalDateTime to) {
+		addRange(rangeLocalDateTime(field, from, to));
+		return this;
+	}
+
+	public SearchParameters range(SingularAttribute<?, Date> field, Date from, Date to) {
+		addRange(rangeDate(field, from, to));
+		return this;
+	}
+
 	public void clearRanges() {
 		ranges.clear();
 	}
@@ -441,27 +462,42 @@ public class SearchParameters implements Serializable {
 	// Search by property selector support
 	// -----------------------------------
 	public SearchParameters(PropertySelector<?, ?> propertySelector) {
-		propertySelector(propertySelector);
+		property(propertySelector);
 	}
 
-	public List<PropertySelector<?, ?>> getPropertySelectors() {
-		return propertySelectors;
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public SearchParameters(SingularAttribute<?, ?> field, Object value) {
+		property(new PropertySelector(field, value));
 	}
 
-	public void addPropertySelector(PropertySelector<?, ?> propertySelector) {
-		propertySelectors.add(propertySelector);
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public SearchParameters(SingularAttribute<?, ?> field, Object... values) {
+		property(new PropertySelector(field, values));
+	}
+
+	public List<PropertySelector<?, ?>> getProperties() {
+		return properties;
+	}
+
+	public void addProperty(PropertySelector<?, ?> propertySelector) {
+		properties.add(propertySelector);
 	}
 
 	/**
 	 * Add the passed {@link PropertySelector} in order to construct an OR predicate for the corresponding property.
 	 */
-	public SearchParameters propertySelector(PropertySelector<?, ?> propertySelector) {
-		addPropertySelector(propertySelector);
+	public SearchParameters property(PropertySelector<?, ?> propertySelector) {
+		addProperty(propertySelector);
 		return this;
 	}
 
-	public void clearPropertySelectors() {
-		propertySelectors.clear();
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public SearchParameters property(SingularAttribute<?, ?> field, Object... values) {
+		return property(new PropertySelector(field, values));
+	}
+
+	public void clearProperties() {
+		properties.clear();
 	}
 
 	// -----------------------------------
@@ -469,27 +505,32 @@ public class SearchParameters implements Serializable {
 	// -----------------------------------
 
 	public SearchParameters(EntitySelector<?, ? extends Identifiable<?>, ?> entitySelector) {
-		addEntitySelector(entitySelector);
+		addEntity(entitySelector);
 	}
 
-	public List<EntitySelector<?, ? extends Identifiable<?>, ?>> getEntitySelectors() {
-		return entitySelectors;
+	public List<EntitySelector<?, ? extends Identifiable<?>, ?>> getEntities() {
+		return entities;
 	}
 
-	public void addEntitySelector(EntitySelector<?, ? extends Identifiable<?>, ?> entitySelector) {
-		entitySelectors.add(entitySelector);
+	public void addEntity(EntitySelector<?, ? extends Identifiable<?>, ?> entitySelector) {
+		entities.add(entitySelector);
 	}
 
 	/**
 	 * Add the passed {@link EntitySelector} in order to construct an OR predicate for the underlying foreign key.
 	 */
-	public SearchParameters entitySelector(EntitySelector<?, ? extends Identifiable<?>, ?> entitySelector) {
-		addEntitySelector(entitySelector);
+	public SearchParameters entity(EntitySelector<?, ? extends Identifiable<?>, ?> entitySelector) {
+		addEntity(entitySelector);
 		return this;
 	}
 
-	public void clearEntitySelectors() {
-		entitySelectors.clear();
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public SearchParameters entity(SingularAttribute<?, ?> field, Identifiable<?>... values) {
+		return entity(new EntitySelector(field, values));
+	}
+
+	public void clearEntity() {
+		entities.clear();
 	}
 
 	// -----------------------------------

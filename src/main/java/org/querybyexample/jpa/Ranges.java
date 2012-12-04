@@ -38,11 +38,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeInteger<E> newRangeInteger(SingularAttribute<E, Integer> field) {
+		public static <E> RangeInteger<E> rangeInteger(SingularAttribute<E, Integer> field) {
 			return new RangeInteger<E>(field);
 		}
 
-		public static <E> RangeInteger<E> newRangeInteger(SingularAttribute<E, Integer> field, Integer from, Integer to) {
+		public static <E> RangeInteger<E> rangeInteger(SingularAttribute<E, Integer> field, Integer from, Integer to) {
 			return new RangeInteger<E>(field, from, to);
 		}
 	}
@@ -56,11 +56,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeBigInteger<E> newRangeBigInteger(SingularAttribute<E, BigInteger> field) {
+		public static <E> RangeBigInteger<E> rangeBigInteger(SingularAttribute<E, BigInteger> field) {
 			return new RangeBigInteger<E>(field);
 		}
 
-		public static <E> RangeBigInteger<E> newRangeBigInteger(SingularAttribute<E, BigInteger> field, BigInteger from, BigInteger to) {
+		public static <E> RangeBigInteger<E> rangeBigInteger(SingularAttribute<E, BigInteger> field, BigInteger from, BigInteger to) {
 			return new RangeBigInteger<E>(field, from, to);
 		}
 	}
@@ -74,11 +74,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeLong<E> newRangeLong(SingularAttribute<E, Long> field) {
+		public static <E> RangeLong<E> rangeLong(SingularAttribute<E, Long> field) {
 			return new RangeLong<E>(field);
 		}
 
-		public static <E> RangeLong<E> newRangeLong(SingularAttribute<E, Long> field, Long from, Long to) {
+		public static <E> RangeLong<E> rangeLong(SingularAttribute<E, Long> field, Long from, Long to) {
 			return new RangeLong<E>(field, from, to);
 		}
 	}
@@ -92,11 +92,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeDouble<E> newRangeDouble(SingularAttribute<E, Double> field) {
+		public static <E> RangeDouble<E> rangeDouble(SingularAttribute<E, Double> field) {
 			return new RangeDouble<E>(field);
 		}
 
-		public static <E> RangeDouble<E> newRangeDouble(SingularAttribute<E, Double> field, Double from, Double to) {
+		public static <E> RangeDouble<E> rangeDouble(SingularAttribute<E, Double> field, Double from, Double to) {
 			return new RangeDouble<E>(field, from, to);
 		}
 	}
@@ -110,11 +110,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeFloat<E> newRangeFloat(SingularAttribute<E, Float> field) {
+		public static <E> RangeFloat<E> rangeFloat(SingularAttribute<E, Float> field) {
 			return new RangeFloat<E>(field);
 		}
 
-		public static <E> RangeFloat<E> newRangeFloat(SingularAttribute<E, Float> field, Float from, Float to) {
+		public static <E> RangeFloat<E> rangeFloat(SingularAttribute<E, Float> field, Float from, Float to) {
 			return new RangeFloat<E>(field, from, to);
 		}
 	}
@@ -128,11 +128,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeBigDecimal<E> newRangeBigDecimal(SingularAttribute<E, BigDecimal> field) {
+		public static <E> RangeBigDecimal<E> rangeBigDecimal(SingularAttribute<E, BigDecimal> field) {
 			return new RangeBigDecimal<E>(field);
 		}
 
-		public static <E> RangeBigDecimal<E> newRangeBigDecimal(SingularAttribute<E, BigDecimal> field, BigDecimal from, BigDecimal to) {
+		public static <E> RangeBigDecimal<E> rangeBigDecimal(SingularAttribute<E, BigDecimal> field, BigDecimal from, BigDecimal to) {
 			return new RangeBigDecimal<E>(field, from, to);
 		}
 	}
@@ -146,7 +146,7 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <T> RangeDate<T> newRangeDate(SingularAttribute<T, Date> field) {
+		public static <T> RangeDate<T> rangeDate(SingularAttribute<T, Date> field) {
 			return new RangeDate<T>(field);
 		}
 
@@ -176,11 +176,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeLocalDate<E> newRangeLocalDate(SingularAttribute<E, LocalDate> field) {
+		public static <E> RangeLocalDate<E> rangeLocalDate(SingularAttribute<E, LocalDate> field) {
 			return new RangeLocalDate<E>(field);
 		}
 
-		public static <E> RangeLocalDate<E> newRangeLocalDate(SingularAttribute<E, LocalDate> field, LocalDate from, LocalDate to) {
+		public static <E> RangeLocalDate<E> rangeLocalDate(SingularAttribute<E, LocalDate> field, LocalDate from, LocalDate to) {
 			return new RangeLocalDate<E>(field, from, to);
 		}
 	}
@@ -194,11 +194,11 @@ public class Ranges {
 			super(field, from, to);
 		}
 
-		public static <E> RangeLocalDateTime<E> newRangeLocalDateTime(SingularAttribute<E, LocalDateTime> field) {
+		public static <E> RangeLocalDateTime<E> rangeLocalDateTime(SingularAttribute<E, LocalDateTime> field) {
 			return new RangeLocalDateTime<E>(field);
 		}
 
-		public static <E> RangeLocalDateTime<E> newRangeLocalDateTime(SingularAttribute<E, LocalDateTime> field, LocalDateTime from, LocalDateTime to) {
+		public static <E> RangeLocalDateTime<E> rangeLocalDateTime(SingularAttribute<E, LocalDateTime> field, LocalDateTime from, LocalDateTime to) {
 			return new RangeLocalDateTime<E>(field, from, to);
 		}
 	}
