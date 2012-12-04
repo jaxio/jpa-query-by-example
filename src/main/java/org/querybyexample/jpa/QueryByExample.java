@@ -166,7 +166,7 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 		}
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<E> criteriaQuery = builder.createQuery(type);
-		
+
 		if (sp.isDistinct()) {
 			criteriaQuery.distinct(true);
 		}
@@ -179,7 +179,7 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 		}
 
 		// join fetch
-		for(Map.Entry<JoinType, List<SingularAttribute<?, ?>>> joins : sp.getJoinAttributes().entrySet()) {
+		for (Map.Entry<JoinType, List<SingularAttribute<?, ?>>> joins : sp.getJoinAttributes().entrySet()) {
 			for (SingularAttribute<?, ?> join : joins.getValue()) {
 				root.fetch((SingularAttribute<E, ?>) join, joins.getKey());
 			}

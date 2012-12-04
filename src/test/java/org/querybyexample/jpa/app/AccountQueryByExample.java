@@ -26,8 +26,8 @@ import org.querybyexample.jpa.QueryByExample;
 @Named
 @Singleton
 public class AccountQueryByExample extends QueryByExample<Account, String> {
-    public AccountQueryByExample() {
-        super(Account.class);
-    }
+	public AccountQueryByExample() {
+		super(Account.class);
+	}
 
 }

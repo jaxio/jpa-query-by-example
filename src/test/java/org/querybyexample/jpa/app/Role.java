@@ -29,42 +29,42 @@ import org.querybyexample.jpa.Identifiable;
 @Entity
 @Table(name = "`ROLE`")
 public class Role implements Identifiable<Integer>, Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    // Raw attributes
-    private Integer id; // pk
-    private String roleName; // unique (not null)
+	// Raw attributes
+	private Integer id; // pk
+	private String roleName; // unique (not null)
 
-    // -------------------------------
-    // Getter & Setter
-    // -------------------------------
+	// -------------------------------
+	// Getter & Setter
+	// -------------------------------
 
-    // -- [id] ------------------------
+	// -- [id] ------------------------
 
-    @Column(name = "ID", precision = 10)
-    @GeneratedValue
-    @Id
-    public Integer getId() {
-        return id;
-    }
+	@Column(name = "ID", precision = 10)
+	@GeneratedValue
+	@Id
+	public Integer getId() {
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    @Transient
-    public boolean isIdSet() {
-        return id != null;
-    }
+	@Transient
+	public boolean isIdSet() {
+		return id != null;
+	}
 
-    // -- [roleName] ------------------------
+	// -- [roleName] ------------------------
 
-    @Column(name = "ROLE_NAME", nullable = false, unique = true, length = 100)
-    public String getRoleName() {
-        return roleName;
-    }
+	@Column(name = "ROLE_NAME", nullable = false, unique = true, length = 100)
+	public String getRoleName() {
+		return roleName;
+	}
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
 }

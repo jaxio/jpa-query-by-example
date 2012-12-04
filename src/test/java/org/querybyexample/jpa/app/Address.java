@@ -29,67 +29,67 @@ import org.querybyexample.jpa.Identifiable;
 @Entity
 @Table(name = "ADDRESS")
 public class Address implements Identifiable<Integer>, Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    // Raw attributes
-    private Integer id; // pk
-    private String streetName;
-    private String city; // not null
-    private Integer version;
+	private static final long serialVersionUID = 1L;
 
-    // -------------------------------
-    // Getter & Setter
-    // -------------------------------
+	// Raw attributes
+	private Integer id; // pk
+	private String streetName;
+	private String city; // not null
+	private Integer version;
 
-    // -- [id] ------------------------
+	// -------------------------------
+	// Getter & Setter
+	// -------------------------------
 
-    @Column(name = "ID", precision = 10)
-    @GeneratedValue
-    @Id
-    public Integer getId() {
-        return id;
-    }
+	// -- [id] ------------------------
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	@Column(name = "ID", precision = 10)
+	@GeneratedValue
+	@Id
+	public Integer getId() {
+		return id;
+	}
 
-    @Transient
-    public boolean isIdSet() {
-        return id != null;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    // -- [streetName] ------------------------
+	@Transient
+	public boolean isIdSet() {
+		return id != null;
+	}
 
-    @Column(name = "STREET_NAME", length = 100)
-    public String getStreetName() {
-        return streetName;
-    }
+	// -- [streetName] ------------------------
 
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
-    }
+	@Column(name = "STREET_NAME", length = 100)
+	public String getStreetName() {
+		return streetName;
+	}
 
-    // -- [city] ------------------------
+	public void setStreetName(String streetName) {
+		this.streetName = streetName;
+	}
 
-    @Column(name = "CITY", nullable = false, length = 100)
-    public String getCity() {
-        return city;
-    }
+	// -- [city] ------------------------
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+	@Column(name = "CITY", nullable = false, length = 100)
+	public String getCity() {
+		return city;
+	}
 
-    // -- [version] ------------------------
+	public void setCity(String city) {
+		this.city = city;
+	}
 
-    @Column(name = "VERSION", precision = 10)
-    @Version
-    public Integer getVersion() {
-        return version;
-    }
+	// -- [version] ------------------------
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+	@Column(name = "VERSION", precision = 10)
+	@Version
+	public Integer getVersion() {
+		return version;
+	}
+
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
 }

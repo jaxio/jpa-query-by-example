@@ -21,9 +21,9 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Address.class)
 public abstract class Address_ {
 
-    // Raw attributes
-    public static volatile SingularAttribute<Address, Integer> id;
-    public static volatile SingularAttribute<Address, String> streetName;
-    public static volatile SingularAttribute<Address, String> city;
-    public static volatile SingularAttribute<Address, Integer> version;
+	// Raw attributes
+	public static volatile SingularAttribute<Address, Integer> id;
+	public static volatile SingularAttribute<Address, String> streetName;
+	public static volatile SingularAttribute<Address, String> city;
+	public static volatile SingularAttribute<Address, Integer> version;
 }
