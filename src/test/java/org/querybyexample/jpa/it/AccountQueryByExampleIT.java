@@ -188,16 +188,19 @@ public class AccountQueryByExampleIT {
 
 		assertThat(accountQBE.find(new SearchParameters().range(birthDate, getDate("01/01/1970"), getDate("01/01/2000")))).hasSize(2);
 		assertThat(accountQBE.find(new SearchParameters().range(birthDate, getDate("01/01/1988"), getDate("01/01/1989")))).isEmpty();
-}
+	}
 
 	@Test
 	@Rollback
 	public void byDateRangeSelectorFrom() {
 		assertThat(accountQBE.find(new SearchParameters(fromRangeDate(birthDate, getDate("01/01/1970"))))).hasSize(2);
 		assertThat(accountQBE.find(new SearchParameters(fromRangeDate(birthDate, getDate("01/01/2100"))))).isEmpty();
-		
+
 		assertThat(accountQBE.find(new SearchParameters().range(fromRangeDate(birthDate, getDate("01/01/1970"))))).hasSize(2);
 		assertThat(accountQBE.find(new SearchParameters().range(fromRangeDate(birthDate, getDate("01/01/2100"))))).isEmpty();
+
+		assertThat(accountQBE.find(new SearchParameters().rangeFrom(birthDate, getDate("01/01/1970")))).hasSize(2);
+		assertThat(accountQBE.find(new SearchParameters().rangeFrom(birthDate, getDate("01/01/2100")))).isEmpty();
 	}
 
 	@Test
@@ -205,9 +208,12 @@ public class AccountQueryByExampleIT {
 	public void byDateRangeSelectorTo() {
 		assertThat(accountQBE.find(new SearchParameters(toRangeDate(birthDate, getDate("01/01/1970"))))).isEmpty();
 		assertThat(accountQBE.find(new SearchParameters(toRangeDate(birthDate, getDate("01/01/2100"))))).hasSize(2);
-		
+
 		assertThat(accountQBE.find(new SearchParameters().range(toRangeDate(birthDate, getDate("01/01/1970"))))).isEmpty();
 		assertThat(accountQBE.find(new SearchParameters().range(toRangeDate(birthDate, getDate("01/01/2100"))))).hasSize(2);
+
+		assertThat(accountQBE.find(new SearchParameters().rangeTo(birthDate, getDate("01/01/1970")))).isEmpty();
+		assertThat(accountQBE.find(new SearchParameters().rangeTo(birthDate, getDate("01/01/2100")))).hasSize(2);
 	}
 
 	@Test
@@ -215,13 +221,13 @@ public class AccountQueryByExampleIT {
 	public void byEntitySelector() {
 		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
 		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
-		
+
 		assertThat(accountQBE.find(new SearchParameters().range(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
 		assertThat(accountQBE.find(new SearchParameters().range(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
 
 		assertThat(accountQBE.find(new SearchParameters().range(birthDate, getDate("01/01/1970"), getDate("01/01/2000")))).hasSize(2);
 		assertThat(accountQBE.find(new SearchParameters().range(birthDate, getDate("01/01/1988"), getDate("01/01/1989")))).isEmpty();
-}
+	}
 
 	@Test
 	@Rollback

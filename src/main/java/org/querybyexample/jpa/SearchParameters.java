@@ -34,6 +34,9 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.querybyexample.jpa.Ranges.RangeDate;
+import org.querybyexample.jpa.Ranges.RangeLocalDate;
+import org.querybyexample.jpa.Ranges.RangeLocalDateTime;
 
 /**
  * The SearchParameters is used to pass search parameters to the DAO layer.
@@ -454,6 +457,48 @@ public class SearchParameters implements Serializable {
 		return this;
 	}
 
+	public SearchParameters rangeFrom(SingularAttribute<?, LocalDate> field, LocalDate from) {
+		RangeLocalDate<?> rangeLocalDate = rangeLocalDate(field);
+		rangeLocalDate.setFrom(from);
+		addRange(rangeLocalDate);
+		return this;
+	}
+
+	public SearchParameters rangeFrom(SingularAttribute<?, LocalDateTime> field, LocalDateTime from) {
+		RangeLocalDateTime<?> rangeLocalDateTime = rangeLocalDateTime(field);
+		rangeLocalDateTime.setFrom(from);
+		addRange(rangeLocalDateTime);
+		return this;
+	}
+
+	public SearchParameters rangeFrom(SingularAttribute<?, Date> field, Date from) {
+		RangeDate<?> rangeDate = rangeDate(field);
+		rangeDate.setFrom(from);
+		addRange(rangeDate);
+		return this;
+	}
+
+	public SearchParameters rangeTo(SingularAttribute<?, LocalDate> field, LocalDate setToto) {
+		RangeLocalDate<?> rangeLocalDate = rangeLocalDate(field);
+		rangeLocalDate.setTo(setToto);
+		addRange(rangeLocalDate);
+		return this;
+	}
+
+	public SearchParameters rangeTo(SingularAttribute<?, LocalDateTime> field, LocalDateTime setToto) {
+		RangeLocalDateTime<?> rangeLocalDateTime = rangeLocalDateTime(field);
+		rangeLocalDateTime.setTo(setToto);
+		addRange(rangeLocalDateTime);
+		return this;
+	}
+
+	public SearchParameters rangeTo(SingularAttribute<?, Date> field, Date setToto) {
+		RangeDate<?> rangeDate = rangeDate(field);
+		rangeDate.setTo(setToto);
+		addRange(rangeDate);
+		return this;
+	}
+
 	public void clearRanges() {
 		ranges.clear();
 	}
@@ -463,11 +508,6 @@ public class SearchParameters implements Serializable {
 	// -----------------------------------
 	public SearchParameters(PropertySelector<?, ?> propertySelector) {
 		property(propertySelector);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SearchParameters(SingularAttribute<?, ?> field, Object value) {
-		property(new PropertySelector(field, value));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
