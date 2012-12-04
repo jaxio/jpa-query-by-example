@@ -19,7 +19,7 @@ CREATE TABLE ACCOUNT (
     first_name               varchar(100),
     last_name                varchar(100),
     birth_date               timestamp,
-    description              varchar(255),
+    favorite_number          int,
     address_id               int,
     creation_date            timestamp,
     creation_author          varchar(200),
@@ -56,12 +56,12 @@ INSERT INTO ADDRESS (street_name, city) values('Park avenue', 'New-York');
 INSERT INTO ADDRESS (street_name, city) values('California Street', 'San Francisco');
 INSERT INTO ADDRESS (street_name, city) values('742 Evergreen Terrasse', 'Springfield');
 
-INSERT INTO ACCOUNT (id, login, password, email, is_enabled, address_id) VALUES ('0000000000000000000000000000001', 'admin', 'admin', 'admin@example.com', true, 1);
-INSERT INTO ACCOUNT (id, login, password, email, is_enabled, address_id) VALUES ('0000000000000000000000000000002', 'user',  'user',  'user@example.com', true, 2);
-INSERT INTO ACCOUNT (id, login, password, email, is_enabled, address_id) VALUES ('0000000000000000000000000000003', 'demo',  'demo',  'demo@example.com', true, 3);
-INSERT INTO ACCOUNT (id, login, password, email, is_enabled, address_id) VALUES ('000000000000000000000000000004', 'disabled',  'disabled',  'disabled@example.com', false, 3);
-INSERT INTO ACCOUNT (id, login, password, email, civility, address_id, birth_date) VALUES ('000000000000000000000000000005', 'homer',  'homer',  'homer@example.com', 'MR', 4, PARSEDATETIME('01/01/1972','dd/mm/yyyy'));
-INSERT INTO ACCOUNT (id, login, password, email, civility, address_id, birth_date) VALUES ('000000000000000000000000000006', 'maggy',  'maggy',  'maggy@example.com', 'MS', 4, PARSEDATETIME('01/01/1982','dd/mm/yyyy'));
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, is_enabled, address_id) VALUES ('0000000000000000000000000000001', 'admin', 'admin', 'admin@example.com', 1, true, 1);
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, is_enabled, address_id) VALUES ('0000000000000000000000000000002', 'user',  'user',  'user@example.com', 2, true, 2);
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, is_enabled, address_id) VALUES ('0000000000000000000000000000003', 'demo',  'demo',  'demo@example.com', 3, true, 3);
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, is_enabled, address_id) VALUES ('000000000000000000000000000004', 'disabled',  'disabled',  'disabled@example.com', -1, false, 3);
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000005', 'homer',  'homer',  'homer@example.com', 666, 'MR', 4, PARSEDATETIME('01/01/1972','dd/mm/yyyy'));
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000006', 'maggy',  'maggy',  'maggy@example.com', 42, 'MS', 4, PARSEDATETIME('01/01/1982','dd/mm/yyyy'));
 
 INSERT INTO ROLE (role_name) VALUES ('ROLE_ADMIN');
 INSERT INTO ROLE (role_name) VALUES ('ROLE_USER');

@@ -49,6 +49,7 @@ public class Account implements Identifiable<String>, Serializable {
 	private String username; // unique (not null)
 	private String password; // not null
 	private String email; // unique (not null)
+	private Integer favoriteNumber;
 	private Boolean isEnabled;
 	private Date birthDate;
 
@@ -115,6 +116,17 @@ public class Account implements Identifiable<String>, Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	// -- [favoriteNumber] ------------------------
+
+	@Column(name = "FAVORITE_NUMBER")
+	public Integer getFavoriteNumber() {
+		return favoriteNumber;
+	}
+
+	public void setFavoriteNumber(Integer favoriteNumber) {
+		this.favoriteNumber = favoriteNumber;
 	}
 
 	// -- [isEnabled] ------------------------

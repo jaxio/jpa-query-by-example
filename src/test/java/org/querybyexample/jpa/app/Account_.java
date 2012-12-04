@@ -29,6 +29,7 @@ public abstract class Account_ {
 	public static volatile SingularAttribute<Account, String> username;
 	public static volatile SingularAttribute<Account, String> password;
 	public static volatile SingularAttribute<Account, String> email;
+	public static volatile SingularAttribute<Account, Integer> favoriteNumber;
 	public static volatile SingularAttribute<Account, Boolean> isEnabled;
 	public static volatile SingularAttribute<Account, Date> birthDate;
 

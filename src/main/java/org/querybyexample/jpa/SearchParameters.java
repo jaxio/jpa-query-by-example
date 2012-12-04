@@ -35,6 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.querybyexample.jpa.Ranges.RangeDate;
+import org.querybyexample.jpa.Ranges.RangeInteger;
 import org.querybyexample.jpa.Ranges.RangeLocalDate;
 import org.querybyexample.jpa.Ranges.RangeLocalDateTime;
 
@@ -498,6 +499,21 @@ public class SearchParameters implements Serializable {
 		addRange(rangeDate);
 		return this;
 	}
+
+	public SearchParameters lower(SingularAttribute<?, Integer> field, Integer value) {
+		RangeInteger<?> rangeInteger = RangeInteger.rangeInteger(field);
+		rangeInteger.setTo(value);
+		addRange(rangeInteger);
+		return this;
+	}
+
+	public SearchParameters greather(SingularAttribute<?, Integer> field, Integer value) {
+		RangeInteger<?> rangeInteger = RangeInteger.rangeInteger(field);
+		rangeInteger.setFrom(value);
+		addRange(rangeInteger);
+		return this;
+	}
+
 
 	public void clearRanges() {
 		ranges.clear();

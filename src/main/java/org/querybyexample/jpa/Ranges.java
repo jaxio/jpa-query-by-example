@@ -150,13 +150,13 @@ public class Ranges {
 			return new RangeDate<T>(field);
 		}
 
-		public static <T> RangeDate<T> fromRangeDate(SingularAttribute<T, Date> field, Date from) {
+		public static <T> RangeDate<T> after(SingularAttribute<T, Date> field, Date from) {
 			RangeDate<T> rangeDate = new RangeDate<T>(field);
 			rangeDate.setFrom(from);
 			return rangeDate;
 		}
 
-		public static <T> RangeDate<T> toRangeDate(SingularAttribute<T, Date> field, Date to) {
+		public static <T> RangeDate<T> before(SingularAttribute<T, Date> field, Date to) {
 			RangeDate<T> rangeDate = new RangeDate<T>(field);
 			rangeDate.setTo(to);
 			return rangeDate;
@@ -180,6 +180,18 @@ public class Ranges {
 			return new RangeLocalDate<E>(field);
 		}
 
+		public static <E> RangeLocalDate<E> after(SingularAttribute<E, LocalDate> field, LocalDate from) {
+			RangeLocalDate<E> rangeLocalDate = new RangeLocalDate<E>(field);
+			rangeLocalDate.setFrom(from);
+			return rangeLocalDate;
+		}
+
+		public static <E> RangeLocalDate<E> before(SingularAttribute<E, LocalDate> field, LocalDate to) {
+			RangeLocalDate<E> rangeLocalDate = new RangeLocalDate<E>(field);
+			rangeLocalDate.setTo(to);
+			return rangeLocalDate;
+		}
+
 		public static <E> RangeLocalDate<E> rangeLocalDate(SingularAttribute<E, LocalDate> field, LocalDate from, LocalDate to) {
 			return new RangeLocalDate<E>(field, from, to);
 		}
@@ -196,6 +208,18 @@ public class Ranges {
 
 		public static <E> RangeLocalDateTime<E> rangeLocalDateTime(SingularAttribute<E, LocalDateTime> field) {
 			return new RangeLocalDateTime<E>(field);
+		}
+
+		public static <E> RangeLocalDateTime<E> after(SingularAttribute<E, LocalDateTime> field, LocalDateTime from) {
+			RangeLocalDateTime<E> rangeLocalDateTime = new RangeLocalDateTime<E>(field);
+			rangeLocalDateTime.setFrom(from);
+			return rangeLocalDateTime;
+		}
+
+		public static <E> RangeLocalDateTime<E> before(SingularAttribute<E, LocalDateTime> field, LocalDateTime to) {
+			RangeLocalDateTime<E> rangeLocalDateTime = new RangeLocalDateTime<E>(field);
+			rangeLocalDateTime.setTo(to);
+			return rangeLocalDateTime;
 		}
 
 		public static <E> RangeLocalDateTime<E> rangeLocalDateTime(SingularAttribute<E, LocalDateTime> field, LocalDateTime from, LocalDateTime to) {
