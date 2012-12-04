@@ -40,250 +40,260 @@ import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 
 /**
- * JPA 2 Generic DAO with find by example/range/pattern and CRUD support. 
+ * JPA 2 Generic DAO with find by example/range/pattern and CRUD support.
  */
 public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Serializable> {
 
-    @Inject
-    private ByExampleUtil byExampleUtil;
-    @Inject
-    private ByPatternUtil byPatternUtil;
-    @Inject
-    private NamedQueryUtil namedQueryUtil;
-    @PersistenceContext
-    private EntityManager entityManager;
+	@Inject
+	private ByExampleUtil byExampleUtil;
+	@Inject
+	private ByPatternUtil byPatternUtil;
+	@Inject
+	private NamedQueryUtil namedQueryUtil;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    private Class<E> type;
-    private Logger log;
-    private String cacheRegion;
+	private Class<E> type;
+	private Logger log;
+	private String cacheRegion;
 
-    protected EntityManager getEntityManager() {
-        return entityManager;
-    }
+	protected EntityManager getEntityManager() {
+		return entityManager;
+	}
 
-    protected ByExampleUtil getByExampleUtil() {
-        return byExampleUtil;
-    }
+	protected ByExampleUtil getByExampleUtil() {
+		return byExampleUtil;
+	}
 
-    protected ByPatternUtil getByPatternUtil() {
-        return byPatternUtil;
-    }
+	protected ByPatternUtil getByPatternUtil() {
+		return byPatternUtil;
+	}
 
-    protected NamedQueryUtil getNamedQueryUtil() {
-        return namedQueryUtil;
-    }
+	protected NamedQueryUtil getNamedQueryUtil() {
+		return namedQueryUtil;
+	}
 
-    /**
-     * This constructor needs the real type of the generic type E so it can be passed to the {@link EntityManager}.
-     */
-    public QueryByExample(Class<E> type) {
-        this.type = type;
-        this.log = Logger.getLogger(getClass());
-        this.cacheRegion = type.getCanonicalName();
-    }
+	/**
+	 * This constructor needs the real type of the generic type E so it can be passed to the {@link EntityManager}.
+	 */
+	public QueryByExample(Class<E> type) {
+		this.type = type;
+		this.log = Logger.getLogger(getClass());
+		this.cacheRegion = type.getCanonicalName();
+	}
 
-    /**
-     * Gets from the repository the E entity instance.
-     * 
-     * DAO for the local database will typically use the primary key or unique fields of the passed entity, while DAO for external repository may use a unique
-     * field present in the entity as they probably have no knowledge of the primary key. Hence, passing the entity as an argument instead of the primary key
-     * allows you to switch the DAO more easily.
-     * 
-     * @param entity an E instance having a primary key set
-     * @return the corresponding E persistent instance or null if none could be found.
-     */
-    public E get(E entity) {
-        if (entity == null) {
-            return null;
-        }
+	/**
+	 * Gets from the repository the E entity instance.
+	 * 
+	 * DAO for the local database will typically use the primary key or unique fields of the passed entity, while DAO for external repository may use a unique
+	 * field present in the entity as they probably have no knowledge of the primary key. Hence, passing the entity as an argument instead of the primary key
+	 * allows you to switch the DAO more easily.
+	 * 
+	 * @param entity an E instance having a primary key set
+	 * @return the corresponding E persistent instance or null if none could be found.
+	 */
+	public E get(E entity) {
+		if (entity == null) {
+			return null;
+		}
 
-        Serializable id = entity.getId();
-        if (id == null) {
-            return null;
-        }
+		Serializable id = entity.getId();
+		if (id == null) {
+			return null;
+		}
 
-        E entityFound = getEntityManager().find(type, id);
+		E entityFound = getEntityManager().find(type, id);
 
-        if (entityFound == null) {
-            log.warn("get returned null with pk=" + id);
-        }
+		if (entityFound == null) {
+			log.warn("get returned null with pk=" + id);
+		}
 
-        return entityFound;
-    }
+		return entityFound;
+	}
 
-    /**
-     * Find and load a list of E instance.
-     * 
-     * @param entity a sample entity whose non-null properties may be used as search hints
-     * @param searchParameters carries additional search information
-     * @return the entities matching the search.
-     */
-    @SuppressWarnings("unchecked")
-    public List<E> find(E entity, SearchParameters sp) {
-        if (sp.hasNamedQuery()) {
-            return getNamedQueryUtil().findByNamedQuery(sp);
-        }
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<E> criteriaQuery = builder.createQuery(type);
-        Root<E> root = criteriaQuery.from(type);
+	/**
+	 * Find and load a list of E instance.
+	 * 
+	 * @param entity a sample entity whose non-null properties may be used as search hints
+	 * @return the entities matching the search.
+	 */
+	public List<E> find(E entity) {
+		return find(entity, new SearchParameters());
+	}
 
-        // predicate
-        Predicate predicate = getPredicate(root, criteriaQuery, builder, entity, sp);
-        if (predicate != null) {
-            criteriaQuery = criteriaQuery.where(predicate);
-        }
+	/**
+	 * Find and load a list of E instance.
+	 * 
+	 * @param entity a sample entity whose non-null properties may be used as search hints
+	 * @param searchParameters carries additional search information
+	 * @return the entities matching the search.
+	 */
+	@SuppressWarnings("unchecked")
+	public List<E> find(E entity, SearchParameters sp) {
+		if (sp.hasNamedQuery()) {
+			return getNamedQueryUtil().findByNamedQuery(sp);
+		}
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<E> criteriaQuery = builder.createQuery(type);
+		Root<E> root = criteriaQuery.from(type);
 
-        // left join
-        if (sp.hasLeftJoinAttributes()) {
-            for (SingularAttribute<?, ?> arg : sp.getLeftJoinAttributes()) {
-                root.fetch((SingularAttribute<E, ?>) arg, JoinType.LEFT);
-            }
-        }
+		// predicate
+		Predicate predicate = getPredicate(root, criteriaQuery, builder, entity, sp);
+		if (predicate != null) {
+			criteriaQuery = criteriaQuery.where(predicate);
+		}
 
-        // order by
-        criteriaQuery.orderBy(buildJpaOrders(sp.getOrders(), root, builder));
+		// left join
+		if (sp.hasLeftJoinAttributes()) {
+			for (SingularAttribute<?, ?> arg : sp.getLeftJoinAttributes()) {
+				root.fetch((SingularAttribute<E, ?>) arg, JoinType.LEFT);
+			}
+		}
 
-        TypedQuery<E> typedQuery = entityManager.createQuery(criteriaQuery);
+		// order by
+		criteriaQuery.orderBy(buildJpaOrders(sp.getOrders(), root, builder));
 
-        // cache
-        setCacheHints(typedQuery, sp);
+		TypedQuery<E> typedQuery = entityManager.createQuery(criteriaQuery);
 
-        // pagination
-        if (sp.getFirstResult() >= 0) {
-            typedQuery.setFirstResult(sp.getFirstResult());
-        }
-        if (sp.getMaxResults() > 0) {
-            typedQuery.setMaxResults(sp.getMaxResults());
-        }
+		// cache
+		setCacheHints(typedQuery, sp);
 
-        // execution
-        List<E> entities = typedQuery.getResultList();
-        if (log.isDebugEnabled()) {
-            log.debug("Returned " + entities.size() + " elements");
-        }
+		// pagination
+		if (sp.getFirstResult() >= 0) {
+			typedQuery.setFirstResult(sp.getFirstResult());
+		}
+		if (sp.getMaxResults() > 0) {
+			typedQuery.setMaxResults(sp.getMaxResults());
+		}
 
-        return entities;
-    }
+		// execution
+		List<E> entities = typedQuery.getResultList();
+		if (log.isDebugEnabled()) {
+			log.debug("Returned " + entities.size() + " elements");
+		}
 
-    /**
-     * Count the number of E instances.
-     * 
-     * @param entity a sample entity whose non-null properties may be used as search hint
-     * @param searchParameters carries additional search information
-     * @return the number of entities matching the search.
-     */
-    public int findCount(E entity, SearchParameters sp) {
-        Validate.notNull(entity, "The entity cannot be null");
+		return entities;
+	}
 
-        if (sp.hasNamedQuery()) {
-            return getNamedQueryUtil().numberByNamedQuery(sp).intValue();
-        }
-        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+	/**
+	 * Count the number of E instances.
+	 * 
+	 * @param entity a sample entity whose non-null properties may be used as search hint
+	 * @param searchParameters carries additional search information
+	 * @return the number of entities matching the search.
+	 */
+	public int findCount(E entity, SearchParameters sp) {
+		Validate.notNull(entity, "The entity cannot be null");
 
-        CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
-        Root<E> root = criteriaQuery.from(type);
+		if (sp.hasNamedQuery()) {
+			return getNamedQueryUtil().numberByNamedQuery(sp).intValue();
+		}
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
-        // count
-        criteriaQuery = criteriaQuery.select(builder.count(root));
+		CriteriaQuery<Long> criteriaQuery = builder.createQuery(Long.class);
+		Root<E> root = criteriaQuery.from(type);
 
-        // predicate
-        Predicate predicate = getPredicate(root, criteriaQuery, builder, entity, sp);
-        if (predicate != null) {
-            criteriaQuery = criteriaQuery.where(predicate);
-        }
+		// count
+		criteriaQuery = criteriaQuery.select(builder.count(root));
 
-        TypedQuery<Long> typedQuery = entityManager.createQuery(criteriaQuery);
+		// predicate
+		Predicate predicate = getPredicate(root, criteriaQuery, builder, entity, sp);
+		if (predicate != null) {
+			criteriaQuery = criteriaQuery.where(predicate);
+		}
 
-        // cache
-        setCacheHints(typedQuery, sp);
+		TypedQuery<Long> typedQuery = entityManager.createQuery(criteriaQuery);
 
-        // execution
-        Long count = typedQuery.getSingleResult();
+		// cache
+		setCacheHints(typedQuery, sp);
 
-        if (count != null) {
-            return count.intValue();
-        } else {
-            log.warn("findCount returned null!");
-            return 0;
-        }
-    }
+		// execution
+		Long count = typedQuery.getSingleResult();
 
-    public E findUnique(E entity, SearchParameters sp) {
-        E result = findUniqueOrNone(entity, sp);
+		if (count != null) {
+			return count.intValue();
+		} else {
+			log.warn("findCount returned null!");
+			return 0;
+		}
+	}
 
-        if (result == null) {
-            throw new NoResultException("Developper: You expected 1 result but we found none ! sample: " + entity);
-        }
+	public E findUnique(E entity, SearchParameters sp) {
+		E result = findUniqueOrNone(entity, sp);
 
-        return result;
-    }
+		if (result == null) {
+			throw new NoResultException("Developper: You expected 1 result but we found none ! sample: " + entity);
+		}
 
-    /**
-     * We request at most 2, if there's more than one then we throw a  {@link NonUniqueResultException}
-     * @throws NonUniqueResultException
-     */
-    public E findUniqueOrNone(E entity, SearchParameters sp) {
-        // this code is an optimization to prevent using a count
-        sp.setFirstResult(0);
-        sp.setMaxResults(2);
-        List<E> results = find(entity, sp);
+		return result;
+	}
 
-        if (results == null || results.isEmpty()) {
-            return null;
-        }
+	/**
+	 * We request at most 2, if there's more than one then we throw a {@link NonUniqueResultException}
+	 * 
+	 * @throws NonUniqueResultException
+	 */
+	public E findUniqueOrNone(E entity, SearchParameters sp) {
+		// this code is an optimization to prevent using a count
+		sp.setFirstResult(0);
+		sp.setMaxResults(2);
+		List<E> results = find(entity, sp);
 
-        if (results.size() > 1) {
-            throw new NonUniqueResultException("Developper: You expected 1 result but we found more ! sample: " + entity);
-        }
+		if (results == null || results.isEmpty()) {
+			return null;
+		}
 
-        return results.iterator().next();
-    }
+		if (results.size() > 1) {
+			throw new NonUniqueResultException("Developper: You expected 1 result but we found more ! sample: " + entity);
+		}
 
-    protected <R> Predicate getPredicate(Root<E> root, CriteriaQuery<R> query, CriteriaBuilder builder, E entity, SearchParameters sp) {
-        return JpaUtil.andPredicate(builder, //
-                byRanges(root, query, builder, sp.getRanges(), type), //
-                byPropertySelectors(root, builder, sp.getPropertySelectors()), //
-                byEntitySelectors(root, builder, sp.getEntitySelectors()), //
-                getByExamplePredicate(root, entity, sp, builder), //
-                byPatternUtil.byPattern(root, query, builder, sp, type), //
-                getExtraPredicate(root, query, builder, entity, sp));
-    }
+		return results.iterator().next();
+	}
 
-    protected Predicate getByExamplePredicate(Root<E> root, E entity, SearchParameters sp, CriteriaBuilder builder) {
-        return byExampleUtil.byExampleOnEntity(root, entity, sp, builder);
-    }
+	protected <R> Predicate getPredicate(Root<E> root, CriteriaQuery<R> query, CriteriaBuilder builder, E entity, SearchParameters sp) {
+		return JpaUtil.andPredicate(builder, //
+				byRanges(root, query, builder, sp.getRanges(), type), //
+				byPropertySelectors(root, builder, sp.getPropertySelectors()), //
+				byEntitySelectors(root, builder, sp.getEntitySelectors()), //
+				getByExamplePredicate(root, entity, sp, builder), //
+				byPatternUtil.byPattern(root, query, builder, sp, type), //
+				getExtraPredicate(root, query, builder, entity, sp));
+	}
 
-    /**
-     * You may override this method to add a Predicate to the default find method.
-     */
-    protected <R> Predicate getExtraPredicate(Root<E> root, CriteriaQuery<R> query, CriteriaBuilder builder, E entity, SearchParameters sp) {
-        return null;
-    }
-    
-    
-    // -----------------
-    // Commons
-    // -----------------
+	protected Predicate getByExamplePredicate(Root<E> root, E entity, SearchParameters sp, CriteriaBuilder builder) {
+		return byExampleUtil.byExampleOnEntity(root, entity, sp, builder);
+	}
 
-    /**
-     * Set hints for 2d level cache.
-     */
-    protected void setCacheHints(TypedQuery<?> typedQuery, SearchParameters sp) {
-        if (sp.isCacheable()) {
-            typedQuery.setHint("org.hibernate.cacheable", true);
+	/**
+	 * You may override this method to add a Predicate to the default find method.
+	 */
+	protected <R> Predicate getExtraPredicate(Root<E> root, CriteriaQuery<R> query, CriteriaBuilder builder, E entity, SearchParameters sp) {
+		return null;
+	}
 
-            if (sp.hasCacheRegion()) {
-                typedQuery.setHint("org.hibernate.cacheRegion", sp.getCacheRegion());
-            } else {
-                typedQuery.setHint("org.hibernate.cacheRegion", cacheRegion);
-            }
-        }
-    }
+	// -----------------
+	// Commons
+	// -----------------
 
-    // -----------------
-    // Hibernate Search
-    // -----------------
-    protected String[] getIndexedFields() {
-        return new String[0];
-    }
+	/**
+	 * Set hints for 2d level cache.
+	 */
+	protected void setCacheHints(TypedQuery<?> typedQuery, SearchParameters sp) {
+		if (sp.isCacheable()) {
+			typedQuery.setHint("org.hibernate.cacheable", true);
+
+			if (sp.hasCacheRegion()) {
+				typedQuery.setHint("org.hibernate.cacheRegion", sp.getCacheRegion());
+			} else {
+				typedQuery.setHint("org.hibernate.cacheRegion", cacheRegion);
+			}
+		}
+	}
+
+	// -----------------
+	// Hibernate Search
+	// -----------------
+	protected String[] getIndexedFields() {
+		return new String[0];
+	}
 }

@@ -22,66 +22,65 @@ import java.util.List;
 import javax.persistence.metamodel.SingularAttribute;
 
 /**
- * Used to construct OR predicate for a property value. In other words you can search
- * all entities E having a given property set to one of the selected values.
+ * Used to construct OR predicate for a property value. In other words you can search all entities E having a given property set to one of the selected values.
  */
 public class PropertySelector<E, F> implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final SingularAttribute<E, F> field;
-    private List<F> selected = new ArrayList<F>();
+	private final SingularAttribute<E, F> field;
+	private List<F> selected = new ArrayList<F>();
 
-    /**
-     * @param field the property that should match one of the selected value.
-     */
-    public PropertySelector(SingularAttribute<E, F> field, F... values) {
-        this.field = field;
-        for(F value : values) {
-        	selected.add(value);
-        }
-    }
+	/**
+	 * @param field the property that should match one of the selected value.
+	 */
+	public PropertySelector(SingularAttribute<E, F> field, F... values) {
+		this.field = field;
+		for (F value : values) {
+			selected.add(value);
+		}
+	}
 
-    public SingularAttribute<E, F> getField() {
-        return field;
-    }
+	public SingularAttribute<E, F> getField() {
+		return field;
+	}
 
-    /**
-     * Get the possible candidates for property.
-     */
-    public List<F> getSelected() {
-        return selected;
-    }
+	/**
+	 * Get the possible candidates for property.
+	 */
+	public List<F> getSelected() {
+		return selected;
+	}
 
-    /**
-     * Set the possible candidates for property.
-     */
-    public void setSelected(List<F> selected) {
-        this.selected = selected;
-    }
-    
-    public PropertySelector<E, F> value(F v) {
-        selected.add(v);
-        return this;
-    }
+	/**
+	 * Set the possible candidates for property.
+	 */
+	public void setSelected(List<F> selected) {
+		this.selected = selected;
+	}
 
-    public boolean isNotEmpty() {
-        return selected != null && !selected.isEmpty();
-    }
+	public PropertySelector<E, F> value(F v) {
+		selected.add(v);
+		return this;
+	}
 
-    public void clearSelected() {
-        if (selected != null) {
-            selected.clear();
-        }
-    }
+	public boolean isNotEmpty() {
+		return selected != null && !selected.isEmpty();
+	}
 
-    public boolean isBoolean() {
-        return field != null && field.getJavaType().isAssignableFrom(Boolean.class);
-    }
+	public void clearSelected() {
+		if (selected != null) {
+			selected.clear();
+		}
+	}
 
-    /**
-     * {@link PropertySelector} builder
-     */
-    static public <E, F> PropertySelector<E, F> newPropertySelector(SingularAttribute<E, F> field, F... values) {
-        return new PropertySelector<E, F>(field, values);
-    }
+	public boolean isBoolean() {
+		return field != null && field.getJavaType().isAssignableFrom(Boolean.class);
+	}
+
+	/**
+	 * {@link PropertySelector} builder
+	 */
+	static public <E, F> PropertySelector<E, F> property(SingularAttribute<E, F> field, F... values) {
+		return new PropertySelector<E, F>(field, values);
+	}
 }

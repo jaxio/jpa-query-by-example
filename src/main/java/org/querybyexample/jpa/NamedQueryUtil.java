@@ -34,144 +34,144 @@ import org.apache.log4j.Logger;
 @Named
 @Singleton
 public class NamedQueryUtil {
-    private static final Logger log = Logger.getLogger(NamedQueryUtil.class);
+	private static final Logger log = Logger.getLogger(NamedQueryUtil.class);
 
-    private static final String NAMED_PARAMETER_NOW = "now";
+	private static final String NAMED_PARAMETER_NOW = "now";
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    public NamedQueryUtil() {
-    }
+	public NamedQueryUtil() {
+	}
 
-    public NamedQueryUtil(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+	public NamedQueryUtil(EntityManager entityManager) {
+		this.entityManager = entityManager;
+	}
 
-    protected EntityManager getEntityManager() {
-        return entityManager;
-    }
+	protected EntityManager getEntityManager() {
+		return entityManager;
+	}
 
-    public <T> List<T> findByNamedQuery(SearchParameters sp) {
-        if (sp == null || !sp.hasNamedQuery()) {
-            throw new IllegalArgumentException("searchParameters must be non null and must have a namedQuery");
-        }
+	public <T> List<T> findByNamedQuery(SearchParameters sp) {
+		if (sp == null || !sp.hasNamedQuery()) {
+			throw new IllegalArgumentException("searchParameters must be non null and must have a namedQuery");
+		}
 
-        Query query = entityManager.createNamedQuery(sp.getNamedQuery());
-        String queryString = getQueryString(query);
+		Query query = entityManager.createNamedQuery(sp.getNamedQuery());
+		String queryString = getQueryString(query);
 
-        // append order by if needed
-        if (queryString != null && sp.hasOrders()) {
-            // create the sql restriction clausis
-            StringBuilder orderClausis = new StringBuilder("order by ");
-            boolean first = true;
-            for (OrderBy orderBy : sp.getOrders()) {
-                if (!first) {
-                    orderClausis.append(", ");
-                }
-                orderClausis.append(orderBy.getColumn());
-                orderClausis.append(orderBy.isOrderDesc() ? " desc" : " asc");
-                first = false;
-            }
+		// append order by if needed
+		if (queryString != null && sp.hasOrders()) {
+			// create the sql restriction clausis
+			StringBuilder orderClausis = new StringBuilder("order by ");
+			boolean first = true;
+			for (OrderBy orderBy : sp.getOrders()) {
+				if (!first) {
+					orderClausis.append(", ");
+				}
+				orderClausis.append(orderBy.getColumn());
+				orderClausis.append(orderBy.isOrderDesc() ? " desc" : " asc");
+				first = false;
+			}
 
-            if (log.isDebugEnabled()) {
-                log.debug("appending: [" + orderClausis.toString() + "] to " + queryString);
-            }
+			if (log.isDebugEnabled()) {
+				log.debug("appending: [" + orderClausis.toString() + "] to " + queryString);
+			}
 
-            query = recreateQuery(query, queryString + " " + orderClausis.toString());
-        }
+			query = recreateQuery(query, queryString + " " + orderClausis.toString());
+		}
 
-        // pagination
-        if (sp.getFirstResult() >= 0) {
-            query.setFirstResult(sp.getFirstResult());
-        }
-        if (sp.getMaxResults() > 0) {
-            query.setMaxResults(sp.getMaxResults());
-        }
+		// pagination
+		if (sp.getFirstResult() >= 0) {
+			query.setFirstResult(sp.getFirstResult());
+		}
+		if (sp.getMaxResults() > 0) {
+			query.setMaxResults(sp.getMaxResults());
+		}
 
-        // named parameters
-        setQueryParameters(query, sp);
+		// named parameters
+		setQueryParameters(query, sp);
 
-        // execute
-        @SuppressWarnings("unchecked")
-        List<T> result = (List<T>) query.getResultList();
+		// execute
+		@SuppressWarnings("unchecked")
+		List<T> result = (List<T>) query.getResultList();
 
-        if (result != null && log.isDebugEnabled()) {
-            log.debug(sp.getNamedQuery() + " returned a List of size: " + result.size());
-        }
+		if (result != null && log.isDebugEnabled()) {
+			log.debug(sp.getNamedQuery() + " returned a List of size: " + result.size());
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    @SuppressWarnings("unchecked")
-    public <T> T byNamedQuery(SearchParameters sp) {
-        return (T) objectByNamedQuery(sp);
-    }
+	@SuppressWarnings("unchecked")
+	public <T> T byNamedQuery(SearchParameters sp) {
+		return (T) objectByNamedQuery(sp);
+	}
 
-    public Number numberByNamedQuery(SearchParameters sp) {
-        return (Number) objectByNamedQuery(sp);
-    }
+	public Number numberByNamedQuery(SearchParameters sp) {
+		return (Number) objectByNamedQuery(sp);
+	}
 
-    public Object objectByNamedQuery(SearchParameters sp) {
-        if (sp == null || !sp.hasNamedQuery()) {
-            throw new IllegalStateException("Invalid search template provided: could not determine which namedQuery to use");
-        }
+	public Object objectByNamedQuery(SearchParameters sp) {
+		if (sp == null || !sp.hasNamedQuery()) {
+			throw new IllegalStateException("Invalid search template provided: could not determine which namedQuery to use");
+		}
 
-        Query query = entityManager.createNamedQuery(sp.getNamedQuery());
-        String queryString = getQueryString(query);
+		Query query = entityManager.createNamedQuery(sp.getNamedQuery());
+		String queryString = getQueryString(query);
 
-        // append select count if needed
-        if (queryString != null && queryString.toLowerCase().startsWith("from") && !queryString.toLowerCase().contains("count(")) {
-            query = recreateQuery(query, "select count(*) " + queryString);
-        }
+		// append select count if needed
+		if (queryString != null && queryString.toLowerCase().startsWith("from") && !queryString.toLowerCase().contains("count(")) {
+			query = recreateQuery(query, "select count(*) " + queryString);
+		}
 
-        setQueryParameters(query, sp);
+		setQueryParameters(query, sp);
 
-        if (log.isDebugEnabled()) {
-            log.debug("objectNamedQuery " + sp.toString());
-        }
+		if (log.isDebugEnabled()) {
+			log.debug("objectNamedQuery " + sp.toString());
+		}
 
-        // execute
-        Object result = query.getSingleResult();
+		// execute
+		Object result = query.getSingleResult();
 
-        if (log.isDebugEnabled()) {
-            log.debug(sp.getNamedQuery() + " returned a " + (result == null ? "null" : result.getClass()) + " object");
-            if (result instanceof Number) {
-                log.debug(sp.getNamedQuery() + " returned a number with value : " + result);
-            }
-        }
+		if (log.isDebugEnabled()) {
+			log.debug(sp.getNamedQuery() + " returned a " + (result == null ? "null" : result.getClass()) + " object");
+			if (result instanceof Number) {
+				log.debug(sp.getNamedQuery() + " returned a number with value : " + result);
+			}
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    private void setQueryParameters(Query query, SearchParameters sp) {
-        // add default parameter if specified in the named query
-        for (Parameter<?> p : query.getParameters()) {
-            if (NAMED_PARAMETER_NOW.equals(p.getName())) {
-                query.setParameter(NAMED_PARAMETER_NOW, Calendar.getInstance().getTime());
-            }
-        }
+	private void setQueryParameters(Query query, SearchParameters sp) {
+		// add default parameter if specified in the named query
+		for (Parameter<?> p : query.getParameters()) {
+			if (NAMED_PARAMETER_NOW.equals(p.getName())) {
+				query.setParameter(NAMED_PARAMETER_NOW, Calendar.getInstance().getTime());
+			}
+		}
 
-        // add parameters for the named query
-        for (String paramName : sp.getNamedQueryParameters().keySet()) {
-            query.setParameter(paramName, sp.getNamedQueryParameter(paramName));
-        }
-    }
+		// add parameters for the named query
+		for (String paramName : sp.getNamedQueryParameters().keySet()) {
+			query.setParameter(paramName, sp.getNamedQueryParameter(paramName));
+		}
+	}
 
-    /**
-     * If the named query has the "query" hint, it uses the hint value (which must be jpa QL) to create a new query and append to it the proper order by clause.
-     */
-    private String getQueryString(Query query) {
-        Map<String, Object> hints = query.getHints();
-        return hints != null ? (String) hints.get("query") : null;
-    }
+	/**
+	 * If the named query has the "query" hint, it uses the hint value (which must be jpa QL) to create a new query and append to it the proper order by clause.
+	 */
+	private String getQueryString(Query query) {
+		Map<String, Object> hints = query.getHints();
+		return hints != null ? (String) hints.get("query") : null;
+	}
 
-    private Query recreateQuery(Query current, String newSqlString) {
-        Query result = entityManager.createQuery(newSqlString);
-        Map<String, Object> hints = current.getHints();
-        for (String hintName : hints.keySet()) {
-            result.setHint(hintName, hints.get(hintName));
-        }
-        return result;
-    }
+	private Query recreateQuery(Query current, String newSqlString) {
+		Query result = entityManager.createQuery(newSqlString);
+		Map<String, Object> hints = current.getHints();
+		for (String hintName : hints.keySet()) {
+			result.setHint(hintName, hints.get(hintName));
+		}
+		return result;
+	}
 }

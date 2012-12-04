@@ -27,26 +27,26 @@ import javax.persistence.criteria.Root;
  */
 public class ByEntitySelectorUtil {
 
-    public static <E> Predicate byEntitySelectors(Root<E> root, CriteriaBuilder builder, final List<EntitySelector<?, ? extends Identifiable<?>, ?>> selectors) {
-        List<Predicate> predicates = new ArrayList<Predicate>();
+	public static <E> Predicate byEntitySelectors(Root<E> root, CriteriaBuilder builder, final List<EntitySelector<?, ? extends Identifiable<?>, ?>> selectors) {
+		List<Predicate> predicates = new ArrayList<Predicate>();
 
-        for (EntitySelector<?, ? extends Identifiable<?>, ?> s : selectors) {
-            @SuppressWarnings("unchecked")
-            EntitySelector<E, ? extends Identifiable<?>, ?> selector = (EntitySelector<E, ? extends Identifiable<?>, ?>) s;
+		for (EntitySelector<?, ? extends Identifiable<?>, ?> s : selectors) {
+			@SuppressWarnings("unchecked")
+			EntitySelector<E, ? extends Identifiable<?>, ?> selector = (EntitySelector<E, ? extends Identifiable<?>, ?>) s;
 
-            if (selector.isNotEmpty()) {
-                List<Predicate> selectorPredicates = new ArrayList<Predicate>();
+			if (selector.isNotEmpty()) {
+				List<Predicate> selectorPredicates = new ArrayList<Predicate>();
 
-                for (Identifiable<?> selection : selector.getSelected()) {
-                    if (selector.getField() != null) {
-                        selectorPredicates.add(builder.equal(root.get(selector.getField()), selection.getId()));
-                    } else {
-                        selectorPredicates.add(builder.equal(root.get(selector.getCpkField()).get(selector.getCpkInnerField().getName()), selection.getId()));
-                    }
-                }
-                predicates.add(JpaUtil.orPredicate(builder, selectorPredicates));
-            }
-        }
-        return JpaUtil.andPredicate(builder, predicates);
-    }
+				for (Identifiable<?> selection : selector.getSelected()) {
+					if (selector.getField() != null) {
+						selectorPredicates.add(builder.equal(root.get(selector.getField()), selection.getId()));
+					} else {
+						selectorPredicates.add(builder.equal(root.get(selector.getCpkField()).get(selector.getCpkInnerField().getName()), selection.getId()));
+					}
+				}
+				predicates.add(JpaUtil.orPredicate(builder, selectorPredicates));
+			}
+		}
+		return JpaUtil.andPredicate(builder, predicates);
+	}
 }

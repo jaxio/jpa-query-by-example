@@ -16,5 +16,5 @@
 package org.querybyexample.jpa;
 
 public enum OrderByDirection {
-    ASC, DESC;
+	ASC, DESC;
 }

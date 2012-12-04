@@ -31,43 +31,43 @@ import javax.persistence.criteria.Root;
  */
 public class ByRangeUtil {
 
-    public static <E> Predicate byRanges(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, final List<Range<?, ?>> ranges, final Class<E> type) {
+	public static <E> Predicate byRanges(Root<E> root, CriteriaQuery<?> query, CriteriaBuilder builder, final List<Range<?, ?>> ranges, final Class<E> type) {
 
-        List<Predicate> predicates = new ArrayList<Predicate>();
-        for (Range<?, ?> r : ranges) {
-            @SuppressWarnings("unchecked")
-            Range<E, ?> range = (Range<E, ?>) r;
-            if (range.isSet()) {
-                Predicate rangePredicate = buildRangePredicate(range, root, builder);
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		for (Range<?, ?> r : ranges) {
+			@SuppressWarnings("unchecked")
+			Range<E, ?> range = (Range<E, ?>) r;
+			if (range.isSet()) {
+				Predicate rangePredicate = buildRangePredicate(range, root, builder);
 
-                if (rangePredicate != null) {
-                    if (!range.isIncludeNullSet() || range.getIncludeNull() == FALSE) {
-                        predicates.add(rangePredicate);
-                    } else {
-                        predicates.add(builder.or(rangePredicate, builder.isNull(root.get(range.getField()))));
-                    }
-                }
+				if (rangePredicate != null) {
+					if (!range.isIncludeNullSet() || range.getIncludeNull() == FALSE) {
+						predicates.add(rangePredicate);
+					} else {
+						predicates.add(builder.or(rangePredicate, builder.isNull(root.get(range.getField()))));
+					}
+				}
 
-                // no range at all, let's take the opportunity to keep only null...
-                if (TRUE == range.getIncludeNull()) {
-                    predicates.add(builder.isNull(root.get(range.getField())));
-                } else if (FALSE == range.getIncludeNull()) {
-                    predicates.add(builder.isNotNull(root.get(range.getField())));
-                }
-            }
-        }
+				// no range at all, let's take the opportunity to keep only null...
+				if (TRUE == range.getIncludeNull()) {
+					predicates.add(builder.isNull(root.get(range.getField())));
+				} else if (FALSE == range.getIncludeNull()) {
+					predicates.add(builder.isNotNull(root.get(range.getField())));
+				}
+			}
+		}
 
-        return JpaUtil.andPredicate(builder, predicates);
-    }
+		return JpaUtil.andPredicate(builder, predicates);
+	}
 
-    private static <D extends Comparable<? super D>, E> Predicate buildRangePredicate(Range<E, D> range, Root<E> root, CriteriaBuilder builder) {
-        if (range.isBetween()) {
-            return builder.between(root.get(range.getField()), range.getFrom(), range.getTo());
-        } else if (range.isFromSet()) {
-            return builder.greaterThanOrEqualTo(root.get(range.getField()), range.getFrom());
-        } else if (range.isToSet()) {
-            return builder.lessThanOrEqualTo(root.get(range.getField()), range.getTo());
-        }
-        return null;
-    }
+	private static <D extends Comparable<? super D>, E> Predicate buildRangePredicate(Range<E, D> range, Root<E> root, CriteriaBuilder builder) {
+		if (range.isBetween()) {
+			return builder.between(root.get(range.getField()), range.getFrom(), range.getTo());
+		} else if (range.isFromSet()) {
+			return builder.greaterThanOrEqualTo(root.get(range.getField()), range.getFrom());
+		} else if (range.isToSet()) {
+			return builder.lessThanOrEqualTo(root.get(range.getField()), range.getTo());
+		}
+		return null;
+	}
 }

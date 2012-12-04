@@ -37,35 +37,35 @@ import javax.persistence.metamodel.SingularAttribute;
 @Singleton
 public class ByPatternUtil {
 
-    @PersistenceContext
-    private EntityManager em;
+	@PersistenceContext
+	private EntityManager em;
 
-    /**
-     * Lookup entities having at least one String attribute matching the passed sp's pattern
-     */
-    public <T> Predicate byPattern(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder, final SearchParameters sp, final Class<T> type) {
-        if (!sp.hasSearchPattern()) {
-            return null;
-        }
+	/**
+	 * Lookup entities having at least one String attribute matching the passed sp's pattern
+	 */
+	public <T> Predicate byPattern(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder, final SearchParameters sp, final Class<T> type) {
+		if (!sp.hasSearchPattern()) {
+			return null;
+		}
 
-        List<Predicate> predicates = new ArrayList<Predicate>();
-        EntityType<T> entity = em.getMetamodel().entity(type);
-        String pattern = sp.getSearchPattern();
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		EntityType<T> entity = em.getMetamodel().entity(type);
+		String pattern = sp.getSearchPattern();
 
-        for (Attribute<T, ?> attr : entity.getDeclaredSingularAttributes()) {
-            if (attr.getPersistentAttributeType() == MANY_TO_ONE || attr.getPersistentAttributeType() == ONE_TO_ONE) {
-                continue;
-            }
+		for (Attribute<T, ?> attr : entity.getDeclaredSingularAttributes()) {
+			if (attr.getPersistentAttributeType() == MANY_TO_ONE || attr.getPersistentAttributeType() == ONE_TO_ONE) {
+				continue;
+			}
 
-            if (attr.getJavaType() == String.class) {
-                predicates.add(JpaUtil.stringPredicate(root.get(attribute(entity, attr)), pattern, sp, builder));
-            }
-        }
+			if (attr.getJavaType() == String.class) {
+				predicates.add(JpaUtil.stringPredicate(root.get(attribute(entity, attr)), pattern, sp, builder));
+			}
+		}
 
-        return JpaUtil.orPredicate(builder, predicates);
-    }
+		return JpaUtil.orPredicate(builder, predicates);
+	}
 
-    private static <T> SingularAttribute<T, String> attribute(EntityType<T> entity, Attribute<T, ?> attr) {
-        return entity.getDeclaredSingularAttribute(attr.getName(), String.class);
-    }
+	private static <T> SingularAttribute<T, String> attribute(EntityType<T> entity, Attribute<T, ?> attr) {
+		return entity.getDeclaredSingularAttribute(attr.getName(), String.class);
+	}
 }

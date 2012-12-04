@@ -21,95 +21,104 @@ import java.util.List;
 
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.apache.commons.lang.Validate;
+
 /**
- * Used to construct OR predicate for a single foreign key value. In other words you can search
- * all entities E having their x-to-one association value set to one of the selected values.
- * To avoid a join we rely on the foreign key field, not the association itself.
+ * Used to construct OR predicate for a single foreign key value. In other words you can search all entities E having their x-to-one association value set to
+ * one of the selected values. To avoid a join we rely on the foreign key field, not the association itself.
  */
 public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializable> implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final SingularAttribute<E, TPK> field;
-    private final SingularAttribute<E, ?> cpkField;
-    private final SingularAttribute<?, TPK> cpkInnerField;
-    private List<T> selected = new ArrayList<T>();
+	private final SingularAttribute<E, TPK> field;
+	private final SingularAttribute<E, ?> cpkField;
+	private final SingularAttribute<?, TPK> cpkInnerField;
+	private List<T> selected = new ArrayList<T>();
 
-    /**
-     * @param field the property holding an foreign key.
-     */
-    public EntitySelector(SingularAttribute<E, TPK> field, T... values) {
-        this.field = field;
-        this.cpkField = null;
-        this.cpkInnerField = null;
-        for(T value : values) {
-        	selected.add(value);
-        }
-    }
+	/**
+	 * @param field the property holding an foreign key.
+	 */
+	public EntitySelector(SingularAttribute<E, TPK> field) {
+		this.field = field;
+		this.cpkField = null;
+		this.cpkInnerField = null;
+	}
 
-    public EntitySelector(SingularAttribute<E, ?> cpkField, SingularAttribute<?, TPK> cpkInnerField) {
-        this.cpkField = cpkField;
-        this.cpkInnerField = cpkInnerField;
-        this.field = null; // not used        
-    }
+	public EntitySelector(SingularAttribute<E, TPK> field, T... values) {
+		this(field);
+		for (T value : values) {
+			Validate.notNull(value);
+			selected.add(value);
+		}
+	}
 
-    public SingularAttribute<E, TPK> getField() {
-        return field;
-    }
+	public EntitySelector(SingularAttribute<E, ?> cpkField, SingularAttribute<?, TPK> cpkInnerField) {
+		this.cpkField = cpkField;
+		this.cpkInnerField = cpkInnerField;
+		this.field = null; // not used
+	}
 
-    public SingularAttribute<E, ?> getCpkField() {
-        return cpkField;
-    }
+	public SingularAttribute<E, TPK> getField() {
+		return field;
+	}
 
-    public SingularAttribute<?, TPK> getCpkInnerField() {
-        return cpkInnerField;
-    }
+	public SingularAttribute<E, ?> getCpkField() {
+		return cpkField;
+	}
 
-    /**
-     * Get the possible candidates for the x-to-one association.
-     */
-    public List<T> getSelected() {
-        return selected;
-    }
+	public SingularAttribute<?, TPK> getCpkInnerField() {
+		return cpkInnerField;
+	}
 
-    /**
-     * Set the possible candidates for the x-to-one association.
-     */
-    public void setSelected(List<T> selected) {
-        this.selected = selected;
-    }
+	/**
+	 * Get the possible candidates for the x-to-one association.
+	 */
+	public List<T> getSelected() {
+		return selected;
+	}
 
-    public void selected(T... selected) {
-    	List<T> t = new ArrayList<T>();
-    	for(T s : selected){
-    		t.add(s);
-    	}
-        this.selected = t;
-    }
+	/**
+	 * Set the possible candidates for the x-to-one association.
+	 */
+	public void setSelected(List<T> selected) {
+		this.selected = selected;
+	}
 
-    public boolean isNotEmpty() {
-        return selected != null && !selected.isEmpty();
-    }
+	public void selected(T... selected) {
+		List<T> t = new ArrayList<T>();
+		for (T s : selected) {
+			t.add(s);
+		}
+		this.selected = t;
+	}
 
-    public void clearSelected() {
-        if (selected != null) {
-            selected.clear();
-        }
-    }
+	public boolean isNotEmpty() {
+		return selected != null && !selected.isEmpty();
+	}
 
-    /**
-     * Import statically this helper for smooth instanciation.
-     */
-    static public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> EntitySelector<E2, T2, TPK2> newEntitySelector(
-            SingularAttribute<E2, TPK2> field, T2... values) {
-        return new EntitySelector<E2, T2, TPK2>(field, values);
-    }
+	public void clearSelected() {
+		if (selected != null) {
+			selected.clear();
+		}
+	}
 
-    /**
-     * Import statically this helper for smooth instanciation.
-     * It is used in the case where the PK is composite AND the pk member(s) are/is also a foreign key. 
-     */
-    static public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable, CPK2> EntitySelector<E2, T2, TPK2> newEntitySelectorInCpk(
-            SingularAttribute<E2, CPK2> cpkField, SingularAttribute<CPK2, TPK2> cpkInnerField) {
-        return new EntitySelector<E2, T2, TPK2>(cpkField, cpkInnerField);
-    }
+	/**
+	 * Import statically this helper for smooth instanciation.
+	 */
+	static public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> EntitySelector<E2, T2, TPK2> entitySelector(SingularAttribute<E2, TPK2> field) {
+		return new EntitySelector<E2, T2, TPK2>(field);
+	}
+
+	static public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> EntitySelector<E2, T2, TPK2> entitySelector(SingularAttribute<E2, TPK2> field,
+			T2... values) {
+		return new EntitySelector<E2, T2, TPK2>(field, values);
+	}
+
+	/**
+	 * Import statically this helper for smooth instanciation. It is used in the case where the PK is composite AND the pk member(s) are/is also a foreign key.
+	 */
+	static public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable, CPK2> EntitySelector<E2, T2, TPK2> newEntitySelectorInCpk(
+			SingularAttribute<E2, CPK2> cpkField, SingularAttribute<CPK2, TPK2> cpkInnerField) {
+		return new EntitySelector<E2, T2, TPK2>(cpkField, cpkInnerField);
+	}
 }

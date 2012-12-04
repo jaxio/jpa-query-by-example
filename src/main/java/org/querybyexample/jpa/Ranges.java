@@ -150,19 +150,19 @@ public class Ranges {
 			return new RangeDate<T>(field);
 		}
 
-		public static <T> RangeDate<T> newFromRangeDate(SingularAttribute<T, Date> field, Date from) {
+		public static <T> RangeDate<T> fromRangeDate(SingularAttribute<T, Date> field, Date from) {
 			RangeDate<T> rangeDate = new RangeDate<T>(field);
 			rangeDate.setFrom(from);
 			return rangeDate;
 		}
 
-		public static <T> RangeDate<T> newToRangeDate(SingularAttribute<T, Date> field, Date to) {
+		public static <T> RangeDate<T> toRangeDate(SingularAttribute<T, Date> field, Date to) {
 			RangeDate<T> rangeDate = new RangeDate<T>(field);
 			rangeDate.setTo(to);
 			return rangeDate;
 		}
 
-		public static <T> RangeDate<T> newRangeDate(SingularAttribute<T, Date> field, Date from, Date to) {
+		public static <T> RangeDate<T> rangeDate(SingularAttribute<T, Date> field, Date from, Date to) {
 			return new RangeDate<T>(field, from, to);
 		}
 	}

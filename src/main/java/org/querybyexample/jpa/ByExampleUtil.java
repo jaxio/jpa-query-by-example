@@ -45,131 +45,131 @@ import javax.persistence.metamodel.SingularAttribute;
 @Named
 @Singleton
 public class ByExampleUtil {
-    @PersistenceContext
-    private EntityManager em;
+	@PersistenceContext
+	private EntityManager em;
 
-    public <T extends Identifiable<?>> Predicate byExampleOnEntity(Root<T> rootPath, final T entityValue, SearchParameters sp, CriteriaBuilder builder) {
-        if (entityValue == null) {
-            return null;
-        }
+	public <T extends Identifiable<?>> Predicate byExampleOnEntity(Root<T> rootPath, final T entityValue, SearchParameters sp, CriteriaBuilder builder) {
+		if (entityValue == null) {
+			return null;
+		}
 
-        Class<T> type = rootPath.getModel().getBindableJavaType();
-        ManagedType<T> mt = em.getMetamodel().entity(type);
+		Class<T> type = rootPath.getModel().getBindableJavaType();
+		ManagedType<T> mt = em.getMetamodel().entity(type);
 
-        List<Predicate> predicates = new ArrayList<Predicate>();
-        predicates.addAll(byExample(mt, rootPath, entityValue, sp, builder));
-        try {
-            if (mt.getAttribute("id").getPersistentAttributeType().compareTo(EMBEDDED) == 0) {
-                predicates.addAll(byExampleOnCompositePk(rootPath, entityValue, sp, builder));
-            }
-        } catch (IllegalArgumentException iae) {            
-        }
-        predicates.addAll(byExampleOnXToOne(mt, rootPath, entityValue, sp, builder)); // 1 level deep only
-        predicates.addAll(byExampleOnManyToMany(mt, rootPath, entityValue, sp, builder));
-        return JpaUtil.andPredicate(builder, predicates);
-    }
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		predicates.addAll(byExample(mt, rootPath, entityValue, sp, builder));
+		try {
+			if (mt.getAttribute("id").getPersistentAttributeType().compareTo(EMBEDDED) == 0) {
+				predicates.addAll(byExampleOnCompositePk(rootPath, entityValue, sp, builder));
+			}
+		} catch (IllegalArgumentException iae) {
+		}
+		predicates.addAll(byExampleOnXToOne(mt, rootPath, entityValue, sp, builder)); // 1 level deep only
+		predicates.addAll(byExampleOnManyToMany(mt, rootPath, entityValue, sp, builder));
+		return JpaUtil.andPredicate(builder, predicates);
+	}
 
-    protected <T extends Identifiable<?>> List<Predicate> byExampleOnCompositePk(Root<T> root, T entity, SearchParameters sp, CriteriaBuilder builder) {
-        String compositePropertyName = "id";
-        List<Predicate> result = new ArrayList<Predicate>();
-        if (compositePropertyName != null) {
-            result.add(byExampleOnEmbeddable(root.get(compositePropertyName), entity.getId(), sp, builder));
-        }
-        return result;
-    }
+	protected <T extends Identifiable<?>> List<Predicate> byExampleOnCompositePk(Root<T> root, T entity, SearchParameters sp, CriteriaBuilder builder) {
+		String compositePropertyName = "id";
+		List<Predicate> result = new ArrayList<Predicate>();
+		if (compositePropertyName != null) {
+			result.add(byExampleOnEmbeddable(root.get(compositePropertyName), entity.getId(), sp, builder));
+		}
+		return result;
+	}
 
-    public <E> Predicate byExampleOnEmbeddable(Path<E> embeddablePath, final E embeddableValue, SearchParameters sp, CriteriaBuilder builder) {
-        if (embeddableValue == null) {
-            return null;
-        }
+	public <E> Predicate byExampleOnEmbeddable(Path<E> embeddablePath, final E embeddableValue, SearchParameters sp, CriteriaBuilder builder) {
+		if (embeddableValue == null) {
+			return null;
+		}
 
-        Class<E> type = embeddablePath.getModel().getBindableJavaType();
-        ManagedType<E> mt = em.getMetamodel().embeddable(type); // note: calling .managedType() does not work
+		Class<E> type = embeddablePath.getModel().getBindableJavaType();
+		ManagedType<E> mt = em.getMetamodel().embeddable(type); // note: calling .managedType() does not work
 
-        return JpaUtil.andPredicate(builder, byExample(mt, embeddablePath, embeddableValue, sp, builder));
-    }
+		return JpaUtil.andPredicate(builder, byExample(mt, embeddablePath, embeddableValue, sp, builder));
+	}
 
-    /**
-     * Add a predicate for each simple property whose value is not null.
-     */
-    public <T> List<Predicate> byExample(ManagedType<T> mt, Path<T> mtPath, final T mtValue, SearchParameters sp, CriteriaBuilder builder) {
-        List<Predicate> predicates = new ArrayList<Predicate>();
-        for (SingularAttribute<? super T, ?> attr : mt.getSingularAttributes()) {
-            if (attr.getPersistentAttributeType() == MANY_TO_ONE //
-                    || attr.getPersistentAttributeType() == ONE_TO_ONE //
-                    || attr.getPersistentAttributeType() == EMBEDDED) {
-                continue;
-            }
+	/**
+	 * Add a predicate for each simple property whose value is not null.
+	 */
+	public <T> List<Predicate> byExample(ManagedType<T> mt, Path<T> mtPath, final T mtValue, SearchParameters sp, CriteriaBuilder builder) {
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		for (SingularAttribute<? super T, ?> attr : mt.getSingularAttributes()) {
+			if (attr.getPersistentAttributeType() == MANY_TO_ONE //
+					|| attr.getPersistentAttributeType() == ONE_TO_ONE //
+					|| attr.getPersistentAttributeType() == EMBEDDED) {
+				continue;
+			}
 
-            Object attrValue = getValue(mtValue, attr);
-            if (attrValue != null) {
-                if (attr.getJavaType() == String.class) {
-                    if (isNotEmpty((String) attrValue)) {
-                        predicates.add(JpaUtil.stringPredicate(mtPath.get(stringAttribute(mt, attr)), attrValue, sp, builder));
-                    }
-                } else {
-                    predicates.add(builder.equal(mtPath.get(attribute(mt, attr)), attrValue));
-                }
-            }
-        }
-        return predicates;
-    }
+			Object attrValue = getValue(mtValue, attr);
+			if (attrValue != null) {
+				if (attr.getJavaType() == String.class) {
+					if (isNotEmpty((String) attrValue)) {
+						predicates.add(JpaUtil.stringPredicate(mtPath.get(stringAttribute(mt, attr)), attrValue, sp, builder));
+					}
+				} else {
+					predicates.add(builder.equal(mtPath.get(attribute(mt, attr)), attrValue));
+				}
+			}
+		}
+		return predicates;
+	}
 
-    /**
-     * Invoke byExample method for each not null x-to-one association when their pk is not set. This allows you to search entities based on an associated
-     * entity's properties value.
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends Identifiable<?>, M2O extends Identifiable<?>> List<Predicate> byExampleOnXToOne(ManagedType<T> mt, Root<T> mtPath, final T mtValue,
-            SearchParameters sp, CriteriaBuilder builder) {
-        List<Predicate> predicates = new ArrayList<Predicate>();
-        for (SingularAttribute<? super T, ?> attr : mt.getSingularAttributes()) {
-            if (attr.getPersistentAttributeType() == MANY_TO_ONE || attr.getPersistentAttributeType() == ONE_TO_ONE) { //
-                M2O m2oValue = (M2O) getValue(mtValue, mt.getAttribute(attr.getName()));
-                if (m2oValue != null && !mtValue.isIdSet()) {
-                    Class<M2O> m2oType = (Class<M2O>) attr.getBindableJavaType();
-                    ManagedType<M2O> m2oMt = em.getMetamodel().entity(m2oType);
-                    Path<M2O> m2oPath = (Path<M2O>) mtPath.get(attr);
-                    predicates.addAll(byExample(m2oMt, m2oPath, m2oValue, sp, builder));
-                }
-            }
-        }
-        return predicates;
-    }
+	/**
+	 * Invoke byExample method for each not null x-to-one association when their pk is not set. This allows you to search entities based on an associated
+	 * entity's properties value.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends Identifiable<?>, M2O extends Identifiable<?>> List<Predicate> byExampleOnXToOne(ManagedType<T> mt, Root<T> mtPath, final T mtValue,
+			SearchParameters sp, CriteriaBuilder builder) {
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		for (SingularAttribute<? super T, ?> attr : mt.getSingularAttributes()) {
+			if (attr.getPersistentAttributeType() == MANY_TO_ONE || attr.getPersistentAttributeType() == ONE_TO_ONE) { //
+				M2O m2oValue = (M2O) getValue(mtValue, mt.getAttribute(attr.getName()));
+				if (m2oValue != null && !mtValue.isIdSet()) {
+					Class<M2O> m2oType = (Class<M2O>) attr.getBindableJavaType();
+					ManagedType<M2O> m2oMt = em.getMetamodel().entity(m2oType);
+					Path<M2O> m2oPath = (Path<M2O>) mtPath.get(attr);
+					predicates.addAll(byExample(m2oMt, m2oPath, m2oValue, sp, builder));
+				}
+			}
+		}
+		return predicates;
+	}
 
-    /**
-     * Construct a join predicate on collection (eg many to many, List)
-     */
-    public <T> List<Predicate> byExampleOnManyToMany(ManagedType<T> mt, Root<T> mtPath, final T mtValue, SearchParameters sp, CriteriaBuilder builder) {
-        List<Predicate> predicates = new ArrayList<Predicate>();
-        for (PluralAttribute<T, ?, ?> pa : mt.getDeclaredPluralAttributes()) {
-            if (pa.getCollectionType() == PluralAttribute.CollectionType.LIST) {
-                List<?> value = (List<?>) getValue(mtValue, mt.getAttribute(pa.getName()));
+	/**
+	 * Construct a join predicate on collection (eg many to many, List)
+	 */
+	public <T> List<Predicate> byExampleOnManyToMany(ManagedType<T> mt, Root<T> mtPath, final T mtValue, SearchParameters sp, CriteriaBuilder builder) {
+		List<Predicate> predicates = new ArrayList<Predicate>();
+		for (PluralAttribute<T, ?, ?> pa : mt.getDeclaredPluralAttributes()) {
+			if (pa.getCollectionType() == PluralAttribute.CollectionType.LIST) {
+				List<?> value = (List<?>) getValue(mtValue, mt.getAttribute(pa.getName()));
 
-                if (value != null && !value.isEmpty()) {
-                    ListJoin<T, ?> join = mtPath.join(mt.getDeclaredList(pa.getName()));
-                    predicates.add(join.in(value));
-                }
-            }
-        }
-        return predicates;
-    }
+				if (value != null && !value.isEmpty()) {
+					ListJoin<T, ?> join = mtPath.join(mt.getDeclaredList(pa.getName()));
+					predicates.add(join.in(value));
+				}
+			}
+		}
+		return predicates;
+	}
 
-    private <T> Object getValue(T example, Attribute<? super T, ?> attr) {
-        try {
-            return ((Method) attr.getJavaMember()).invoke(example, new Object[0]);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	private <T> Object getValue(T example, Attribute<? super T, ?> attr) {
+		try {
+			return ((Method) attr.getJavaMember()).invoke(example, new Object[0]);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    private <T, A> SingularAttribute<? super T, A> attribute(ManagedType<? super T> mt, Attribute<? super T, A> attr) {
-        return mt.getSingularAttribute(attr.getName(), attr.getJavaType());
-    }
+	private <T, A> SingularAttribute<? super T, A> attribute(ManagedType<? super T> mt, Attribute<? super T, A> attr) {
+		return mt.getSingularAttribute(attr.getName(), attr.getJavaType());
+	}
 
-    private <T> SingularAttribute<? super T, String> stringAttribute(ManagedType<? super T> mt, Attribute<? super T, ?> attr) {
-        return mt.getSingularAttribute(attr.getName(), String.class);
-    }
+	private <T> SingularAttribute<? super T, String> stringAttribute(ManagedType<? super T> mt, Attribute<? super T, ?> attr) {
+		return mt.getSingularAttribute(attr.getName(), String.class);
+	}
 }
