@@ -15,9 +15,25 @@
  */
 package org.querybyexample.jpa.it;
 
+import static org.fest.assertions.Assertions.assertThat;
+import static org.querybyexample.jpa.EntitySelector.newEntitySelector;
+import static org.querybyexample.jpa.OrderByDirection.ASC;
+import static org.querybyexample.jpa.OrderByDirection.DESC;
+import static org.querybyexample.jpa.PropertySelector.newPropertySelector;
+import static org.querybyexample.jpa.Ranges.RangeDate.newFromRangeDate;
+import static org.querybyexample.jpa.Ranges.RangeDate.newRangeDate;
+import static org.querybyexample.jpa.Ranges.RangeDate.newToRangeDate;
+import static org.querybyexample.jpa.SearchMode.ANYWHERE;
+import static org.querybyexample.jpa.SearchMode.ENDING_LIKE;
+import static org.querybyexample.jpa.SearchMode.STARTING_LIKE;
+import static org.querybyexample.jpa.app.Account_.addressId;
+import static org.querybyexample.jpa.app.Account_.birthDate;
+import static org.querybyexample.jpa.app.Account_.homeAddress;
+import static org.querybyexample.jpa.app.Account_.username;
+
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,17 +41,13 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.querybyexample.jpa.EntitySelector;
-import org.querybyexample.jpa.PropertySelector;
-import org.querybyexample.jpa.Ranges;
-import org.querybyexample.jpa.SearchMode;
+import org.querybyexample.jpa.OrderBy;
+import org.querybyexample.jpa.OrderByDirection;
 import org.querybyexample.jpa.SearchParameters;
 import org.querybyexample.jpa.app.Account;
 import org.querybyexample.jpa.app.AccountQueryByExample;
-import org.querybyexample.jpa.app.Account_;
 import org.querybyexample.jpa.app.Address;
 import org.querybyexample.jpa.app.Role;
 import org.springframework.test.annotation.Rollback;
@@ -44,140 +56,228 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Integration test illustrating the use of JPA Query By Example project. 
+ * Integration test illustrating the use of JPA Query By Example project.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath*:applicationContext-test.xml" })
 @Transactional
 public class AccountQueryByExampleIT {
-    private static final Logger log = Logger.getLogger(AccountQueryByExampleIT.class);
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@Inject
+	private AccountQueryByExample accountQBE;
 
-    @Inject
-    private AccountQueryByExample accountQBE;
+	@Test
+	@Rollback
+	public void all() {
+		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(53);
+	}
 
-    @Test
-    @Rollback
-    public void defaultSearch() {
-        List<Account> accounts = accountQBE.find(new Account(), new SearchParameters());
-        logResults(accounts);
-    }
+	@Test
+	@Rollback
+	public void username() {
+		Account admin = new Account();
+		admin.setUsername("admin");
+		assertThat(accountQBE.find(admin, new SearchParameters())).hasSize(1);
 
-    @Test
-    @Rollback
-    public void findUsingBasicExample() {
-        SearchParameters sp = new SearchParameters();
+		Account noMatch = new Account();
+		noMatch.setUsername("noMatch");
+		assertThat(accountQBE.find(noMatch, new SearchParameters())).isEmpty();
+	}
 
-        Account example = new Account();
-        example.setUsername("admin");
+	@Test
+	@Rollback
+	public void usernameAndEmail() {
+		Account example = new Account();
+		example.setUsername("admin");
+		example.setEmail("admin@example.com");
+		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(1);
 
-        sp.setSearchMode(SearchMode.EQUALS);
+		Account noMatch = new Account();
+		noMatch.setUsername("admin");
+		noMatch.setEmail("noMatch");
+		assertThat(accountQBE.find(noMatch, new SearchParameters())).isEmpty();
+	}
 
-        List<Account> accounts = accountQBE.find(example, sp);
-        logResults(accounts);
-    }
+	@Test
+	@Rollback
+	public void usernameStartingLikeAdm() {
+		Account example = new Account();
+		example.setUsername("adm");
+		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(0);
+		assertThat(accountQBE.find(example, new SearchParameters().startingLike())).hasSize(1);
+		assertThat(accountQBE.find(example, new SearchParameters(STARTING_LIKE))).hasSize(1);
+	}
 
-    @Test
-    @Rollback
-    public void findUsingBasicExample2() {
-        SearchParameters sp = new SearchParameters();
+	@Test
+	@Rollback
+	public void usernameEndingLikeMin() {
+		Account example = new Account();
+		example.setUsername("min");
+		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(0);
+		assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
+		assertThat(accountQBE.find(example, new SearchParameters(ENDING_LIKE))).hasSize(1);
+	}
 
-        Account example = new Account();
-        example.setUsername("dmi");
-        example.setIsEnabled(true);
+	@Test
+	@Rollback
+	public void usernameContainingMin() {
+		Account example = new Account();
+		example.setUsername("mi");
+		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(0);
+		assertThat(accountQBE.find(example, new SearchParameters().anywhere())).hasSize(1);
+		assertThat(accountQBE.find(example, new SearchParameters(ANYWHERE))).hasSize(1);
+	}
 
-        sp.setSearchMode(SearchMode.ANYWHERE);
+	@Test
+	@Rollback
+	public void usernameEqualsAdminCaseSensitive() {
+		Account example = new Account();
+		example.setUsername("AdMiN");
+		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(1);
+		assertThat(accountQBE.find(example, new SearchParameters().caseSensitive())).hasSize(0);
+		assertThat(accountQBE.find(example, new SearchParameters().caseInsensitive())).hasSize(1);
+	}
 
-        List<Account> accounts = accountQBE.find(example, sp);
-        logResults(accounts);
-    }
+	@Test
+	@Rollback
+	public void byPropertySelector() {
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newPropertySelector(username)))).hasSize(53);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newPropertySelector(username, "demo", "demo")))).hasSize(1);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newPropertySelector(username, "demo", "admin")))).hasSize(2);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newPropertySelector(username, "unknown", "admin")))).hasSize(1);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newPropertySelector(username, "unknown", "invalid")))).isEmpty();
+	}
 
-    @Test
-    @Rollback
-    public void findUsingPropertySelector() {
-        SearchParameters sp = new SearchParameters();
+	@Test
+	@Rollback
+	public void byDateRangeSelectorBetween() throws ParseException {
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newRangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newRangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
+	}
 
-        // Selector for username
-        PropertySelector<Account, String> psUsername = PropertySelector.newPropertySelector(Account_.username);
-        List<String> possibleValues = new ArrayList<String>();
-        possibleValues.add("demo");
-        possibleValues.add("admin");
-        psUsername.setSelected(possibleValues);
+	@Test
+	@Rollback
+	public void byDateRangeSelectorFrom() throws ParseException {
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newFromRangeDate(birthDate, getDate("01/01/1970"))))).hasSize(2);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newFromRangeDate(birthDate, getDate("01/01/2100"))))).isEmpty();
 
-        sp.addPropertySelector(psUsername);
+	}
 
-        List<Account> accounts = accountQBE.find(new Account(), sp);
-        logResults(accounts);
-    }
+	@Test
+	@Rollback
+	public void byDateRangeSelectorTo() throws ParseException {
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newToRangeDate(birthDate, getDate("01/01/1970"))))).isEmpty();
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newToRangeDate(birthDate, getDate("01/01/2100"))))).hasSize(2);
+	}
 
-    @Test
-    @Rollback
-    public void findByRangeAndFetchJoinAddress() throws ParseException {
-        SearchParameters sp = new SearchParameters();
+	@Test
+	@Rollback
+	public void byEntitySelector() throws ParseException {
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newRangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
+		assertThat(accountQBE.find(new Account(), new SearchParameters(newRangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
+	}
 
-        // date range
-        Ranges.RangeDate<Account> rangeBirthday = Ranges.RangeDate.newRangeDate(Account_.birthDate);
-        rangeBirthday.setFrom(DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse("01/01/1972"));
-        rangeBirthday.setTo(DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse("01/01/1982"));
-        sp.addRange(rangeBirthday);
+	@Test
+	@Rollback
+	public void byEntitySelectors() {
+		assertThat(
+				accountQBE.find(new Account(),
+						new SearchParameters(newEntitySelector(addressId, entityManager.find(Address.class, 1), entityManager.find(Address.class, 2)))))
+				.hasSize(2);
+	}
 
-        // fetch join address
-        sp.addLeftJoinAttribute(Account_.homeAddress);
+	@Test
+	@Rollback
+	public void leftJoinHomeAddress() {
+		assertThat(accountQBE.find(new Account(), new SearchParameters().leftJoin(homeAddress))).hasSize(53);
+	}
 
-        List<Account> accounts = accountQBE.find(new Account(), sp);
-        logResults(accounts);
-    }
+	@Test
+	@Rollback
+	public void byManyToOneProperty() throws ParseException {
+		Account example = new Account();
+		example.setHomeAddress(new Address());
+		example.getHomeAddress().setCity("Paris");
 
-    @Test
-    @Rollback
-    public void findByExampleOnAssociatedAddress() throws ParseException {
-        SearchParameters sp = new SearchParameters();
+		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(1);
+	}
 
-        Account example = new Account();
-        example.setHomeAddress(new Address());
-        example.getHomeAddress().setCity("Paris");
+	@Test
+	@Rollback
+	public void byManyToOnePropertyEndingLike() throws ParseException {
+		Account example = new Account();
+		example.setHomeAddress(new Address());
+		example.getHomeAddress().setCity("ris");
 
-        List<Account> accounts = accountQBE.find(example, sp);
-        logResults(accounts);
-    }
-    
-    @Test
-    @Rollback
-    public void findUsingEntitySelectorOnManyToOne() {
-        SearchParameters sp = new SearchParameters();
+		assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
+	}
 
-        // Selector for associated address
-        EntitySelector<Account, Address, Integer> esAddressId = EntitySelector.newEntitySelector(Account_.addressId);
-        List<Address> possibleValues = new ArrayList<Address>();
-        possibleValues.add(entityManager.find(Address.class, 1));
-        possibleValues.add(entityManager.find(Address.class, 2));
-        esAddressId.setSelected(possibleValues);
+	@Test
+	@Rollback
+	public void byManyToMany() {
+		Account example = new Account();
+		example.addRole(entityManager.find(Role.class, 1));
+		example.addRole(entityManager.find(Role.class, 2));
 
-        sp.addEntitySelector(esAddressId);
+		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(4);
+	}
 
-        List<Account> accounts = accountQBE.find(new Account(), sp);
-        logResults(accounts);
-    }
-    
+	@Test
+	@Rollback
+	public void orderByFieldname() {
+		List<Account> accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username"));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
 
-    @Test
-    @Rollback
-    public void findWithManyToMany() {
-        SearchParameters sp = new SearchParameters();
+		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username", ASC));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
 
-        Account example = new Account();
-        example.addRole(entityManager.find(Role.class, 1));
-        example.addRole(entityManager.find(Role.class, 2));
+		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy("username", DESC));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
 
-        List<Account> accounts = accountQBE.find(example, sp);
-        logResults(accounts);
-    }        
+		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(new OrderBy("username", DESC)));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
+	}
 
-    private void logResults(List<Account> accounts) {
-        for (Account account : accounts) {
-            log.info("Got account " + account.getUsername());
-        }
-    }
+	@Test
+	@Rollback
+	public void orderByAttribute() {
+		List<Account> accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
+
+		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username, ASC));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("admin");
+
+		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(username, DESC));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
+
+		accounts = accountQBE.find(new Account(), new SearchParameters().orderBy(new OrderBy(username, DESC)));
+		assertThat(accounts.iterator().next().getUsername()).isEqualTo("user50");
+	}
+
+	@Test
+	@Rollback
+	public void orderByDesc() {
+		List<Account> list = accountQBE.find(new Account(), new SearchParameters().orderBy("username", OrderByDirection.DESC));
+		assertThat(list.iterator().next().getUsername()).isEqualTo("user50");
+	}
+
+	@Test
+	@Rollback
+	public void bySearchPattern() {
+		assertThat(accountQBE.find(new Account(), new SearchParameters().searchPattern("admin"))).hasSize(1);
+		assertThat(accountQBE.find(new Account(), new SearchParameters().searchPattern("min").anywhere())).hasSize(1);
+		assertThat(accountQBE.find(new Account(), new SearchParameters().searchPattern("no_match").anywhere())).isEmpty();
+	}
+
+	@Test
+	@Rollback
+	public void maxResults() {
+		assertThat(accountQBE.find(new Account(), new SearchParameters().maxResults(7))).hasSize(7);
+	}
+
+	private Date getDate(String from) throws ParseException {
+		return DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse(from);
+	}
 }
