@@ -91,7 +91,7 @@ public class SearchParameters implements Serializable {
 	private Boolean cacheable = true;
 	private String cacheRegion;
 	// distinct
-	private Boolean distinct;
+	private Boolean distinct = false;
 
 	public SearchParameters() {
 
@@ -629,7 +629,7 @@ public class SearchParameters implements Serializable {
 	// -----------------------------------
 
 	public boolean isDistinct() {
-		return distinct != null && distinct != false;
+		return distinct;
 	}
 
 	public SearchParameters distinct() {
@@ -637,8 +637,8 @@ public class SearchParameters implements Serializable {
 		return this;
 	}
 
-	public SearchParameters indistinct() {
-		distinct = false;
+	public SearchParameters distinct(boolean value) {
+		distinct = value;
 		return this;
 	}
 

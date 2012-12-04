@@ -211,16 +211,16 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void byManyToOneProperty() {
-		Address address = new Address();
-		address.setCity("Paris");
+		Address paris = new Address();
+		paris.setCity("Paris");
 
 		Account example = new Account();
-		example.setHomeAddress(address);
+		example.setHomeAddress(paris);
 
 		assertThat(accountQBE.find(example)).hasSize(1);
 
 		Address invalidAddress = new Address();
-		invalidAddress.setCity("even");
+		invalidAddress.setCity("noMatch");
 
 		Account noMatch = new Account();
 		noMatch.setHomeAddress(invalidAddress);
@@ -231,9 +231,10 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void byManyToOnePropertyEndingLike() {
+		Address almostParis = new Address();
+		almostParis.setCity("ris");
 		Account example = new Account();
-		example.setHomeAddress(new Address());
-		example.getHomeAddress().setCity("ris");
+		example.setHomeAddress(almostParis);
 
 		assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
 	}
@@ -297,7 +298,7 @@ public class AccountQueryByExampleIT {
 
 	@Test
 	@Rollback
-	public void bySearchPattern() {
+	public void bySearchPatternOnAllStringFields() {
 		assertThat(accountQBE.find(new SearchParameters().searchPattern("admin"))).hasSize(1);
 		assertThat(accountQBE.find(new SearchParameters().searchPattern("min").anywhere())).hasSize(1);
 		assertThat(accountQBE.find(new SearchParameters().searchPattern("no_match").anywhere())).isEmpty();
