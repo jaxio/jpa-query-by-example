@@ -70,6 +70,7 @@ public class AccountQueryByExampleIT {
 	@Test
 	@Rollback
 	public void all() {
+		assertThat(accountQBE.find()).hasSize(6);
 		assertThat(accountQBE.find(new Account())).hasSize(6);
 		assertThat(accountQBE.find(new SearchParameters())).hasSize(6);
 	}
@@ -308,6 +309,14 @@ public class AccountQueryByExampleIT {
 	@Rollback
 	public void maxResults() {
 		assertThat(accountQBE.find(new SearchParameters().maxResults(4))).hasSize(4);
+	}
+
+	@Test
+	@Rollback
+	public void firstResult() {
+		assertThat(first(accountQBE.find(new SearchParameters().orderBy(username))).getUsername()).isEqualTo("admin");
+		assertThat(first(accountQBE.find(new SearchParameters().orderBy(username).firstResult(0))).getUsername()).isEqualTo("admin");
+		assertThat(first(accountQBE.find(new SearchParameters().orderBy(username).firstResult(1))).getUsername()).isEqualTo("demo");
 	}
 
 	private Account first(List<Account> accounts) {

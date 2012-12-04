@@ -115,6 +115,15 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 	/**
 	 * Find and load a list of E instance.
 	 * 
+	 * @return all the entities
+	 */
+	public List<E> find() {
+		return find(newInstance(), new SearchParameters());
+	}
+
+	/**
+	 * Find and load a list of E instance.
+	 * 
 	 * @param entity a sample entity whose non-null properties may be used as search hints
 	 * @return the entities matching the search.
 	 */
@@ -122,6 +131,12 @@ public abstract class QueryByExample<E extends Identifiable<PK>, PK extends Seri
 		return find(entity, new SearchParameters());
 	}
 
+	/**
+	 * Find and load a list of E instance.
+	 * 
+	 * @param searchParameters carries additional search information
+	 * @return the entities matching the search.
+	 */
 	public List<E> find(SearchParameters sp) {
 		return find(newInstance(), sp);
 	}
