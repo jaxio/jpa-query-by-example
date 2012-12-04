@@ -73,15 +73,20 @@ public class AccountQueryByExampleIT {
 		assertThat(accountQBE.find()).hasSize(6);
 		assertThat(accountQBE.find(new Account())).hasSize(6);
 		assertThat(accountQBE.find(new SearchParameters())).hasSize(6);
+		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(6);
 	}
 
 	@Test
 	@Rollback
-	public void username() {
+	public void usernameMatch() {
 		Account admin = new Account();
 		admin.setUsername("admin");
 		assertThat(accountQBE.find(admin)).hasSize(1);
+	}
 
+	@Test
+	@Rollback
+	public void usernameDoesNotMatch() {
 		Account noMatch = new Account();
 		noMatch.setUsername("noMatch");
 		assertThat(accountQBE.find(noMatch)).isEmpty();
@@ -89,12 +94,16 @@ public class AccountQueryByExampleIT {
 
 	@Test
 	@Rollback
-	public void usernameAndEmail() {
+	public void usernameAndEmailMatch() {
 		Account example = new Account();
 		example.setUsername("admin");
 		example.setEmail("admin@example.com");
 		assertThat(accountQBE.find(example)).hasSize(1);
+	}
 
+	@Test
+	@Rollback
+	public void usernameAndEmailDoesNotMatch() {
 		Account noMatch = new Account();
 		noMatch.setUsername("admin");
 		noMatch.setEmail("noMatch");
@@ -211,7 +220,7 @@ public class AccountQueryByExampleIT {
 
 	@Test
 	@Rollback
-	public void byManyToOneProperty() {
+	public void byManyToOnePropertyMatch() {
 		Address paris = new Address();
 		paris.setCity("Paris");
 
@@ -219,7 +228,11 @@ public class AccountQueryByExampleIT {
 		example.setHomeAddress(paris);
 
 		assertThat(accountQBE.find(example)).hasSize(1);
+	}
 
+	@Test
+	@Rollback
+	public void byManyToOnePropertyDoesNotMatch() {
 		Address invalidAddress = new Address();
 		invalidAddress.setCity("noMatch");
 
