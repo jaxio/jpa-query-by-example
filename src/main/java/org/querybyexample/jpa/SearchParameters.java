@@ -457,42 +457,42 @@ public class SearchParameters implements Serializable {
 		return this;
 	}
 
-	public SearchParameters rangeFrom(SingularAttribute<?, LocalDate> field, LocalDate from) {
+	public SearchParameters after(SingularAttribute<?, LocalDate> field, LocalDate from) {
 		RangeLocalDate<?> rangeLocalDate = rangeLocalDate(field);
 		rangeLocalDate.setFrom(from);
 		addRange(rangeLocalDate);
 		return this;
 	}
 
-	public SearchParameters rangeFrom(SingularAttribute<?, LocalDateTime> field, LocalDateTime from) {
+	public SearchParameters after(SingularAttribute<?, LocalDateTime> field, LocalDateTime from) {
 		RangeLocalDateTime<?> rangeLocalDateTime = rangeLocalDateTime(field);
 		rangeLocalDateTime.setFrom(from);
 		addRange(rangeLocalDateTime);
 		return this;
 	}
 
-	public SearchParameters rangeFrom(SingularAttribute<?, Date> field, Date from) {
+	public SearchParameters after(SingularAttribute<?, Date> field, Date from) {
 		RangeDate<?> rangeDate = rangeDate(field);
 		rangeDate.setFrom(from);
 		addRange(rangeDate);
 		return this;
 	}
 
-	public SearchParameters rangeTo(SingularAttribute<?, LocalDate> field, LocalDate setToto) {
+	public SearchParameters before(SingularAttribute<?, LocalDate> field, LocalDate setToto) {
 		RangeLocalDate<?> rangeLocalDate = rangeLocalDate(field);
 		rangeLocalDate.setTo(setToto);
 		addRange(rangeLocalDate);
 		return this;
 	}
 
-	public SearchParameters rangeTo(SingularAttribute<?, LocalDateTime> field, LocalDateTime setToto) {
+	public SearchParameters before(SingularAttribute<?, LocalDateTime> field, LocalDateTime setToto) {
 		RangeLocalDateTime<?> rangeLocalDateTime = rangeLocalDateTime(field);
 		rangeLocalDateTime.setTo(setToto);
 		addRange(rangeLocalDateTime);
 		return this;
 	}
 
-	public SearchParameters rangeTo(SingularAttribute<?, Date> field, Date setToto) {
+	public SearchParameters before(SingularAttribute<?, Date> field, Date setToto) {
 		RangeDate<?> rangeDate = rangeDate(field);
 		rangeDate.setTo(setToto);
 		addRange(rangeDate);
