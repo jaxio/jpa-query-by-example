@@ -37,10 +37,13 @@ public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializ
     /**
      * @param field the property holding an foreign key.
      */
-    public EntitySelector(SingularAttribute<E, TPK> field) {
+    public EntitySelector(SingularAttribute<E, TPK> field, T... values) {
         this.field = field;
         this.cpkField = null;
         this.cpkInnerField = null;
+        for(T value : values) {
+        	selected.add(value);
+        }
     }
 
     public EntitySelector(SingularAttribute<E, ?> cpkField, SingularAttribute<?, TPK> cpkInnerField) {
@@ -75,6 +78,14 @@ public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializ
         this.selected = selected;
     }
 
+    public void selected(T... selected) {
+    	List<T> t = new ArrayList<T>();
+    	for(T s : selected){
+    		t.add(s);
+    	}
+        this.selected = t;
+    }
+
     public boolean isNotEmpty() {
         return selected != null && !selected.isEmpty();
     }
@@ -89,8 +100,8 @@ public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializ
      * Import statically this helper for smooth instanciation.
      */
     static public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> EntitySelector<E2, T2, TPK2> newEntitySelector(
-            SingularAttribute<E2, TPK2> field) {
-        return new EntitySelector<E2, T2, TPK2>(field);
+            SingularAttribute<E2, TPK2> field, T2... values) {
+        return new EntitySelector<E2, T2, TPK2>(field, values);
     }
 
     /**

@@ -34,8 +34,11 @@ public class PropertySelector<E, F> implements Serializable {
     /**
      * @param field the property that should match one of the selected value.
      */
-    public PropertySelector(SingularAttribute<E, F> field) {
+    public PropertySelector(SingularAttribute<E, F> field, F... values) {
         this.field = field;
+        for(F value : values) {
+        	selected.add(value);
+        }
     }
 
     public SingularAttribute<E, F> getField() {
@@ -78,7 +81,7 @@ public class PropertySelector<E, F> implements Serializable {
     /**
      * {@link PropertySelector} builder
      */
-    static public <E, F> PropertySelector<E, F> newPropertySelector(SingularAttribute<E, F> field) {
-        return new PropertySelector<E, F>(field);
+    static public <E, F> PropertySelector<E, F> newPropertySelector(SingularAttribute<E, F> field, F... values) {
+        return new PropertySelector<E, F>(field, values);
     }
 }

@@ -89,10 +89,18 @@ public class SearchParameters implements Serializable {
     private Boolean cacheable = true;
     private String cacheRegion;
 
+    public SearchParameters() {
+    	
+    }
+    
     // -----------------------------------
     // SearchMode
     // -----------------------------------
 
+    public SearchParameters(SearchMode searchMode) {
+    	setSearchMode(searchMode);
+    }
+    
     /**
      * Fluently set the @{link SearchMode}. It defaults to EQUALS.
      * @see SearchMode#EQUALS
@@ -393,6 +401,9 @@ public class SearchParameters implements Serializable {
     // -----------------------------------
     // Search by range support
     // -----------------------------------
+    public SearchParameters(Range<?, ?> range) {
+    	addRange(range);
+    }
 
     public List<Range<?, ?>> getRanges() {
         return ranges;
@@ -417,6 +428,9 @@ public class SearchParameters implements Serializable {
     // -----------------------------------
     // Search by property selector support
     // -----------------------------------
+    public SearchParameters(PropertySelector<?, ?> propertySelector) {
+    	propertySelector(propertySelector);
+    }
 
     public List<PropertySelector<?, ?>> getPropertySelectors() {
         return propertySelectors;
@@ -441,6 +455,10 @@ public class SearchParameters implements Serializable {
     // -----------------------------------
     // Search by entity selector support
     // -----------------------------------
+
+    public SearchParameters(EntitySelector<?, ? extends Identifiable<?>, ?> entitySelector) {
+    	addEntitySelector(entitySelector);
+    }
 
     public List<EntitySelector<?, ? extends Identifiable<?>, ?>> getEntitySelectors() {
         return entitySelectors;
@@ -518,7 +536,7 @@ public class SearchParameters implements Serializable {
     /**
      * The passed attribute (x-to-one association) will be fetched with a left join.
      */
-    public SearchParameters addLeftJoinAttribute(SingularAttribute<?, ?> xToOneAttribute) {
+    public SearchParameters leftJoin(SingularAttribute<?, ?> xToOneAttribute) {
         leftJoinAttributes.add(xToOneAttribute);
         return this;
     }
