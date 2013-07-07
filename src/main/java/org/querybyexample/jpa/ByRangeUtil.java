@@ -21,6 +21,8 @@ import static java.lang.Boolean.TRUE;
 
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -28,9 +30,10 @@ import javax.persistence.criteria.Root;
 /**
  * Helper to create a predicate out of {@link Range}s.
  */
+@Named
+@Singleton
 public class ByRangeUtil {
-
-    public static <E> Predicate byRanges(Root<E> root, CriteriaBuilder builder, SearchParameters sp, Class<E> type) {
+    public <E> Predicate byRanges(Root<E> root, CriteriaBuilder builder, SearchParameters sp, Class<E> type) {
         List<Range<?, ?>> ranges = sp.getRanges();
         List<Predicate> predicates = newArrayList();
         for (Range<?, ?> r : ranges) {

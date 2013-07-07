@@ -20,6 +20,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.querybyexample.jpa.Identifiable;
@@ -29,6 +31,8 @@ import org.querybyexample.jpa.Identifiable;
  * all entities E having their x-to-one association value set to one of the selected values.
  * To avoid a join we rely on the foreign key field, not the association itself.
  */
+@Named
+@Singleton
 public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializable> implements Serializable {
     private static final long serialVersionUID = 1L;
 

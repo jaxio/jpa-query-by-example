@@ -20,6 +20,8 @@ import static java.lang.Boolean.TRUE;
 
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
@@ -30,9 +32,11 @@ import org.querybyexample.jpa.Identifiable;
 /**
  * Helper to create a predicate out of {@link EntitySelector}s.
  */
+@Named
+@Singleton
 public class ByEntitySelectorUtil {
 
-    public static <E> Predicate byEntitySelectors(Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
+    public <E> Predicate byEntitySelectors(Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
         List<EntitySelector<?, ?, ?>> selectors = sp.getEntities();
         List<Predicate> predicates = newArrayList();
 

@@ -20,8 +20,12 @@ import static org.querybyexample.jpa.OrderByDirection.ASC;
 import static org.querybyexample.jpa.OrderByDirection.DESC;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
-import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.Attribute;
+
+import org.hibernate.ejb.metamodel.AbstractAttribute;
 
 /**
  * Holder class for search ordering used by the {@link SearchParameters}.
@@ -29,33 +33,35 @@ import javax.persistence.metamodel.SingularAttribute;
  */
 public class OrderBy implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String columnOrProperty;
+    private final List<Attribute<?, ?>> attributes;
+    private final String property;
     private OrderByDirection direction = ASC;
 
-    public OrderBy(String columnOrProperty, OrderByDirection direction) {
-        this.columnOrProperty = checkNotNull(columnOrProperty);
+    public OrderBy(OrderByDirection direction, Attribute<?, ?>... attributes) {
         this.direction = checkNotNull(direction);
+        this.attributes = Arrays.asList(checkNotNull(attributes));
+        this.property = null;
     }
 
-    public OrderBy(String columnOrProperty) {
-        this(columnOrProperty, ASC);
+    public OrderBy(OrderByDirection direction, String property) {
+        this(direction, new AbstractAttribute<Object, Object>(property, null, null, null, null) {
+            private static final long serialVersionUID = 1L;
+
+            public boolean isAssociation() {
+                return false;
+            }
+
+            public boolean isCollection() {
+                return false;
+            }
+        });
     }
 
-    public OrderBy(SingularAttribute<?, ?> attribute, OrderByDirection direction) {
-        this.columnOrProperty = checkNotNull(attribute).getName();
-        this.direction = checkNotNull(direction);
-    }
-
-    public OrderBy(SingularAttribute<?, ?> attribute) {
-        this(attribute, ASC);
-    }
-
-    public String getColumn() {
-        return columnOrProperty;
-    }
-
-    public String getProperty() {
-        return columnOrProperty;
+    public List<Attribute<?, ?>> getAttributes() {
+        if (property != null) {
+            ;
+        }
+        return attributes;
     }
 
     public OrderByDirection getDirection() {

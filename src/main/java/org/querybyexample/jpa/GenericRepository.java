@@ -16,11 +16,7 @@
 package org.querybyexample.jpa;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.querybyexample.jpa.ByEntitySelectorUtil.byEntitySelectors;
-import static org.querybyexample.jpa.ByPropertySelectorUtil.byPropertySelectors;
-import static org.querybyexample.jpa.ByRangeUtil.byRanges;
 import static org.querybyexample.jpa.JpaUtil.applyPagination;
-import static org.querybyexample.jpa.JpaUtil.buildJpaOrders;
 
 import java.io.Serializable;
 import java.util.List;
@@ -39,11 +35,15 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
+import org.querybyexample.jpa.ByEntitySelectorUtil;
 import org.querybyexample.jpa.ByExampleUtil;
 import org.querybyexample.jpa.ByPatternUtil;
+import org.querybyexample.jpa.ByPropertySelectorUtil;
+import org.querybyexample.jpa.ByRangeUtil;
 import org.querybyexample.jpa.Identifiable;
 import org.querybyexample.jpa.JpaUtil;
 import org.querybyexample.jpa.NamedQueryUtil;
+import org.querybyexample.jpa.OrderByUtil;
 import org.querybyexample.jpa.SearchParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +56,17 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     @Inject
     protected ByExampleUtil byExampleUtil;
     @Inject
+    protected ByEntitySelectorUtil byEntitySelectorUtil;
+    @Inject
     protected ByPatternUtil byPatternUtil;
     @Inject
+    protected ByRangeUtil byRangeUtil;
+    @Inject
     protected NamedQueryUtil namedQueryUtil;
+    @Inject
+    protected ByPropertySelectorUtil byPropertySelectorUtil;
+    @Inject
+    protected OrderByUtil orderByUtil;
     @PersistenceContext
     protected EntityManager entityManager;
     protected Class<E> type;
@@ -183,7 +191,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
 
         // order by
-        criteriaQuery.orderBy(buildJpaOrders(sp.getOrders(), root, builder, sp));
+        criteriaQuery.orderBy(orderByUtil.buildJpaOrders(sp.getOrders(), root, builder, sp));
 
         TypedQuery<E> typedQuery = entityManager.createQuery(criteriaQuery);
 
@@ -253,7 +261,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         if (count != null) {
             return count.intValue();
         } else {
-            log.warn("findCount returned null!");
+            log.warn("findCount returned null");
             return 0;
         }
     }
@@ -310,12 +318,28 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
                 byPropertySelectors(root, builder, sp), //
                 byEntitySelectors(root, builder, sp), //
                 byExample(root, builder, sp, entity), //
-                byPatternUtil.byPattern(root, builder, sp, type), //
+                byPattern(root, builder, sp, type), //
                 byExtraPredicate(root, builder, sp, entity));
+    }
+
+    protected Predicate byEntitySelectors(Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
+        return byEntitySelectorUtil.byEntitySelectors(root, builder, sp);
     }
 
     protected Predicate byExample(Root<E> root, CriteriaBuilder builder, SearchParameters sp, E entity) {
         return byExampleUtil.byExampleOnEntity(root, entity, builder, sp);
+    }
+
+    protected Predicate byPropertySelectors(Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
+        return byPropertySelectorUtil.byPropertySelectors(root, builder, sp);
+    }
+
+    protected Predicate byRanges(Root<E> root, CriteriaBuilder builder, SearchParameters sp, Class<E> type) {
+        return byRangeUtil.byRanges(root, builder, sp, type);
+    }
+
+    protected Predicate byPattern(Root<E> root, CriteriaBuilder builder, SearchParameters sp, Class<E> type) {
+        return byPatternUtil.byPattern(root, builder, sp, type);
     }
 
     /**

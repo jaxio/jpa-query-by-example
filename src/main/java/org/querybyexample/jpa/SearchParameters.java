@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -365,22 +366,6 @@ public class SearchParameters implements Serializable {
         return orders;
     }
 
-    public void addOrderBy(String fieldName) {
-        orders.add(new OrderBy(checkNotNull(fieldName)));
-    }
-
-    public void addOrderBy(String fieldName, OrderByDirection direction) {
-        orders.add(new OrderBy(checkNotNull(fieldName), checkNotNull(direction)));
-    }
-
-    public void addOrderBy(SingularAttribute<?, ?> attribute) {
-        orders.add(new OrderBy(checkNotNull(attribute)));
-    }
-
-    public void addOrderBy(SingularAttribute<?, ?> attribute, OrderByDirection direction) {
-        orders.add(new OrderBy(checkNotNull(attribute), checkNotNull(direction)));
-    }
-
     public void addOrderBy(OrderBy orderBy) {
         orders.add(checkNotNull(orderBy));
     }
@@ -390,32 +375,20 @@ public class SearchParameters implements Serializable {
         return this;
     }
 
-    public SearchParameters orderBy(String fieldName) {
-        addOrderBy(fieldName);
-        return this;
+    public SearchParameters orderBy(Attribute<?, ?>... attributes) {
+        return orderBy(new OrderBy(OrderByDirection.ASC, attributes));
     }
 
-    public SearchParameters orderBy(String fieldName, OrderByDirection direction) {
-        addOrderBy(fieldName, direction);
-        return this;
+    public SearchParameters orderBy(OrderByDirection orderByDirection, Attribute<?, ?>... attributes) {
+        return orderBy(new OrderBy(orderByDirection, attributes));
     }
 
-    public SearchParameters orderBy(SingularAttribute<?, ?> attribute) {
-        addOrderBy(attribute);
-        return this;
-    }
-
-    public SearchParameters orderBy(SingularAttribute<?, ?> attribute, OrderByDirection direction) {
-        addOrderBy(attribute, direction);
-        return this;
+    public SearchParameters orderBy(String property) {
+        return orderBy(new OrderBy(OrderByDirection.ASC, property));
     }
 
     public boolean hasOrders() {
         return !orders.isEmpty();
-    }
-
-    public void clearOrders() {
-        orders.clear();
     }
 
     // -----------------------------------
@@ -441,10 +414,6 @@ public class SearchParameters implements Serializable {
         return !ranges.isEmpty();
     }
 
-    public void clearRanges() {
-        ranges.clear();
-    }
-
     // -----------------------------------
     // Search by property selector support
     // -----------------------------------
@@ -466,10 +435,6 @@ public class SearchParameters implements Serializable {
 
     public boolean hasProperties() {
         return !properties.isEmpty();
-    }
-
-    public void clearProperties() {
-        properties.clear();
     }
 
     // -----------------------------------
@@ -498,10 +463,6 @@ public class SearchParameters implements Serializable {
 
     public boolean hasEntities() {
         return !entities.isEmpty();
-    }
-
-    public void clearEntities() {
-        entities.clear();
     }
 
     // -----------------------------------

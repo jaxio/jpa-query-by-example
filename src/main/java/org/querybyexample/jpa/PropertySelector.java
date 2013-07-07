@@ -21,28 +21,53 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.Attribute;
 
 /**
  * Used to construct OR predicate for a property value. In other words you can search
  * all entities E having a given property set to one of the selected values.
  */
 public class PropertySelector<E, F> implements Serializable {
+    /**
+     * {@link PropertySelector} builder
+     */
+    public static <E, F> PropertySelector<E, F> newPropertySelector(Attribute<?, ?>... fields) {
+        return new PropertySelector<E, F>(checkNotNull(fields));
+    }
+
+    /**
+     * {@link PropertySelector} builder
+     */
+    public static <E, F> PropertySelector<E, F> newPropertySelector(SearchMode searchMode, Attribute<?, ?>... fields) {
+        PropertySelector<E, F> ps = new PropertySelector<E, F>(checkNotNull(fields));
+        ps.setSearchMode(searchMode);
+        return ps;
+    }
+
     private static final long serialVersionUID = 1L;
 
-    private final SingularAttribute<E, F> field;
+    private final List<Attribute<?, ?>> attributes;
     private List<F> selected = newArrayList();
     private SearchMode searchMode; // for string property only.
 
-    /**
-     * @param field the property that should match one of the selected value.
-     */
-    public PropertySelector(SingularAttribute<E, F> field) {
-        this.field = checkNotNull(field);
+    public PropertySelector(Attribute<?, ?>... attributes) {
+        this.attributes = newArrayList(checkNotNull(attributes));
+        verifyPath(newArrayList(attributes));
     }
 
-    public SingularAttribute<E, F> getField() {
-        return field;
+    private void verifyPath(List<Attribute<?, ?>> attributes) {
+        Class<?> from = attributes.get(0).getJavaType();
+        attributes.remove(0);
+        for (Attribute<?, ?> attribute : attributes) {
+            if (!attribute.getDeclaringType().getJavaType().isAssignableFrom(from)) {
+                throw new IllegalStateException("Wrong path.");
+            }
+            from = attribute.getJavaType();
+        }
+    }
+
+    public List<Attribute<?, ?>> getAttributes() {
+        return attributes;
     }
 
     /**
@@ -52,26 +77,20 @@ public class PropertySelector<E, F> implements Serializable {
         return selected;
     }
 
+    @SuppressWarnings("unchecked")
+    public void setSelected(F selected) {
+        this.selected = newArrayList(selected);
+    }
+
     /**
      * Set the possible candidates for property.
      */
     public void setSelected(List<F> selected) {
-        if (selected == null) {
-            clearSelected();
-        } else {
-            this.selected = selected;
-        }
-    }
-
-    /**
-     * Add a possible candidates for property.
-     */
-    public void add(F selected) {
-        this.selected.add(selected);
+        this.selected = selected;
     }
 
     public boolean isNotEmpty() {
-        return selected != null && !selected.isEmpty();
+        return (selected != null) && !selected.isEmpty();
     }
 
     public void clearSelected() {
@@ -81,7 +100,7 @@ public class PropertySelector<E, F> implements Serializable {
     }
 
     public boolean isBoolean() {
-        return field.getJavaType().isAssignableFrom(Boolean.class);
+        return attributes.get(attributes.size() - 1).getJavaType().isAssignableFrom(Boolean.class);
     }
 
     public SearchMode getSearchMode() {
@@ -89,26 +108,17 @@ public class PropertySelector<E, F> implements Serializable {
     }
 
     /**
-     * In case, the field's type is a String, you can set a searchMode to use.
-     * It is null by default.
+     * In case, the field's type is a String, you can set a searchMode to use. It is null by default.
      */
     public void setSearchMode(SearchMode searchMode) {
-        this.searchMode = checkNotNull(searchMode);
+        this.searchMode = searchMode;
     }
 
-    /**
-     * {@link PropertySelector} builder
-     */
-    public static <E, F> PropertySelector<E, F> newPropertySelector(SingularAttribute<E, F> field) {
-        return new PropertySelector<E, F>(field);
+    public void add(F object) {
+        this.selected.add(object);
     }
 
-    /**
-     * {@link PropertySelector} builder
-     */
-    public static <E, F> PropertySelector<E, F> newPropertySelector(SingularAttribute<E, F> field, SearchMode searchMode) {
-        PropertySelector<E, F> ps = new PropertySelector<E, F>(field);
-        ps.setSearchMode(searchMode);
-        return ps;
+    public String getPath() {
+        return JpaUtil.getPath(getAttributes());
     }
 }

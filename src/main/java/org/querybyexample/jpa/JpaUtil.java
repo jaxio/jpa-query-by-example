@@ -38,7 +38,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -46,7 +45,6 @@ import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.WordUtils;
 import org.querybyexample.jpa.Identifiable;
 import org.springframework.beans.BeanUtils;
@@ -54,7 +52,6 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.ReflectionUtils;
 
 public class JpaUtil {
-
     public static boolean isEntityIdManuallyAssigned(Class<?> type) {
         for (Method method : type.getMethods()) {
             if (isPrimaryKey(method)) {
@@ -146,55 +143,46 @@ public class JpaUtil {
         return stringPredicate(path, attrValue, null, sp, builder);
     }
 
-    public static <E> List<Order> buildJpaOrders(Iterable<OrderBy> orders, Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
-        List<Order> jpaOrders = newArrayList();
-
-        for (OrderBy ob : orders) {
-            Path<?> path = getPropertyOrderPath(root, ob.getProperty(), sp);
-
-            if (ob.isOrderDesc()) {
-                jpaOrders.add(builder.desc(path));
-            } else {
-                jpaOrders.add(builder.asc(path));
-            }
-        }
-        return jpaOrders;
-    }
-
     /**
-     * Convert the passed propertyPath into a JPA path. <br>
+     * Convert the passed propertyPath into a JPA path.
+     * <p>
      * Note: JPA will do joins if the property is in an associated entity.
      */
     @SuppressWarnings("unchecked")
-    private static <E> Path<?> getPropertyOrderPath(Root<E> root, String propertyPath, SearchParameters sp) {
-        String[] pathItems = StringUtils.split(propertyPath, ".");
-
-        Path<?> path = null;
-
-        String pathItem = pathItems[0];
-        if (sp.getDistinct()) {
-            // handle case when order on already fetched attribute
-            for (Fetch<E, ?> fetch : root.getFetches()) {
-                if (pathItem.equals(fetch.getAttribute().getName()) && fetch instanceof Join<?, ?>) {
-                    path = (Join<E, ?>) fetch;
+    public static <E, F> Path<F> getPath(Root<E> root, List<Attribute<?, ?>> attributes, boolean distinct) {
+        Path<?> path = root;
+        for (Attribute<?, ?> attribute : attributes) {
+            boolean found = false;
+            if (distinct) {
+                // handle case when order on already fetched attribute
+                for (Fetch<E, ?> fetch : root.getFetches()) {
+                    if (attribute.getName().equals(fetch.getAttribute().getName()) && (fetch instanceof Join<?, ?>)) {
+                        path = (Join<E, ?>) fetch;
+                        found = true;
+                        break;
+                    }
+                }
+                for (Join<E, ?> join : root.getJoins()) {
+                    if (attribute.getName().equals(join.getAttribute().getName())) {
+                        path = join;
+                        found = true;
+                        break;
+                    }
                 }
             }
-            for (Join<E, ?> join : root.getJoins()) {
-                if (pathItem.equals(join.getAttribute().getName())) {
-                    path = join;
-                }
+            if (!found) {
+                path = path.get(attribute.getName());
             }
         }
+        return (Path<F>) path;
+    }
 
-        // if no fetch matches the required path item, load it from root
-        if (path == null) {
-            path = root.get(pathItem);
+    public static String getPath(List<Attribute<?, ?>> attributes) {
+        StringBuilder builder = new StringBuilder();
+        for (Attribute<?, ?> attribute : attributes) {
+            builder.append(attribute.getName()).append(".");
         }
-
-        for (int i = 1; i < pathItems.length; i++) {
-            path = path.get(pathItems[i]);
-        }
-        return path;
+        return builder.substring(0, builder.length() - 1);
     }
 
     public static <T extends Identifiable<?>> String compositePkPropertyName(T entity) {

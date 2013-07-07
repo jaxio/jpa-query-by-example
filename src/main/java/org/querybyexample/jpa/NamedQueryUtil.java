@@ -69,7 +69,7 @@ public class NamedQueryUtil {
                 if (!first) {
                     orderClausis.append(", ");
                 }
-                orderClausis.append(orderBy.getColumn());
+                orderClausis.append(JpaUtil.getPath(orderBy.getAttributes()));
                 orderClausis.append(orderBy.isOrderDesc() ? " desc" : " asc");
                 first = false;
             }

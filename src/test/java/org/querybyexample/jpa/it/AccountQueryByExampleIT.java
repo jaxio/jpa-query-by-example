@@ -33,6 +33,7 @@ import org.querybyexample.jpa.OrderBy;
 import org.querybyexample.jpa.SearchParameters;
 import org.querybyexample.jpa.app.Account;
 import org.querybyexample.jpa.app.AccountQueryByExample;
+import org.querybyexample.jpa.app.Account_;
 import org.querybyexample.jpa.app.Address;
 import org.querybyexample.jpa.app.Role;
 import org.springframework.test.annotation.Rollback;
@@ -47,223 +48,223 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = { "classpath*:applicationContext-test.xml" })
 @Transactional
 public class AccountQueryByExampleIT {
-	@PersistenceContext
-	private EntityManager entityManager;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-	@Inject
-	private AccountQueryByExample accountQBE;
-	
-	private static final int NB_ACCOUNTS = 6;
+    @Inject
+    private AccountQueryByExample accountQBE;
+    
+    private static final int NB_ACCOUNTS = 6;
 
-	@Test
-	@Rollback
-	public void all() {
-		assertThat(accountQBE.find()).hasSize(NB_ACCOUNTS);
-		assertThat(accountQBE.find(new Account())).hasSize(NB_ACCOUNTS);
-		assertThat(accountQBE.find(new SearchParameters())).hasSize(NB_ACCOUNTS);
-		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(NB_ACCOUNTS);
-	}
+    @Test
+    @Rollback
+    public void all() {
+        assertThat(accountQBE.find()).hasSize(NB_ACCOUNTS);
+        assertThat(accountQBE.find(new Account())).hasSize(NB_ACCOUNTS);
+        assertThat(accountQBE.find(new SearchParameters())).hasSize(NB_ACCOUNTS);
+        assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(NB_ACCOUNTS);
+    }
 
-	@Test
-	@Rollback
-	public void usernameMatch() {
-		Account admin = new Account();
-		admin.setUsername("admin");
-		assertThat(accountQBE.find(admin)).hasSize(1);
-	}
+    @Test
+    @Rollback
+    public void usernameMatch() {
+        Account admin = new Account();
+        admin.setUsername("admin");
+        assertThat(accountQBE.find(admin)).hasSize(1);
+    }
 
-	@Test
-	@Rollback
-	public void usernameDoesNotMatch() {
-		Account noMatch = new Account();
-		noMatch.setUsername("noMatch");
-		assertThat(accountQBE.find(noMatch)).isEmpty();
-	}
+    @Test
+    @Rollback
+    public void usernameDoesNotMatch() {
+        Account noMatch = new Account();
+        noMatch.setUsername("noMatch");
+        assertThat(accountQBE.find(noMatch)).isEmpty();
+    }
 
-	@Test
-	@Rollback
-	public void usernameAndEmailMatch() {
-		Account example = new Account();
-		example.setUsername("admin");
-		example.setEmail("admin@example.com");
-		assertThat(accountQBE.find(example)).hasSize(1);
-	}
+    @Test
+    @Rollback
+    public void usernameAndEmailMatch() {
+        Account example = new Account();
+        example.setUsername("admin");
+        example.setEmail("admin@example.com");
+        assertThat(accountQBE.find(example)).hasSize(1);
+    }
 
-	@Test
-	@Rollback
-	public void usernameAndEmailDoesNotMatch() {
-		Account noMatch = new Account();
-		noMatch.setUsername("admin");
-		noMatch.setEmail("noMatch");
-		assertThat(accountQBE.find(noMatch)).isEmpty();
-	}
+    @Test
+    @Rollback
+    public void usernameAndEmailDoesNotMatch() {
+        Account noMatch = new Account();
+        noMatch.setUsername("admin");
+        noMatch.setEmail("noMatch");
+        assertThat(accountQBE.find(noMatch)).isEmpty();
+    }
 
-	@Test
-	@Rollback
-	public void usernameStartingLikeAdm() {
-		Account example = new Account();
-		example.setUsername("adm");
-		assertThat(accountQBE.find(example)).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters().startingLike())).hasSize(1);
-	}
+    @Test
+    @Rollback
+    public void usernameStartingLikeAdm() {
+        Account example = new Account();
+        example.setUsername("adm");
+        assertThat(accountQBE.find(example)).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters().startingLike())).hasSize(1);
+    }
 
-	@Test
-	@Rollback
-	public void usernameEndingLikeMin() {
-		Account example = new Account();
-		example.setUsername("min");
-		assertThat(accountQBE.find(example)).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
-	}
+    @Test
+    @Rollback
+    public void usernameEndingLikeMin() {
+        Account example = new Account();
+        example.setUsername("min");
+        assertThat(accountQBE.find(example)).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
+    }
 
-	@Test
-	@Rollback
-	public void usernameContainingMin() {
-		Account example = new Account();
-		example.setUsername("mi");
-		assertThat(accountQBE.find(example)).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters().anywhere())).hasSize(1);
-	}
+    @Test
+    @Rollback
+    public void usernameContainingMin() {
+        Account example = new Account();
+        example.setUsername("mi");
+        assertThat(accountQBE.find(example)).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters().anywhere())).hasSize(1);
+    }
 
-	@Test
-	@Rollback
-	public void usernameEqualsAdminCaseSensitive() {
-		Account example = new Account();
-		example.setUsername("AdMiN");
-		assertThat(accountQBE.find(example)).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters().caseSensitive())).isEmpty();
-		assertThat(accountQBE.find(example, new SearchParameters().caseInsensitive())).hasSize(1);
-	}
-
-
-	@Test
-	@Rollback
-	public void leftJoinHomeAddress() {
-		assertThat(accountQBE.find(new SearchParameters().leftJoin(homeAddress))).hasSize(NB_ACCOUNTS);
-	}
+    @Test
+    @Rollback
+    public void usernameEqualsAdminCaseSensitive() {
+        Account example = new Account();
+        example.setUsername("AdMiN");
+        assertThat(accountQBE.find(example)).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters().caseSensitive())).isEmpty();
+        assertThat(accountQBE.find(example, new SearchParameters().caseInsensitive())).hasSize(1);
+    }
 
 
-	@Test
-	@Rollback
-	public void byManyToOnePropertyMatch() {
-		Address paris = new Address();
-		paris.setCity("Paris");
+    @Test
+    @Rollback
+    public void leftJoinHomeAddress() {
+        assertThat(accountQBE.find(new SearchParameters().leftJoin(homeAddress))).hasSize(NB_ACCOUNTS);
+    }
 
-		Account example = new Account();
-		example.setHomeAddress(paris);
 
-		assertThat(accountQBE.find(example)).hasSize(1);
-	}
+    @Test
+    @Rollback
+    public void byManyToOnePropertyMatch() {
+        Address paris = new Address();
+        paris.setCity("Paris");
 
-	@Test
-	@Rollback
-	public void byManyToOnePropertyDoesNotMatch() {
-		Address invalidAddress = new Address();
-		invalidAddress.setCity("noMatch");
+        Account example = new Account();
+        example.setHomeAddress(paris);
 
-		Account noMatch = new Account();
-		noMatch.setHomeAddress(invalidAddress);
+        assertThat(accountQBE.find(example)).hasSize(1);
+    }
 
-		assertThat(accountQBE.find(noMatch)).isEmpty();
-	}
+    @Test
+    @Rollback
+    public void byManyToOnePropertyDoesNotMatch() {
+        Address invalidAddress = new Address();
+        invalidAddress.setCity("noMatch");
 
-	@Test
-	@Rollback
-	public void byManyToOnePropertyEndingLike() {
-		Address almostParis = new Address();
-		almostParis.setCity("ris");
-		Account example = new Account();
-		example.setHomeAddress(almostParis);
+        Account noMatch = new Account();
+        noMatch.setHomeAddress(invalidAddress);
 
-		assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
-	}
+        assertThat(accountQBE.find(noMatch)).isEmpty();
+    }
 
-	@Test
-	@Rollback
-	public void byManyToMany() {
-		Account adminOnly = new Account();
-		adminOnly.addRole(entityManager.find(Role.class, 1));
-		assertThat(accountQBE.find(adminOnly)).hasSize(1);
+    @Test
+    @Rollback
+    public void byManyToOnePropertyEndingLike() {
+        Address almostParis = new Address();
+        almostParis.setCity("ris");
+        Account example = new Account();
+        example.setHomeAddress(almostParis);
+
+        assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
+    }
+
+    @Test
+    @Rollback
+    public void byManyToMany() {
+        Account adminOnly = new Account();
+        adminOnly.addRole(entityManager.find(Role.class, 1));
+        assertThat(accountQBE.find(adminOnly)).hasSize(1);
         assertThat(accountQBE.find(adminOnly, new SearchParameters())).hasSize(1);
         assertThat(accountQBE.find(adminOnly, new SearchParameters().distinct())).hasSize(1);
 
-		Account users = new Account();
-		users.addRole(entityManager.find(Role.class, 2));
-		assertThat(accountQBE.find(users)).hasSize(3);
-		assertThat(accountQBE.find(users, new SearchParameters().distinct())).hasSize(3);
+        Account users = new Account();
+        users.addRole(entityManager.find(Role.class, 2));
+        assertThat(accountQBE.find(users)).hasSize(3);
+        assertThat(accountQBE.find(users, new SearchParameters().distinct())).hasSize(3);
 
-		Account userOrAdmin = new Account();
-		userOrAdmin.addRole(entityManager.find(Role.class, 1));
-		userOrAdmin.addRole(entityManager.find(Role.class, 2));
+        Account userOrAdmin = new Account();
+        userOrAdmin.addRole(entityManager.find(Role.class, 1));
+        userOrAdmin.addRole(entityManager.find(Role.class, 2));
         assertThat(accountQBE.find(userOrAdmin)).hasSize(1);
         assertThat(accountQBE.find(userOrAdmin, new SearchParameters())).hasSize(1);
         assertThat(accountQBE.find(userOrAdmin, new SearchParameters().distinct())).hasSize(1);
         assertThat(accountQBE.find(userOrAdmin, new SearchParameters().useORInManyToMany())).hasSize(4);
         assertThat(accountQBE.find(userOrAdmin, new SearchParameters().useORInManyToMany().distinct())).hasSize(3);
 
-		Account unassigned = new Account();
-		unassigned.addRole(entityManager.find(Role.class, 3));
-		assertThat(accountQBE.find(unassigned)).isEmpty();
-		assertThat(accountQBE.find(unassigned, new SearchParameters().distinct())).isEmpty();
-	}
+        Account unassigned = new Account();
+        unassigned.addRole(entityManager.find(Role.class, 3));
+        assertThat(accountQBE.find(unassigned)).isEmpty();
+        assertThat(accountQBE.find(unassigned, new SearchParameters().distinct())).isEmpty();
+    }
 
-	@Test
-	@Rollback
-	public void orderByFieldname() {
-		List<Account> accounts = accountQBE.find(new SearchParameters().orderBy("username"));
-		assertThat(first(accounts).getUsername()).isEqualTo("admin");
+    @Test
+    @Rollback
+    public void orderByFieldname() {
+        List<Account> accounts = accountQBE.find(new SearchParameters().orderBy("username"));
+        assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new SearchParameters().orderBy("username", ASC));
-		assertThat(first(accounts).getUsername()).isEqualTo("admin");
+        accounts = accountQBE.find(new SearchParameters().orderBy(Account_.username));
+        assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new SearchParameters().orderBy("username", DESC));
-		assertThat(first(accounts).getUsername()).isEqualTo("user");
+        accounts = accountQBE.find(new SearchParameters().orderBy(DESC, Account_.username));
+        assertThat(first(accounts).getUsername()).isEqualTo("user");
 
-		accounts = accountQBE.find(new SearchParameters().orderBy(new OrderBy("username", DESC)));
-		assertThat(first(accounts).getUsername()).isEqualTo("user");
-	}
+        accounts = accountQBE.find(new SearchParameters().orderBy(new OrderBy(DESC, Account_.username)));
+        assertThat(first(accounts).getUsername()).isEqualTo("user");
+    }
 
-	@Test
-	@Rollback
-	public void orderByAttribute() {
-		List<Account> accounts = accountQBE.find(new SearchParameters().orderBy(username));
-		assertThat(first(accounts).getUsername()).isEqualTo("admin");
+    @Test
+    @Rollback
+    public void orderByAttribute() {
+        List<Account> accounts = accountQBE.find(new SearchParameters().orderBy(username));
+        assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new SearchParameters().orderBy(username, ASC));
-		assertThat(first(accounts).getUsername()).isEqualTo("admin");
+        accounts = accountQBE.find(new SearchParameters().orderBy(ASC, username));
+        assertThat(first(accounts).getUsername()).isEqualTo("admin");
 
-		accounts = accountQBE.find(new SearchParameters().orderBy(username, DESC));
-		assertThat(first(accounts).getUsername()).isEqualTo("user");
+        accounts = accountQBE.find(new SearchParameters().orderBy(DESC, username));
+        assertThat(first(accounts).getUsername()).isEqualTo("user");
 
-		accounts = accountQBE.find(new SearchParameters().orderBy(new OrderBy(username, DESC)));
-		assertThat(first(accounts).getUsername()).isEqualTo("user");
-	}
+        accounts = accountQBE.find(new SearchParameters().orderBy(new OrderBy(DESC, username)));
+        assertThat(first(accounts).getUsername()).isEqualTo("user");
+    }
 
-	@Test
-	@Rollback
-	public void bySearchPatternOnAllStringFields() {
-		assertThat(accountQBE.find(new SearchParameters().searchPattern("admin"))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().searchPattern("min").anywhere())).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().searchPattern("no_match").anywhere())).isEmpty();
-	}
+    @Test
+    @Rollback
+    public void bySearchPatternOnAllStringFields() {
+        assertThat(accountQBE.find(new SearchParameters().searchPattern("admin"))).hasSize(1);
+        assertThat(accountQBE.find(new SearchParameters().searchPattern("min").anywhere())).hasSize(1);
+        assertThat(accountQBE.find(new SearchParameters().searchPattern("no_match").anywhere())).isEmpty();
+    }
 
-	@Test
-	@Rollback
-	public void maxResults() {
-		assertThat(accountQBE.find(new SearchParameters().maxResults(4))).hasSize(4);
-	}
+    @Test
+    @Rollback
+    public void maxResults() {
+        assertThat(accountQBE.find(new SearchParameters().maxResults(4))).hasSize(4);
+    }
 
-	@Test
-	@Rollback
-	public void firstResult() {
-		assertThat(first(accountQBE.find(new SearchParameters().orderBy(username))).getUsername()).isEqualTo("admin");
-	}
+    @Test
+    @Rollback
+    public void firstResult() {
+        assertThat(first(accountQBE.find(new SearchParameters().orderBy(username))).getUsername()).isEqualTo("admin");
+    }
 
-	private Account first(List<Account> accounts) {
-		return accounts.iterator().next();
-	}
+    private Account first(List<Account> accounts) {
+        return accounts.iterator().next();
+    }
 }
