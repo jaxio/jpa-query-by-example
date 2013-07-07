@@ -16,28 +16,12 @@
 package org.querybyexample.jpa.it;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.querybyexample.jpa.EntitySelector.entitySelector;
 import static org.querybyexample.jpa.OrderByDirection.ASC;
 import static org.querybyexample.jpa.OrderByDirection.DESC;
-import static org.querybyexample.jpa.Ranges.RangeDate.after;
-import static org.querybyexample.jpa.Ranges.RangeDate.before;
-import static org.querybyexample.jpa.Ranges.RangeDate.rangeDate;
-import static org.querybyexample.jpa.Ranges.RangeInteger.rangeInteger;
-import static org.querybyexample.jpa.SearchMode.ANYWHERE;
-import static org.querybyexample.jpa.SearchMode.ENDING_LIKE;
-import static org.querybyexample.jpa.SearchMode.STARTING_LIKE;
-import static org.querybyexample.jpa.app.Account_.addressId;
-import static org.querybyexample.jpa.app.Account_.birthDate;
-import static org.querybyexample.jpa.app.Account_.email;
-import static org.querybyexample.jpa.app.Account_.favoriteNumber;
 import static org.querybyexample.jpa.app.Account_.homeAddress;
 import static org.querybyexample.jpa.app.Account_.username;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -69,15 +53,15 @@ public class AccountQueryByExampleIT {
 	@Inject
 	private AccountQueryByExample accountQBE;
 	
-	private static final int MAX = 6;
+	private static final int NB_ACCOUNTS = 6;
 
 	@Test
 	@Rollback
 	public void all() {
-		assertThat(accountQBE.find()).hasSize(MAX);
-		assertThat(accountQBE.find(new Account())).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters())).hasSize(MAX);
-		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(MAX);
+		assertThat(accountQBE.find()).hasSize(NB_ACCOUNTS);
+		assertThat(accountQBE.find(new Account())).hasSize(NB_ACCOUNTS);
+		assertThat(accountQBE.find(new SearchParameters())).hasSize(NB_ACCOUNTS);
+		assertThat(accountQBE.find(new Account(), new SearchParameters())).hasSize(NB_ACCOUNTS);
 	}
 
 	@Test
@@ -122,7 +106,6 @@ public class AccountQueryByExampleIT {
 		assertThat(accountQBE.find(example)).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters().startingLike())).hasSize(1);
-		assertThat(accountQBE.find(example, new SearchParameters(STARTING_LIKE))).hasSize(1);
 	}
 
 	@Test
@@ -133,7 +116,6 @@ public class AccountQueryByExampleIT {
 		assertThat(accountQBE.find(example)).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters().endingLike())).hasSize(1);
-		assertThat(accountQBE.find(example, new SearchParameters(ENDING_LIKE))).hasSize(1);
 	}
 
 	@Test
@@ -144,7 +126,6 @@ public class AccountQueryByExampleIT {
 		assertThat(accountQBE.find(example)).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters().anywhere())).hasSize(1);
-		assertThat(accountQBE.find(example, new SearchParameters(ANYWHERE))).hasSize(1);
 	}
 
 	@Test
@@ -152,134 +133,19 @@ public class AccountQueryByExampleIT {
 	public void usernameEqualsAdminCaseSensitive() {
 		Account example = new Account();
 		example.setUsername("AdMiN");
-		assertThat(accountQBE.find(example)).hasSize(1);
-		assertThat(accountQBE.find(example, new SearchParameters())).hasSize(1);
+		assertThat(accountQBE.find(example)).isEmpty();
+		assertThat(accountQBE.find(example, new SearchParameters())).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters().caseSensitive())).isEmpty();
 		assertThat(accountQBE.find(example, new SearchParameters().caseInsensitive())).hasSize(1);
 	}
 
-	@Test
-	@Rollback
-	public void byPropertySelector() {
-		assertThat(accountQBE.find(new SearchParameters(username))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters(username, "demo", "demo"))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters(username, "demo", "admin"))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters(username, "demo", "admin", "nothing"))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters(username, "unknown", "admin"))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters(username, "unknown", "invalid"))).isEmpty();
-
-		assertThat(accountQBE.find(new SearchParameters().property(username))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters().property(username, "demo", "demo"))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().property(username, "demo", "admin"))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters().property(username, "unknown", "admin"))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().property(username, "unknown", "invalid"))).isEmpty();
-	}
-
-	@Test
-	@Rollback
-	public void byMultiplePropertySelectors() {
-		assertThat(accountQBE.find(new SearchParameters().property(username, "admin").property(email, "admin@example.com"))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().property(username, "unknown").property(email, "admin@example.com"))).isEmpty();
-	}
-
-	@Test
-	@Rollback
-	public void byDateRangeSelectorBetween() {
-		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
-
-		assertThat(accountQBE.find(new SearchParameters().range(rangeDate(birthDate, getDate("01/01/1970"), getDate("01/01/2000"))))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters().range(rangeDate(birthDate, getDate("01/01/1988"), getDate("01/01/1989"))))).isEmpty();
-
-		assertThat(accountQBE.find(new SearchParameters().range(birthDate, getDate("01/01/1970"), getDate("01/01/2000")))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters().range(birthDate, getDate("01/01/1988"), getDate("01/01/1989")))).isEmpty();
-	}
-
-	@Test
-	@Rollback
-	public void byAfterRangeSelector() {
-		assertThat(accountQBE.find(new SearchParameters().after(birthDate, getDate("01/01/1970")))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters().after(birthDate, getDate("01/01/2100")))).isEmpty();
-
-		assertThat(accountQBE.find(new SearchParameters(after(birthDate, getDate("01/01/1970"))))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters(after(birthDate, getDate("01/01/2100"))))).isEmpty();
-
-		assertThat(accountQBE.find(new SearchParameters().range(after(birthDate, getDate("01/01/1970"))))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters().range(after(birthDate, getDate("01/01/2100"))))).isEmpty();
-
-	}
-
-	@Test
-	@Rollback
-	public void byBeforeDateSelector() {
-		assertThat(accountQBE.find(new SearchParameters().before(birthDate, getDate("01/01/1970")))).isEmpty();
-		assertThat(accountQBE.find(new SearchParameters().before(birthDate, getDate("01/01/2100")))).hasSize(2);
-
-		assertThat(accountQBE.find(new SearchParameters(before(birthDate, getDate("01/01/1970"))))).isEmpty();
-		assertThat(accountQBE.find(new SearchParameters(before(birthDate, getDate("01/01/2100"))))).hasSize(2);
-
-		assertThat(accountQBE.find(new SearchParameters().range(before(birthDate, getDate("01/01/1970"))))).isEmpty();
-		assertThat(accountQBE.find(new SearchParameters().range(before(birthDate, getDate("01/01/2100"))))).hasSize(2);
-
-	}
-
-	@Test
-	@Rollback
-	public void byNumericalRangeSelector() {
-		assertThat(accountQBE.find(new SearchParameters(rangeInteger(favoriteNumber, -1000, 1000)))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters().range(rangeInteger(favoriteNumber, -1000, 1000)))).hasSize(MAX);
-		
-		assertThat(accountQBE.find(new SearchParameters(rangeInteger(favoriteNumber, 40, 1000)))).hasSize(2);
-		assertThat(accountQBE.find(new SearchParameters().range(rangeInteger(favoriteNumber, 40, 1000)))).hasSize(2);
-
-		assertThat(accountQBE.find(new SearchParameters().greather(favoriteNumber, -1000))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters().greather(favoriteNumber, 1000))).isEmpty();
-		assertThat(accountQBE.find(new SearchParameters().greather(favoriteNumber, 40))).hasSize(2);
-		
-		assertThat(accountQBE.find(new SearchParameters().lower(favoriteNumber, -100))).isEmpty();
-		assertThat(accountQBE.find(new SearchParameters().lower(favoriteNumber, 1000))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters().lower(favoriteNumber, 40))).hasSize(4);
-
-		
-		assertThat(accountQBE.find(new SearchParameters().lower(favoriteNumber, 45).greather(favoriteNumber, 40))).hasSize(1);
-	}
-
-	@Test
-	@Rollback
-	public void byEntitySelector() {
-		Address address1 = entityManager.find(Address.class, 1);
-		Address address2 = entityManager.find(Address.class, 2);
-
-		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId)))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address1)))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address2)))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address1, address1)))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters(entitySelector(addressId, address1, address2)))).hasSize(2);
-
-		assertThat(accountQBE.find(new SearchParameters().entity(entitySelector(addressId)))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters().entity(entitySelector(addressId, address1)))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().entity(entitySelector(addressId, address2)))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().entity(entitySelector(addressId, address1, address1)))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().entity(entitySelector(addressId, address1, address2)))).hasSize(2);
-
-		assertThat(accountQBE.find(new SearchParameters().entity(addressId))).hasSize(MAX);
-		assertThat(accountQBE.find(new SearchParameters().entity(addressId, address1))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().entity(addressId, address2))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().entity(addressId, address1, address1))).hasSize(1);
-		assertThat(accountQBE.find(new SearchParameters().entity(addressId, address1, address2))).hasSize(2);
-	}
 
 	@Test
 	@Rollback
 	public void leftJoinHomeAddress() {
-		assertThat(accountQBE.find(new SearchParameters().leftJoin(homeAddress))).hasSize(MAX);
+		assertThat(accountQBE.find(new SearchParameters().leftJoin(homeAddress))).hasSize(NB_ACCOUNTS);
 	}
 
-	@Test
-	@Rollback
-	public void innerJoinHomeAddress() {
-		assertThat(accountQBE.find(new SearchParameters().innerJoin(homeAddress))).hasSize(MAX);
-	}
 
 	@Test
 	@Rollback
@@ -322,7 +188,8 @@ public class AccountQueryByExampleIT {
 		Account adminOnly = new Account();
 		adminOnly.addRole(entityManager.find(Role.class, 1));
 		assertThat(accountQBE.find(adminOnly)).hasSize(1);
-		assertThat(accountQBE.find(adminOnly, new SearchParameters().distinct())).hasSize(1);
+        assertThat(accountQBE.find(adminOnly, new SearchParameters())).hasSize(1);
+        assertThat(accountQBE.find(adminOnly, new SearchParameters().distinct())).hasSize(1);
 
 		Account users = new Account();
 		users.addRole(entityManager.find(Role.class, 2));
@@ -332,8 +199,11 @@ public class AccountQueryByExampleIT {
 		Account userOrAdmin = new Account();
 		userOrAdmin.addRole(entityManager.find(Role.class, 1));
 		userOrAdmin.addRole(entityManager.find(Role.class, 2));
-		assertThat(accountQBE.find(userOrAdmin)).hasSize(4);
-		assertThat(accountQBE.find(userOrAdmin, new SearchParameters().distinct())).hasSize(3);
+        assertThat(accountQBE.find(userOrAdmin)).hasSize(1);
+        assertThat(accountQBE.find(userOrAdmin, new SearchParameters())).hasSize(1);
+        assertThat(accountQBE.find(userOrAdmin, new SearchParameters().distinct())).hasSize(1);
+        assertThat(accountQBE.find(userOrAdmin, new SearchParameters().useORInManyToMany())).hasSize(4);
+        assertThat(accountQBE.find(userOrAdmin, new SearchParameters().useORInManyToMany().distinct())).hasSize(3);
 
 		Account unassigned = new Account();
 		unassigned.addRole(entityManager.find(Role.class, 3));
@@ -391,19 +261,9 @@ public class AccountQueryByExampleIT {
 	@Rollback
 	public void firstResult() {
 		assertThat(first(accountQBE.find(new SearchParameters().orderBy(username))).getUsername()).isEqualTo("admin");
-		assertThat(first(accountQBE.find(new SearchParameters().orderBy(username).firstResult(0))).getUsername()).isEqualTo("admin");
-		assertThat(first(accountQBE.find(new SearchParameters().orderBy(username).firstResult(1))).getUsername()).isEqualTo("demo");
 	}
 
 	private Account first(List<Account> accounts) {
 		return accounts.iterator().next();
-	}
-
-	private Date getDate(String from) {
-		try {
-			return DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).parse(from);
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
 	}
 }

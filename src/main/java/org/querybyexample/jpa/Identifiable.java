@@ -1,12 +1,12 @@
 /*
- *  Copyright 2012 JAXIO http://www.jaxio.com
- *
+ * Copyright 2013 JAXIO http://www.jaxio.com
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,25 +18,24 @@ package org.querybyexample.jpa;
 import java.io.Serializable;
 
 /**
- * By making entities implement this interface we can easily retrieve from the {@link Identifiable} the identifier property of the entity.
+ * By making entities implement this interface we can easily retrieve from the
+ * {@link org.querybyexample.jpa.GenericRepository} the identifier property of the entity.
  */
-
 public interface Identifiable<PK extends Serializable> {
 
-	/**
-	 * @return the primary key
-	 */
-	PK getId();
+    /**
+     * @return the primary key
+     */
+    PK getId();
 
-	/**
-	 * Sets the primary key
-	 */
-	void setId(PK id);
+    /**
+     * Sets the primary key
+     */
+    void setId(PK id);
 
-	/**
-	 * Helper method to know whether the primary key is set or not.
-	 * 
-	 * @return true if the primary key is set, false otherwise
-	 */
-	boolean isIdSet();
+    /**
+     * Helper method to know whether the primary key is set or not.
+     * @return true if the primary key is set, false otherwise
+     */
+    boolean isIdSet();
 }

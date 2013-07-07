@@ -18,16 +18,20 @@ package org.querybyexample.jpa.app;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.querybyexample.jpa.QueryByExample;
+import org.querybyexample.jpa.GenericRepository;
 
 /**
  * JPA 2 Query By Example for {@link Account}.
  */
 @Named
 @Singleton
-public class AccountQueryByExample extends QueryByExample<Account, String> {
+public class AccountQueryByExample extends GenericRepository<Account, String> {
 	public AccountQueryByExample() {
 		super(Account.class);
 	}
 
+    @Override
+    public Account getNew() {
+        return new Account();
+    }
 }
