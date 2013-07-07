@@ -31,6 +31,12 @@
 			<organization>JAXIO</organization>
 			<organizationUrl>http://www.jaxio.com</organizationUrl>
 		</developer>
+		<developer>
+			<name>Sébastien Péralta</name>
+			<email>sebastien@peralta.fr</email>
+			<url>http://sebastien.peralta.fr</url>
+			<organizationUrl>http://www.peralta.fr/</organizationUrl>
+		</developer>
 	</developers>
 	<dependencies>
 		<dependency>
