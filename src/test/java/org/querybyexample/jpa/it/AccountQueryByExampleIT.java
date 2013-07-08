@@ -18,6 +18,7 @@ package org.querybyexample.jpa.it;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.querybyexample.jpa.OrderByDirection.ASC;
 import static org.querybyexample.jpa.OrderByDirection.DESC;
+import static org.querybyexample.jpa.PropertySelector.newPropertySelector;
 import static org.querybyexample.jpa.app.Account_.homeAddress;
 import static org.querybyexample.jpa.app.Account_.username;
 
@@ -30,16 +31,20 @@ import javax.persistence.PersistenceContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.querybyexample.jpa.OrderBy;
+import org.querybyexample.jpa.PropertySelector;
 import org.querybyexample.jpa.SearchParameters;
 import org.querybyexample.jpa.app.Account;
 import org.querybyexample.jpa.app.AccountQueryByExample;
 import org.querybyexample.jpa.app.Account_;
 import org.querybyexample.jpa.app.Address;
+import org.querybyexample.jpa.app.Address_;
 import org.querybyexample.jpa.app.Role;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Lists;
 
 /**
  * Integration test illustrating the use of JPA Query By Example project.
@@ -53,7 +58,7 @@ public class AccountQueryByExampleIT {
 
     @Inject
     private AccountQueryByExample accountQBE;
-    
+
     private static final int NB_ACCOUNTS = 6;
 
     @Test
@@ -140,13 +145,11 @@ public class AccountQueryByExampleIT {
         assertThat(accountQBE.find(example, new SearchParameters().caseInsensitive())).hasSize(1);
     }
 
-
     @Test
     @Rollback
     public void leftJoinHomeAddress() {
         assertThat(accountQBE.find(new SearchParameters().leftJoin(homeAddress))).hasSize(NB_ACCOUNTS);
     }
-
 
     @Test
     @Rollback
@@ -158,6 +161,15 @@ public class AccountQueryByExampleIT {
         example.setHomeAddress(paris);
 
         assertThat(accountQBE.find(example)).hasSize(1);
+    }
+
+    @Test
+    @Rollback
+    public void byPropertySelector() {
+        PropertySelector<Address, String> city = newPropertySelector(Account_.homeAddress, Address_.city);
+        city.setSelected(Lists.newArrayList("Paris"));
+
+        assertThat(accountQBE.find(new SearchParameters().property(city))).hasSize(1);
     }
 
     @Test
@@ -255,13 +267,20 @@ public class AccountQueryByExampleIT {
     @Test
     @Rollback
     public void maxResults() {
+        assertThat(accountQBE.find()).hasSize(NB_ACCOUNTS);
         assertThat(accountQBE.find(new SearchParameters().maxResults(4))).hasSize(4);
+        assertThat(first(accountQBE.find(new SearchParameters().maxResults(4))).getUsername()).isEqualTo("admin");
     }
 
     @Test
     @Rollback
     public void firstResult() {
-        assertThat(first(accountQBE.find(new SearchParameters().orderBy(username))).getUsername()).isEqualTo("admin");
+        assertThat(first(accountQBE.find(new SearchParameters())).getUsername()).isEqualTo("admin");
+        assertThat(first(accountQBE.find(new SearchParameters().first(2))).getUsername()).isNotEqualTo("admin");
+        assertThat(accountQBE.find(new SearchParameters().first(4).maxResults(4))).hasSize(2);
+
+        // first and maxResults are not part of count
+        assertThat(accountQBE.findCount(new SearchParameters().first(4).maxResults(4))).isEqualTo(6);
     }
 
     private Account first(List<Account> accounts) {
