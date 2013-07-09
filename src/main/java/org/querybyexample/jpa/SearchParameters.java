@@ -386,6 +386,10 @@ public class SearchParameters implements Serializable {
         return orderBy(new OrderBy(OrderByDirection.ASC, attributes));
     }
 
+    public SearchParameters orderBy(OrderByDirection orderByDirection, List<Attribute<?, ?>> attributes) {
+        return orderBy(new OrderBy(orderByDirection, attributes));
+    }
+
     public SearchParameters orderBy(OrderByDirection orderByDirection, Attribute<?, ?>... attributes) {
         return orderBy(new OrderBy(orderByDirection, attributes));
     }

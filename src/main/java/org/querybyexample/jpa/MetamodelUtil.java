@@ -1,37 +1,41 @@
 package org.querybyexample.jpa;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.metamodel.Attribute;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
 
+@Named
+@Singleton
 public class MetamodelUtil {
+    private Map<Class<?>, Class<?>> metamodelCache = newHashMap();
 
-    private static Map<Class<?>, Class<?>> metamodelCache = Maps.newHashMap();
-
-    public static List<Attribute<?, ?>> toMetamodelListAttributes(String path, Class<?> from) {
+    public List<Attribute<?, ?>> toAttributes(String path, Class<?> from) {
         try {
             List<Attribute<?, ?>> attributes = newArrayList();
             Class<?> current = from;
             for (String pathItem : Splitter.on(".").split(path)) {
-                System.out.println(pathItem);
-                Class<?> metamodelClass = getClazz(current);
-                Attribute<?, ?> attribute = (Attribute<?, ?>) metamodelClass.getField(pathItem).get(null);
+                Class<?> metamodelClass = getCachedClass(current);
+                Field field = metamodelClass.getField(pathItem);
+                Attribute<?, ?> attribute = (Attribute<?, ?>) field.get(null);
                 attributes.add(attribute);
                 current = attribute.getJavaType();
             }
             return attributes;
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 
-    private static Class<?> getClazz(Class<?> current) throws ClassNotFoundException {
+    private Class<?> getCachedClass(Class<?> current) throws ClassNotFoundException {
         if (metamodelCache.containsKey(current)) {
             return metamodelCache.get(current);
         }

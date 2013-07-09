@@ -31,6 +31,7 @@ import javax.persistence.PersistenceContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.querybyexample.jpa.EntitySelector;
+import org.querybyexample.jpa.MetamodelUtil;
 import org.querybyexample.jpa.OrderBy;
 import org.querybyexample.jpa.PropertySelector;
 import org.querybyexample.jpa.SearchParameters;
@@ -58,6 +59,9 @@ public class AccountQueryByExampleIT {
 
     @Inject
     private AccountQueryByExample accountQBE;
+
+    @Inject
+    private MetamodelUtil metamodelUtil;
 
     private static final int NB_ACCOUNTS = 7;
 
@@ -258,6 +262,13 @@ public class AccountQueryByExampleIT {
     @Test
     public void orderByManyToOneAttribute() {
         SearchParameters searchParameter = new SearchParameters().orderBy(ASC, Account_.homeAddress, Address_.city);
+        assertSize(searchParameter, NB_ACCOUNTS);
+        assertFirstUsername(searchParameter, "homeless");
+    }
+
+    @Test
+    public void orderByManyToOneString() {
+        SearchParameters searchParameter = new SearchParameters().orderBy(ASC, metamodelUtil.toAttributes("homeAddress.city", Account.class));
         assertSize(searchParameter, NB_ACCOUNTS);
         assertFirstUsername(searchParameter, "homeless");
     }

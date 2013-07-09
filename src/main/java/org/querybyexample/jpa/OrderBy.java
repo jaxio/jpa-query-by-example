@@ -37,10 +37,14 @@ public class OrderBy implements Serializable {
     private final String property;
     private OrderByDirection direction = ASC;
 
-    public OrderBy(OrderByDirection direction, Attribute<?, ?>... attributes) {
+    public OrderBy(OrderByDirection direction, List<Attribute<?, ?>> attributes) {
         this.direction = checkNotNull(direction);
-        this.attributes = newArrayList(checkNotNull(attributes));
+        this.attributes = checkNotNull(attributes);
         this.property = null;
+    }
+
+    public OrderBy(OrderByDirection direction, Attribute<?, ?>... attributes) {
+        this(direction, newArrayList(attributes));
     }
 
     public OrderBy(OrderByDirection direction, String property) {
