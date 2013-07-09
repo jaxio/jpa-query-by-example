@@ -46,7 +46,6 @@ import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.apache.commons.lang.WordUtils;
-import org.querybyexample.jpa.Identifiable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.util.ReflectionUtils;
@@ -149,25 +148,23 @@ public class JpaUtil {
      * Note: JPA will do joins if the property is in an associated entity.
      */
     @SuppressWarnings("unchecked")
-    public static <E, F> Path<F> getPath(Root<E> root, List<Attribute<?, ?>> attributes, boolean distinct) {
+    public static <E, F> Path<F> getPath(Root<E> root, List<Attribute<?, ?>> attributes) {
         Path<?> path = root;
         for (Attribute<?, ?> attribute : attributes) {
             boolean found = false;
-            if (distinct) {
-                // handle case when order on already fetched attribute
-                for (Fetch<E, ?> fetch : root.getFetches()) {
-                    if (attribute.getName().equals(fetch.getAttribute().getName()) && (fetch instanceof Join<?, ?>)) {
-                        path = (Join<E, ?>) fetch;
-                        found = true;
-                        break;
-                    }
+            // handle case when order on already fetched attribute
+            for (Fetch<E, ?> fetch : root.getFetches()) {
+                if (attribute.getName().equals(fetch.getAttribute().getName()) && (fetch instanceof Join<?, ?>)) {
+                    path = (Join<E, ?>) fetch;
+                    found = true;
+                    break;
                 }
-                for (Join<E, ?> join : root.getJoins()) {
-                    if (attribute.getName().equals(join.getAttribute().getName())) {
-                        path = join;
-                        found = true;
-                        break;
-                    }
+            }
+            for (Join<E, ?> join : root.getJoins()) {
+                if (attribute.getName().equals(join.getAttribute().getName())) {
+                    path = join;
+                    found = true;
+                    break;
                 }
             }
             if (!found) {
