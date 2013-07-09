@@ -35,22 +35,12 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.querybyexample.jpa.ByEntitySelectorUtil;
-import org.querybyexample.jpa.ByExampleUtil;
-import org.querybyexample.jpa.ByPatternUtil;
-import org.querybyexample.jpa.ByPropertySelectorUtil;
-import org.querybyexample.jpa.ByRangeUtil;
-import org.querybyexample.jpa.Identifiable;
-import org.querybyexample.jpa.JpaUtil;
-import org.querybyexample.jpa.NamedQueryUtil;
-import org.querybyexample.jpa.OrderByUtil;
-import org.querybyexample.jpa.SearchParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * JPA 2 {@link GenericRepository} implementation 
+ * JPA 2 {@link GenericRepository} implementation
  */
 public abstract class GenericRepository<E extends Identifiable<PK>, PK extends Serializable> {
     @Inject
@@ -88,14 +78,14 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
 
     /**
      * Create a new instance of the repository type.
-     *
+     * 
      * @return a new instance with no property set.
      */
     public abstract E getNew();
 
     /**
      * Creates a new instance and initializes it with some default values.
-     *
+     * 
      * @return a new instance initialized with default values.
      */
     public E getNewWithDefaults() {
@@ -184,10 +174,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
 
         // left join
-        if (sp.hasLeftJoins()) {
-            for (SingularAttribute<?, ?> arg : sp.getLeftJoins()) {
-                root.fetch((SingularAttribute<E, ?>) arg, JoinType.LEFT);
-            }
+        for (SingularAttribute<?, ?> arg : sp.getLeftJoins()) {
+            root.fetch((SingularAttribute<E, ?>) arg, JoinType.LEFT);
         }
 
         // order by
@@ -250,6 +238,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
             criteriaQuery = criteriaQuery.where(predicate);
         }
 
+        orderByUtil.forceJoinOrder(root, sp);
+
         TypedQuery<Long> typedQuery = entityManager.createQuery(criteriaQuery);
 
         // cache
@@ -294,6 +284,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
 
     /**
      * We request at most 2, if there's more than one then we throw a {@link NonUniqueResultException}
+     * 
      * @throws NonUniqueResultException
      */
     @Transactional(readOnly = true)
@@ -350,9 +341,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     /**
-     * Save or update the passed entity E to the repository.
-     * Assume that the entity is already present in the persistence context.
-     * No merge is done.
+     * Save or update the passed entity E to the repository. Assume that the entity is already present in the persistence context. No merge is done.
      * 
      * @param entity the entity to be saved or updated.
      */

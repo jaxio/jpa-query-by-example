@@ -26,10 +26,6 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.querybyexample.jpa.JpaUtil;
-import org.querybyexample.jpa.PropertySelector;
-import org.querybyexample.jpa.SearchParameters;
-
 /**
  * Helper to create a predicate out of {@link PropertySelector}s.
  */
@@ -56,7 +52,7 @@ public class ByPropertySelectorUtil {
             List<Predicate> selectorPredicates = newArrayList();
 
             for (Boolean selection : selector.getSelected()) {
-                Path<Boolean> path = JpaUtil.getPath(root, selector.getAttributes(), sp.getDistinct());
+                Path<Boolean> path = JpaUtil.getPath(root, selector.getAttributes());
                 if (selection == null) {
                     selectorPredicates.add(builder.isNull(path));
                 } else {
@@ -74,10 +70,10 @@ public class ByPropertySelectorUtil {
 
             for (Object selection : selector.getSelected()) {
                 if (selection instanceof String) {
-                    Path<String> path = JpaUtil.getPath(root, selector.getAttributes(), sp.getDistinct());
+                    Path<String> path = JpaUtil.getPath(root, selector.getAttributes());
                     selectorPredicates.add(JpaUtil.stringPredicate(path, selection, selector.getSearchMode(), sp, builder));
                 } else {
-                    Path<?> path = JpaUtil.getPath(root, selector.getAttributes(), sp.getDistinct());
+                    Path<?> path = JpaUtil.getPath(root, selector.getAttributes());
                     selectorPredicates.add(selection == null ? builder.isNull(path) : builder.equal(path, selection));
                 }
             }

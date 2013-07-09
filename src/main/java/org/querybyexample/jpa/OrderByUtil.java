@@ -22,9 +22,13 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.Attribute.PersistentAttributeType;
+import javax.persistence.metamodel.SingularAttribute;
 
 /**
  * Helper to create list of {@link Order} out of {@link OrderBy}s.
@@ -34,10 +38,23 @@ import javax.persistence.criteria.Root;
 public class OrderByUtil {
     public <E> List<Order> buildJpaOrders(Iterable<OrderBy> orders, Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
         List<Order> jpaOrders = newArrayList();
+        forceJoinOrder(root, sp);
         for (OrderBy ob : orders) {
-            Path<?> path = JpaUtil.getPath(root, ob.getAttributes(), sp.getDistinct());
+            Path<?> path = JpaUtil.getPath(root, ob.getAttributes());
             jpaOrders.add(ob.isOrderDesc() ? builder.desc(path) : builder.asc(path));
         }
         return jpaOrders;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <E> void forceJoinOrder(Root<E> root, SearchParameters sp) {
+        for (OrderBy orderBy : sp.getOrders()) {
+            for (Attribute<?, ?> attr : orderBy.getAttributes()) {
+                if (attr.getPersistentAttributeType() == PersistentAttributeType.MANY_TO_ONE
+                        || attr.getPersistentAttributeType() == PersistentAttributeType.ONE_TO_ONE) {
+                    root.join((SingularAttribute<E, ?>) attr, JoinType.LEFT);
+                }
+            }
+        }
     }
 }
