@@ -24,12 +24,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.querybyexample.jpa.Identifiable;
-
 /**
- * Used to construct OR predicate for a single foreign key value. In other words you can search
- * all entities E having their x-to-one association value set to one of the selected values.
- * To avoid a join we rely on the foreign key field, not the association itself.
+ * Used to construct OR predicate for a single foreign key value. In other words you can search all entities E having their x-to-one association value set to
+ * one of the selected values. To avoid a join we rely on the foreign key field, not the association itself.
  */
 @Named
 @Singleton
@@ -51,10 +48,17 @@ public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializ
         this.cpkInnerField = null;
     }
 
+    public EntitySelector(SingularAttribute<E, T> field, T... selected) {
+        this(field);
+        if (selected != null && selected.length != 0) {
+            this.selected = newArrayList(selected);
+        }
+    }
+
     public EntitySelector(SingularAttribute<E, ?> cpkField, SingularAttribute<?, TPK> cpkInnerField) {
         this.cpkField = cpkField;
         this.cpkInnerField = cpkInnerField;
-        this.field = null; // not used        
+        this.field = null; // not used
     }
 
     public SingularAttribute<E, T> getField() {
@@ -83,6 +87,13 @@ public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializ
         this.selected = selected;
     }
 
+    public void add(T selected) {
+        if (this.selected == null) {
+            this.selected = newArrayList();
+        }
+        this.selected.add(selected);
+    }
+
     public boolean isNotEmpty() {
         return selected != null && !selected.isEmpty();
     }
@@ -105,6 +116,16 @@ public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializ
         return includeNull != null;
     }
 
+    public EntitySelector<E, T, TPK> includeNull() {
+        setIncludeNull(true);
+        return this;
+    }
+
+    public EntitySelector<E, T, TPK> withoutNull() {
+        setIncludeNull(false);
+        return this;
+    }
+
     /**
      * Import statically this helper for smooth instantiation.
      */
@@ -114,7 +135,14 @@ public class EntitySelector<E, T extends Identifiable<TPK>, TPK extends Serializ
 
     /**
      * Import statically this helper for smooth instantiation.
-     * It is used in the case where the PK is composite AND the pk member(s) are/is also a foreign key. 
+     */
+    public static <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> EntitySelector<E2, T2, TPK2> newEntitySelector(
+            SingularAttribute<E2, T2> field, T2... selected) {
+        return new EntitySelector<E2, T2, TPK2>(field, selected);
+    }
+
+    /**
+     * Import statically this helper for smooth instantiation. It is used in the case where the PK is composite AND the pk member(s) are/is also a foreign key.
      */
     public static <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable, CPK2> EntitySelector<E2, T2, TPK2> newEntitySelectorInCpk(
             SingularAttribute<E2, CPK2> cpkField, SingularAttribute<CPK2, TPK2> cpkInnerField) {
