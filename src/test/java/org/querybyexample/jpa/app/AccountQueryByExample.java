@@ -26,9 +26,9 @@ import org.querybyexample.jpa.GenericRepository;
 @Named
 @Singleton
 public class AccountQueryByExample extends GenericRepository<Account, String> {
-	public AccountQueryByExample() {
-		super(Account.class);
-	}
+    public AccountQueryByExample() {
+        super(Account.class);
+    }
 
     @Override
     public Account getNew() {
