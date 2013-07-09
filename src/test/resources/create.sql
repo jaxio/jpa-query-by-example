@@ -62,6 +62,7 @@ INSERT INTO ACCOUNT (id, login, password, email, favorite_number, is_enabled, ad
 INSERT INTO ACCOUNT (id, login, password, email, favorite_number, is_enabled, address_id) VALUES ('000000000000000000000000000004', 'disabled',  'disabled',  'disabled@example.com', -1, false, 3);
 INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000005', 'homer',  'homer',  'homer@example.com', 666, 'MR', 4, PARSEDATETIME('01/01/1972','dd/mm/yyyy'));
 INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000006', 'maggy',  'maggy',  'maggy@example.com', 42, 'MS', 4, PARSEDATETIME('01/01/1982','dd/mm/yyyy'));
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000007', 'homeless',  'homeless',  'homeless@example.com', 42, 'MS', null, PARSEDATETIME('01/01/1982','dd/mm/yyyy'));
 
 INSERT INTO ROLE (role_name) VALUES ('ROLE_ADMIN');
 INSERT INTO ROLE (role_name) VALUES ('ROLE_USER');

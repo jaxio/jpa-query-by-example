@@ -15,7 +15,10 @@
  */
 package org.querybyexample.jpa.it;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.querybyexample.jpa.EntitySelector.*;
+import static org.querybyexample.jpa.EntitySelector.newEntitySelector;
 import static org.querybyexample.jpa.OrderByDirection.ASC;
 import static org.querybyexample.jpa.OrderByDirection.DESC;
 import static org.querybyexample.jpa.PropertySelector.newPropertySelector;
@@ -30,6 +33,7 @@ import javax.persistence.PersistenceContext;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.querybyexample.jpa.EntitySelector;
 import org.querybyexample.jpa.OrderBy;
 import org.querybyexample.jpa.PropertySelector;
 import org.querybyexample.jpa.SearchParameters;
@@ -59,7 +63,7 @@ public class AccountQueryByExampleIT {
     @Inject
     private AccountQueryByExample accountQBE;
 
-    private static final int NB_ACCOUNTS = 6;
+    private static final int NB_ACCOUNTS = 7;
 
     @Test
     @Rollback
@@ -161,6 +165,67 @@ public class AccountQueryByExampleIT {
         example.setHomeAddress(paris);
 
         assertThat(accountQBE.find(example)).hasSize(1);
+    }
+
+    @Test
+    @Rollback
+    public void byEntiySelector() {
+        Account admin = new Account();
+        admin.setUsername("admin");
+
+        EntitySelector<Account, Address, Integer> role = newEntitySelector(Account_.homeAddress);
+        role.setSelected(newArrayList(accountQBE.find(admin).get(0).getHomeAddress()));
+
+        assertThat(accountQBE.find(new SearchParameters().entity(role))).hasSize(1);
+    }
+
+    @Test
+    @Rollback
+    public void byEntiySelectorAndIncludingNull() {
+        Account admin = new Account();
+        admin.setUsername("admin");
+
+        EntitySelector<Account, Address, Integer> role = newEntitySelector(Account_.homeAddress);
+        role.setSelected(Lists.newArrayList(accountQBE.find(admin).get(0).getHomeAddress()));
+        role.setIncludeNull(true);
+
+        assertThat(accountQBE.find(new SearchParameters().entity(role))).hasSize(2);
+    }
+
+    @Test
+    @Rollback
+    public void byEntiySelectorIncludingNull() {
+        Account admin = new Account();
+        admin.setUsername("admin");
+
+        EntitySelector<Account, Address, Integer> role = newEntitySelector(Account_.homeAddress);
+        role.setIncludeNull(true);
+
+        assertThat(accountQBE.find(new SearchParameters().entity(role))).hasSize(1);
+    }
+
+    @Test
+    @Rollback
+    public void byEntiySelectorNotIncludingNull() {
+        Account admin = new Account();
+        admin.setUsername("admin");
+
+        EntitySelector<Account, Address, Integer> role = newEntitySelector(Account_.homeAddress);
+        role.setIncludeNull(false);
+
+        assertThat(accountQBE.find(new SearchParameters().entity(role))).hasSize(6);
+    }
+    
+    @Test
+    @Rollback
+    public void byEntiySelectorInnerPk() {
+        Account admin = new Account();
+        admin.setUsername("admin");
+
+        EntitySelector<Account, Address, Integer> role = newEntitySelectorInCpk(Account_.homeAddress, Address_.id);
+        role.setSelected(Lists.newArrayList(accountQBE.find(admin).get(0).getHomeAddress()));
+
+        assertThat(accountQBE.find(new SearchParameters().entity(role))).hasSize(1);
     }
 
     @Test
@@ -277,10 +342,10 @@ public class AccountQueryByExampleIT {
     public void firstResult() {
         assertThat(first(accountQBE.find(new SearchParameters())).getUsername()).isEqualTo("admin");
         assertThat(first(accountQBE.find(new SearchParameters().first(2))).getUsername()).isNotEqualTo("admin");
-        assertThat(accountQBE.find(new SearchParameters().first(4).maxResults(4))).hasSize(2);
+        assertThat(accountQBE.find(new SearchParameters().first(4).maxResults(4))).hasSize(NB_ACCOUNTS - 4);
 
         // first and maxResults are not part of count
-        assertThat(accountQBE.findCount(new SearchParameters().first(4).maxResults(4))).isEqualTo(6);
+        assertThat(accountQBE.findCount(new SearchParameters().first(4).maxResults(4))).isEqualTo(NB_ACCOUNTS);
     }
 
     private Account first(List<Account> accounts) {

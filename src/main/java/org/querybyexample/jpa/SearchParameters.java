@@ -447,7 +447,6 @@ public class SearchParameters implements Serializable {
 
     public void addEntity(EntitySelector<?, ?, ?> entitySelector) {
         checkNotNull(entitySelector);
-        checkNotNull(entitySelector.getField());
         entities.add(entitySelector);
     }
 
