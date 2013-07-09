@@ -16,11 +16,11 @@
 package org.querybyexample.jpa;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.querybyexample.jpa.OrderByDirection.ASC;
 import static org.querybyexample.jpa.OrderByDirection.DESC;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.metamodel.Attribute;
@@ -28,8 +28,8 @@ import javax.persistence.metamodel.Attribute;
 import org.hibernate.ejb.metamodel.AbstractAttribute;
 
 /**
- * Holder class for search ordering used by the {@link SearchParameters}.
- * When used with {@link NamedQueryUtil}, you pass column name. For other usage, pass the property name.
+ * Holder class for search ordering used by the {@link SearchParameters}. When used with {@link NamedQueryUtil}, you pass column name. For other usage, pass the
+ * property name.
  */
 public class OrderBy implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -39,7 +39,7 @@ public class OrderBy implements Serializable {
 
     public OrderBy(OrderByDirection direction, Attribute<?, ?>... attributes) {
         this.direction = checkNotNull(direction);
-        this.attributes = Arrays.asList(checkNotNull(attributes));
+        this.attributes = newArrayList(checkNotNull(attributes));
         this.property = null;
     }
 
