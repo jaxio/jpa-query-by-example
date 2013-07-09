@@ -35,16 +35,16 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Singleton
-public class NamedQueryUtil {
-    private static final Logger log = LoggerFactory.getLogger(NamedQueryUtil.class);
+public class ByNamedQueryUtil {
+    private static final Logger log = LoggerFactory.getLogger(ByNamedQueryUtil.class);
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    public NamedQueryUtil() {
+    public ByNamedQueryUtil() {
     }
 
-    public NamedQueryUtil(EntityManager entityManager) {
+    public ByNamedQueryUtil(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

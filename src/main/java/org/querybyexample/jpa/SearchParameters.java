@@ -51,7 +51,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @see SearchMode
  * @see OrderBy
  * @see Range
- * @see NamedQueryUtil
+ * @see ByNamedQueryUtil
  * @see PropertySelector
  * @see EntitySelector
  */

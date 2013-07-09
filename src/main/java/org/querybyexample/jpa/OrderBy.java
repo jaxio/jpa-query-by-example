@@ -28,7 +28,7 @@ import javax.persistence.metamodel.Attribute;
 import org.hibernate.ejb.metamodel.AbstractAttribute;
 
 /**
- * Holder class for search ordering used by the {@link SearchParameters}. When used with {@link NamedQueryUtil}, you pass column name. For other usage, pass the
+ * Holder class for search ordering used by the {@link SearchParameters}. When used with {@link ByNamedQueryUtil}, you pass column name. For other usage, pass the
  * property name.
  */
 public class OrderBy implements Serializable {

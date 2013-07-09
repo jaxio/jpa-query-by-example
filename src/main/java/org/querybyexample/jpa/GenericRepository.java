@@ -52,7 +52,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     @Inject
     protected ByRangeUtil byRangeUtil;
     @Inject
-    protected NamedQueryUtil namedQueryUtil;
+    protected ByNamedQueryUtil byNamedQueryUtil;
     @Inject
     protected ByPropertySelectorUtil byPropertySelectorUtil;
     @Inject
@@ -158,7 +158,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     @Transactional(readOnly = true)
     public List<E> find(E entity, SearchParameters sp) {
         if (sp.hasNamedQuery()) {
-            return namedQueryUtil.findByNamedQuery(sp);
+            return byNamedQueryUtil.findByNamedQuery(sp);
         }
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<E> criteriaQuery = builder.createQuery(type);
@@ -219,7 +219,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         checkNotNull(sp, "The searchParameters cannot be null");
 
         if (sp.hasNamedQuery()) {
-            return namedQueryUtil.numberByNamedQuery(sp).intValue();
+            return byNamedQueryUtil.numberByNamedQuery(sp).intValue();
         }
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
