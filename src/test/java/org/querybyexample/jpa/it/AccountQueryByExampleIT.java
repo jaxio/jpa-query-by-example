@@ -17,6 +17,7 @@ package org.querybyexample.jpa.it;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.fest.assertions.Assertions.assertThat;
+import static org.querybyexample.jpa.EntitySelector.*;
 import static org.querybyexample.jpa.EntitySelector.newEntitySelector;
 import static org.querybyexample.jpa.OrderByDirection.ASC;
 import static org.querybyexample.jpa.OrderByDirection.DESC;
@@ -213,6 +214,18 @@ public class AccountQueryByExampleIT {
         role.setIncludeNull(false);
 
         assertThat(accountQBE.find(new SearchParameters().entity(role))).hasSize(6);
+    }
+    
+    @Test
+    @Rollback
+    public void byEntiySelectorInnerPk() {
+        Account admin = new Account();
+        admin.setUsername("admin");
+
+        EntitySelector<Account, Address, Integer> role = newEntitySelectorInCpk(Account_.homeAddress, Address_.id);
+        role.setSelected(Lists.newArrayList(accountQBE.find(admin).get(0).getHomeAddress()));
+
+        assertThat(accountQBE.find(new SearchParameters().entity(role))).hasSize(1);
     }
 
     @Test
