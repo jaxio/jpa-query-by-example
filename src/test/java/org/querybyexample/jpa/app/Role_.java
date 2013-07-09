@@ -21,7 +21,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Role.class)
 public abstract class Role_ {
 
-	// Raw attributes
-	public static volatile SingularAttribute<Role, Integer> id;
-	public static volatile SingularAttribute<Role, String> roleName;
+    // Raw attributes
+    public static volatile SingularAttribute<Role, Integer> id;
+    public static volatile SingularAttribute<Role, String> roleName;
 }

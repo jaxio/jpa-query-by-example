@@ -24,21 +24,21 @@ import javax.persistence.metamodel.StaticMetamodel;
 @StaticMetamodel(Account.class)
 public abstract class Account_ {
 
-	// Raw attributes
-	public static volatile SingularAttribute<Account, String> id;
-	public static volatile SingularAttribute<Account, String> username;
-	public static volatile SingularAttribute<Account, String> password;
-	public static volatile SingularAttribute<Account, String> email;
-	public static volatile SingularAttribute<Account, Integer> favoriteNumber;
-	public static volatile SingularAttribute<Account, Boolean> isEnabled;
-	public static volatile SingularAttribute<Account, Date> birthDate;
+    // Raw attributes
+    public static volatile SingularAttribute<Account, String> id;
+    public static volatile SingularAttribute<Account, String> username;
+    public static volatile SingularAttribute<Account, String> password;
+    public static volatile SingularAttribute<Account, String> email;
+    public static volatile SingularAttribute<Account, Integer> favoriteNumber;
+    public static volatile SingularAttribute<Account, Boolean> isEnabled;
+    public static volatile SingularAttribute<Account, Date> birthDate;
 
-	// Technical attributes for query by example
-	public static volatile SingularAttribute<Account, Integer> addressId;
+    // Technical attributes for query by example
+    public static volatile SingularAttribute<Account, Integer> addressId;
 
-	// Many to one
-	public static volatile SingularAttribute<Account, Address> homeAddress;
+    // Many to one
+    public static volatile SingularAttribute<Account, Address> homeAddress;
 
-	// Many to many
-	public static volatile ListAttribute<Account, Role> roles;
+    // Many to many
+    public static volatile ListAttribute<Account, Role> roles;
 }

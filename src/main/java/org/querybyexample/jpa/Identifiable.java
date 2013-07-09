@@ -18,8 +18,8 @@ package org.querybyexample.jpa;
 import java.io.Serializable;
 
 /**
- * By making entities implement this interface we can easily retrieve from the
- * {@link org.querybyexample.jpa.GenericRepository} the identifier property of the entity.
+ * By making entities implement this interface we can easily retrieve from the {@link org.querybyexample.jpa.GenericRepository} the identifier property of the
+ * entity.
  */
 public interface Identifiable<PK extends Serializable> {
 
@@ -35,6 +35,7 @@ public interface Identifiable<PK extends Serializable> {
 
     /**
      * Helper method to know whether the primary key is set or not.
+     * 
      * @return true if the primary key is set, false otherwise
      */
     boolean isIdSet();

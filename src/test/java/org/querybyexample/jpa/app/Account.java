@@ -42,203 +42,216 @@ import org.querybyexample.jpa.Identifiable;
 @Entity
 @Table(name = "ACCOUNT")
 public class Account implements Identifiable<String>, Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// Raw attributes
-	private String id; // pk
-	private String username; // unique (not null)
-	private String password; // not null
-	private String email; // unique (not null)
-	private Integer favoriteNumber;
-	private Boolean isEnabled;
-	private Date birthDate;
+    // Raw attributes
+    private String id; // pk
+    private String username; // unique (not null)
+    private String password; // not null
+    private String email; // unique (not null)
+    private Integer favoriteNumber;
+    private Boolean isEnabled;
+    private Date birthDate;
 
-	// Technical attributes for query by example
-	private Integer addressId;
+    // Technical attributes for query by example
+    private Integer addressId;
 
-	// Many to one
-	private Address homeAddress; // (addressId)
+    // Many to one
+    private Address homeAddress; // (addressId)
 
-	// Many to many
-	private List<Role> roles = new ArrayList<Role>();
+    // Many to many
+    private List<Role> roles = new ArrayList<Role>();
 
-	// -------------------------------
-	// Getter & Setter
-	// -------------------------------
+    public Account() {
+    }
 
-	// -- [id] ------------------------
+    public Account(Role... roles) {
+        for (Role role : roles) {
+            addRole(role);
+        }
+    }
 
-	@Column(name = "ID", length = 32)
-	@GeneratedValue(generator = "strategy-uuid")
-	@GenericGenerator(name = "strategy-uuid", strategy = "uuid")
-	@Id
-	public String getId() {
-		return id;
-	}
+    public Account(Address homeAddress) {
+        setHomeAddress(homeAddress);
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    // -------------------------------
+    // Getter & Setter
+    // -------------------------------
 
-	@Transient
-	public boolean isIdSet() {
-		return id != null && !id.isEmpty();
-	}
+    // -- [id] ------------------------
 
-	// -- [username] ------------------------
+    @Column(name = "ID", length = 32)
+    @GeneratedValue(generator = "strategy-uuid")
+    @GenericGenerator(name = "strategy-uuid", strategy = "uuid")
+    @Id
+    public String getId() {
+        return id;
+    }
 
-	@Column(name = "LOGIN", nullable = false, unique = true, length = 100)
-	public String getUsername() {
-		return username;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    @Transient
+    public boolean isIdSet() {
+        return id != null && !id.isEmpty();
+    }
 
-	// -- [password] ------------------------
+    // -- [username] ------------------------
 
-	@Column(name = "`PASSWORD`", nullable = false, length = 100)
-	public String getPassword() {
-		return password;
-	}
+    @Column(name = "LOGIN", nullable = false, unique = true, length = 100)
+    public String getUsername() {
+        return username;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	// -- [email] ------------------------
+    // -- [password] ------------------------
 
-	@Column(name = "EMAIL", nullable = false, unique = true, length = 100)
-	public String getEmail() {
-		return email;
-	}
+    @Column(name = "`PASSWORD`", nullable = false, length = 100)
+    public String getPassword() {
+        return password;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	// -- [favoriteNumber] ------------------------
+    // -- [email] ------------------------
 
-	@Column(name = "FAVORITE_NUMBER")
-	public Integer getFavoriteNumber() {
-		return favoriteNumber;
-	}
+    @Column(name = "EMAIL", nullable = false, unique = true, length = 100)
+    public String getEmail() {
+        return email;
+    }
 
-	public void setFavoriteNumber(Integer favoriteNumber) {
-		this.favoriteNumber = favoriteNumber;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	// -- [isEnabled] ------------------------
+    // -- [favoriteNumber] ------------------------
 
-	@Column(name = "IS_ENABLED", length = 1)
-	public Boolean getIsEnabled() {
-		return isEnabled;
-	}
+    @Column(name = "FAVORITE_NUMBER")
+    public Integer getFavoriteNumber() {
+        return favoriteNumber;
+    }
 
-	public void setIsEnabled(Boolean isEnabled) {
-		this.isEnabled = isEnabled;
-	}
+    public void setFavoriteNumber(Integer favoriteNumber) {
+        this.favoriteNumber = favoriteNumber;
+    }
 
-	// -- [birthDate] ------------------------
+    // -- [isEnabled] ------------------------
 
-	@Column(name = "BIRTH_DATE", length = 23)
-	@Temporal(TIMESTAMP)
-	public Date getBirthDate() {
-		return birthDate;
-	}
+    @Column(name = "IS_ENABLED", length = 1)
+    public Boolean getIsEnabled() {
+        return isEnabled;
+    }
 
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
-	}
+    public void setIsEnabled(Boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
 
-	// -- [addressId] ------------------------
+    // -- [birthDate] ------------------------
 
-	@Column(name = "ADDRESS_ID", precision = 10, insertable = false, updatable = false)
-	public Integer getAddressId() {
-		return addressId;
-	}
+    @Column(name = "BIRTH_DATE", length = 23)
+    @Temporal(TIMESTAMP)
+    public Date getBirthDate() {
+        return birthDate;
+    }
 
-	private void setAddressId(Integer addressId) {
-		this.addressId = addressId;
-	}
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
 
-	// --------------------------------------------------------------------
-	// Many to One support
-	// --------------------------------------------------------------------
+    // -- [addressId] ------------------------
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// many-to-one: Account.addressId ==> Address.id
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    @Column(name = "ADDRESS_ID", precision = 10, insertable = false, updatable = false)
+    public Integer getAddressId() {
+        return addressId;
+    }
 
-	@JoinColumn(name = "ADDRESS_ID")
-	@ManyToOne(cascade = PERSIST, fetch = LAZY)
-	public Address getHomeAddress() {
-		return homeAddress;
-	}
+    private void setAddressId(Integer addressId) {
+        this.addressId = addressId;
+    }
 
-	/**
-	 * Set the homeAddress without adding this Account instance on the passed homeAddress If you want to preserve referential integrity we recommend to use
-	 * instead the corresponding adder method provided by {@link Address}
-	 */
-	public void setHomeAddress(Address homeAddress) {
-		this.homeAddress = homeAddress;
+    // --------------------------------------------------------------------
+    // Many to One support
+    // --------------------------------------------------------------------
 
-		// We set the foreign key property so it can be used by our JPA search by Example facility.
-		if (homeAddress != null) {
-			setAddressId(homeAddress.getId());
-		} else {
-			setAddressId(null);
-		}
-	}
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // many-to-one: Account.addressId ==> Address.id
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	// --------------------------------------------------------------------
-	// Many to Many
-	// --------------------------------------------------------------------
+    @JoinColumn(name = "ADDRESS_ID")
+    @ManyToOne(cascade = PERSIST, fetch = LAZY)
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	// many-to-many: account ==> roles
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /**
+     * Set the homeAddress without adding this Account instance on the passed homeAddress If you want to preserve referential integrity we recommend to use
+     * instead the corresponding adder method provided by {@link Address}
+     */
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
 
-	/**
-	 * Returns the roles list.
-	 */
-	@JoinTable(name = "ACCOUNT_ROLE", joinColumns = @JoinColumn(name = "ACCOUNT_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID"))
-	@ManyToMany(cascade = PERSIST)
-	public List<Role> getRoles() {
-		return roles;
-	}
+        // We set the foreign key property so it can be used by our JPA search by Example facility.
+        if (homeAddress != null) {
+            setAddressId(homeAddress.getId());
+        } else {
+            setAddressId(null);
+        }
+    }
 
-	/**
-	 * Set the roles list.
-	 * <p>
-	 * It is recommended to use the helper method {@link #addRole(Role)} / {@link #removeRole(Role)} if you want to preserve referential integrity at the object
-	 * level.
-	 * 
-	 * @param roles the list of Role
-	 */
-	public void setRoles(List<Role> roles) {
-		this.roles = roles;
-	}
+    // --------------------------------------------------------------------
+    // Many to Many
+    // --------------------------------------------------------------------
 
-	/**
-	 * Helper method to add the passed {@link Role} to the roles list.
-	 */
-	public boolean addRole(Role role) {
-		return getRoles().add(role);
-	}
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // many-to-many: account ==> roles
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-	/**
-	 * Helper method to remove the passed {@link Role} from the roles list.
-	 */
-	public boolean removeRole(Role role) {
-		return getRoles().remove(role);
-	}
+    /**
+     * Returns the roles list.
+     */
+    @JoinTable(name = "ACCOUNT_ROLE", joinColumns = @JoinColumn(name = "ACCOUNT_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID"))
+    @ManyToMany(cascade = PERSIST)
+    public List<Role> getRoles() {
+        return roles;
+    }
 
-	/**
-	 * Helper method to determine if the passed {@link Role} is present in the roles list.
-	 */
-	public boolean containsRole(Role role) {
-		return getRoles() != null && getRoles().contains(role);
-	}
+    /**
+     * Set the roles list.
+     * <p>
+     * It is recommended to use the helper method {@link #addRole(Role)} / {@link #removeRole(Role)} if you want to preserve referential integrity at the object
+     * level.
+     * 
+     * @param roles the list of Role
+     */
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    /**
+     * Helper method to add the passed {@link Role} to the roles list.
+     */
+    public boolean addRole(Role role) {
+        return getRoles().add(role);
+    }
+
+    /**
+     * Helper method to remove the passed {@link Role} from the roles list.
+     */
+    public boolean removeRole(Role role) {
+        return getRoles().remove(role);
+    }
+
+    /**
+     * Helper method to determine if the passed {@link Role} is present in the roles list.
+     */
+    public boolean containsRole(Role role) {
+        return getRoles() != null && getRoles().contains(role);
+    }
 }

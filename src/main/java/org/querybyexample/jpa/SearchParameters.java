@@ -108,6 +108,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Fluently set the @{link SearchMode}. It defaults to EQUALS.
+     * 
      * @see SearchMode#EQUALS
      */
     public void setSearchMode(SearchMode searchMode) {
@@ -116,6 +117,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Fluently set the @{link SearchMode}. It defaults to EQUALS.
+     * 
      * @see SearchMode#EQUALS
      */
     public SearchParameters searchMode(SearchMode searchMode) {
@@ -125,6 +127,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Use the EQUALS @{link SearchMode}.
+     * 
      * @see SearchMode#EQUALS
      */
     public SearchParameters equals() {
@@ -133,6 +136,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Use the ANYWHERE @{link SearchMode}.
+     * 
      * @see SearchMode#ANYWHERE
      */
     public SearchParameters anywhere() {
@@ -141,6 +145,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Use the STARTING_LIKE @{link SearchMode}.
+     * 
      * @see SearchMode#STARTING_LIKE
      */
     public SearchParameters startingLike() {
@@ -149,6 +154,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Use the LIKE @{link SearchMode}.
+     * 
      * @see SearchMode#LIKE
      */
     public SearchParameters like() {
@@ -157,6 +163,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Use the ENDING_LIKE @{link SearchMode}.
+     * 
      * @see SearchMode#ENDING_LIKE
      */
     public SearchParameters endingLike() {
@@ -165,6 +172,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Return the @{link SearchMode}. It defaults to EQUALS.
+     * 
      * @see SearchMode#EQUALS
      */
     public SearchMode getSearchMode() {
@@ -288,16 +296,15 @@ public class SearchParameters implements Serializable {
     }
 
     /**
-     * Set the pattern which may contains wildcards (ex: "e%r%ka" ). The given searchPattern is used by the DAO layer on all string properties. Null by
-     * default.
+     * Set the pattern which may contains wildcards (ex: "e%r%ka" ). The given searchPattern is used by the DAO layer on all string properties. Null by default.
      */
     public void setSearchPattern(String searchPattern) {
         this.searchPattern = searchPattern;
     }
 
     /**
-     * Fluently set the pattern which may contains wildcards (ex: "e%r%ka" ). The given searchPattern is used by the DAO layer on all string properties. Null
-     * by default.
+     * Fluently set the pattern which may contains wildcards (ex: "e%r%ka" ). The given searchPattern is used by the DAO layer on all string properties. Null by
+     * default.
      */
     public SearchParameters searchPattern(String searchPattern) {
         setSearchPattern(searchPattern);
@@ -387,6 +394,10 @@ public class SearchParameters implements Serializable {
         return orderBy(new OrderBy(OrderByDirection.ASC, property));
     }
 
+    public SearchParameters orderBy(OrderByDirection orderByDirection, String property) {
+        return orderBy(new OrderBy(orderByDirection, property));
+    }
+
     public boolean hasOrders() {
         return !orders.isEmpty();
     }
@@ -451,7 +462,7 @@ public class SearchParameters implements Serializable {
     }
 
     /**
-     * Add the given {@link EntitySelector}s to construct predicate for the underlying foreign key. 
+     * Add the given {@link EntitySelector}s to construct predicate for the underlying foreign key.
      */
     public SearchParameters entity(EntitySelector<?, ?, ?>... entitySelectors) {
         for (EntitySelector<?, ?, ?> entitySelector : checkNotNull(entitySelectors)) {
@@ -496,6 +507,7 @@ public class SearchParameters implements Serializable {
 
     /**
      * Set the position of the first result to retrieve.
+     * 
      * @param first position of the first result, numbered from 0
      */
     public void setFirst(int first) {
@@ -528,7 +540,7 @@ public class SearchParameters implements Serializable {
     }
 
     // -----------------------------------------
-    // Fetch associated entity using a LEFT Join 
+    // Fetch associated entity using a LEFT Join
     // -----------------------------------------
 
     /**
@@ -564,9 +576,7 @@ public class SearchParameters implements Serializable {
     // -----------------------------------
 
     /**
-     * Default to false.
-     * Please read https://hibernate.atlassian.net/browse/HHH-1523
-     * before using cache.
+     * Default to false. Please read https://hibernate.atlassian.net/browse/HHH-1523 before using cache.
      */
     public void setCacheable(boolean cacheable) {
         this.cacheable = cacheable;
@@ -640,7 +650,7 @@ public class SearchParameters implements Serializable {
     }
 
     // -----------------------------------
-    // Use and in NN Search 
+    // Use and in NN Search
     // -----------------------------------
 
     public SearchParameters useORInManyToMany() {

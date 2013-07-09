@@ -38,7 +38,6 @@ import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 
-import org.querybyexample.jpa.Identifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

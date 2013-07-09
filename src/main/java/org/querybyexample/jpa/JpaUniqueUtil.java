@@ -42,7 +42,6 @@ import javax.persistence.TypedQuery;
 import javax.persistence.UniqueConstraint;
 
 import org.apache.commons.lang.WordUtils;
-import org.querybyexample.jpa.Identifiable;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 @Named

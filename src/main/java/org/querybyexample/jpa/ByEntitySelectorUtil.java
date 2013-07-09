@@ -27,8 +27,6 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.querybyexample.jpa.Identifiable;
-
 /**
  * Helper to create a predicate out of {@link EntitySelector}s.
  */

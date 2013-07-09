@@ -32,6 +32,7 @@ public class Range<E, D extends Comparable<? super D>> implements Serializable {
 
     /**
      * Constructs a new {@link Range} with no boundaries and no restrictions on field's nullability.
+     * 
      * @param field the attribute of an existing entity.
      */
     public Range(SingularAttribute<E, D> field) {
@@ -40,7 +41,7 @@ public class Range<E, D extends Comparable<? super D>> implements Serializable {
 
     /**
      * Constructs a new Range.
-     *
+     * 
      * @param field the property's name of an existing entity.
      * @param from the lower boundary of this range. Null means no lower boundary.
      * @param to the upper boundary of this range. Null means no upper boundary.
@@ -53,7 +54,7 @@ public class Range<E, D extends Comparable<? super D>> implements Serializable {
 
     /**
      * Constructs a new Range.
-     *
+     * 
      * @param field an entity's attribute
      * @param from the lower boundary of this range. Null means no lower boundary.
      * @param to the upper boundary of this range. Null means no upper boundary.

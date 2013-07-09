@@ -24,8 +24,7 @@ import java.util.List;
 import javax.persistence.metamodel.Attribute;
 
 /**
- * Used to construct OR predicate for a property value. In other words you can search
- * all entities E having a given property set to one of the selected values.
+ * Used to construct OR predicate for a property value. In other words you can search all entities E having a given property set to one of the selected values.
  */
 public class PropertySelector<E, F> implements Serializable {
     /**
