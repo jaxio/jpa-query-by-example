@@ -25,46 +25,25 @@ import java.util.List;
 
 import javax.persistence.metamodel.Attribute;
 
-import org.hibernate.ejb.metamodel.AbstractAttribute;
-
 /**
- * Holder class for search ordering used by the {@link SearchParameters}. When used with {@link ByNamedQueryUtil}, you pass column name. For other usage, pass the
- * property name.
+ * Holder class for search ordering used by the {@link SearchParameters}. When used with {@link ByNamedQueryUtil}, you pass column name. For other usage, pass
+ * the property name.
  */
 public class OrderBy implements Serializable {
     private static final long serialVersionUID = 1L;
     private final List<Attribute<?, ?>> attributes;
-    private final String property;
     private OrderByDirection direction = ASC;
 
     public OrderBy(OrderByDirection direction, List<Attribute<?, ?>> attributes) {
         this.direction = checkNotNull(direction);
         this.attributes = checkNotNull(attributes);
-        this.property = null;
     }
 
     public OrderBy(OrderByDirection direction, Attribute<?, ?>... attributes) {
         this(direction, newArrayList(attributes));
     }
 
-    public OrderBy(OrderByDirection direction, String property) {
-        this(direction, new AbstractAttribute<Object, Object>(property, null, null, null, null) {
-            private static final long serialVersionUID = 1L;
-
-            public boolean isAssociation() {
-                return false;
-            }
-
-            public boolean isCollection() {
-                return false;
-            }
-        });
-    }
-
     public List<Attribute<?, ?>> getAttributes() {
-        if (property != null) {
-            ;
-        }
         return attributes;
     }
 

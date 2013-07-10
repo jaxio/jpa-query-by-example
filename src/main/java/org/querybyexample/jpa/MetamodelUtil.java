@@ -7,18 +7,14 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.persistence.metamodel.Attribute;
 
 import com.google.common.base.Splitter;
 
-@Named
-@Singleton
 public class MetamodelUtil {
-    private Map<Class<?>, Class<?>> metamodelCache = newHashMap();
+    private static Map<Class<?>, Class<?>> metamodelCache = newHashMap();
 
-    public List<Attribute<?, ?>> toAttributes(String path, Class<?> from) {
+    public static List<Attribute<?, ?>> toAttributes(String path, Class<?> from) {
         try {
             List<Attribute<?, ?>> attributes = newArrayList();
             Class<?> current = from;
@@ -35,7 +31,7 @@ public class MetamodelUtil {
         }
     }
 
-    private Class<?> getCachedClass(Class<?> current) throws ClassNotFoundException {
+    private static Class<?> getCachedClass(Class<?> current) throws ClassNotFoundException {
         if (metamodelCache.containsKey(current)) {
             return metamodelCache.get(current);
         }

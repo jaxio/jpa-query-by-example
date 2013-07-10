@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.querybyexample.jpa.MetamodelUtil.toAttributes;
 
 import java.io.Serializable;
 import java.util.List;
@@ -394,12 +395,12 @@ public class SearchParameters implements Serializable {
         return orderBy(new OrderBy(orderByDirection, attributes));
     }
 
-    public SearchParameters orderBy(String property) {
-        return orderBy(new OrderBy(OrderByDirection.ASC, property));
+    public SearchParameters orderBy(String property, Class<?> clazz) {
+        return orderBy(new OrderBy(OrderByDirection.ASC, toAttributes(property, clazz)));
     }
 
-    public SearchParameters orderBy(OrderByDirection orderByDirection, String property) {
-        return orderBy(new OrderBy(orderByDirection, property));
+    public SearchParameters orderBy(OrderByDirection orderByDirection, String property, Class<?> clazz) {
+        return orderBy(new OrderBy(orderByDirection, toAttributes(property, clazz)));
     }
 
     public boolean hasOrders() {
