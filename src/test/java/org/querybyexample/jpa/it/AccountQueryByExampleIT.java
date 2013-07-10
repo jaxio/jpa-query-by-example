@@ -15,14 +15,11 @@
  */
 package org.querybyexample.jpa.it;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.querybyexample.jpa.EntitySelector.newEntitySelector;
-import static org.querybyexample.jpa.EntitySelector.newEntitySelectorInCpk;
-import static org.querybyexample.jpa.OrderByDirection.ASC;
-import static org.querybyexample.jpa.OrderByDirection.DESC;
-import static org.querybyexample.jpa.PropertySelector.newPropertySelector;
-import static org.querybyexample.jpa.app.Account_.homeAddress;
-import static org.querybyexample.jpa.app.Account_.username;
+import static org.fest.assertions.Assertions.*;
+import static org.querybyexample.jpa.EntitySelector.*;
+import static org.querybyexample.jpa.OrderByDirection.*;
+import static org.querybyexample.jpa.PropertySelector.*;
+import static org.querybyexample.jpa.app.Account_.*;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -31,6 +28,7 @@ import javax.persistence.PersistenceContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.querybyexample.jpa.EntitySelector;
+import org.querybyexample.jpa.FluentSearchParameters;
 import org.querybyexample.jpa.OrderBy;
 import org.querybyexample.jpa.PropertySelector;
 import org.querybyexample.jpa.SearchParameters;
@@ -103,7 +101,7 @@ public class AccountQueryByExampleIT {
         Account noMatch = new Account();
         noMatch.setUsername("admin");
         noMatch.setEmail("noMatch");
-        assertSize(noMatch, new SearchParameters().orMode(), 1);
+        assertSize(noMatch, new FluentSearchParameters().predicateMode().orMode(), 1);
     }
 
     @Test
@@ -112,7 +110,7 @@ public class AccountQueryByExampleIT {
         example.setUsername("adm");
         assertEmpty(example);
         assertEmpty(example, new SearchParameters());
-        assertSize(example, new SearchParameters().startingLike(), 1);
+        assertSize(example, new FluentSearchParameters().searchMode().startingLike(), 1);
     }
 
     @Test
@@ -121,7 +119,7 @@ public class AccountQueryByExampleIT {
         example.setUsername("min");
         assertEmpty(example);
         assertEmpty(example, new SearchParameters());
-        assertSize(example, new SearchParameters().endingLike(), 1);
+        assertSize(example, new FluentSearchParameters().searchMode().endingLike(), 1);
     }
 
     @Test
@@ -130,7 +128,7 @@ public class AccountQueryByExampleIT {
         example.setUsername("mi");
         assertEmpty(example);
         assertEmpty(example, new SearchParameters());
-        assertSize(example, new SearchParameters().anywhere(), 1);
+        assertSize(example, new FluentSearchParameters().searchMode().anywhere(), 1);
     }
 
     @Test
@@ -139,12 +137,12 @@ public class AccountQueryByExampleIT {
         example.setUsername("AdMiN");
         assertEmpty(example);
         assertEmpty(example, new SearchParameters());
-        assertSize(example, new SearchParameters().caseInsensitive(), 1);
+        assertSize(example, new FluentSearchParameters().caseSensitiveness().insensitive(), 1);
     }
 
     @Test
     public void leftJoinHomeAddress() {
-        assertSize(new SearchParameters().leftJoin(homeAddress), NB_ACCOUNTS);
+        assertSize(new FluentSearchParameters().leftJoins().add(homeAddress), NB_ACCOUNTS);
     }
 
     @Test
@@ -168,27 +166,27 @@ public class AccountQueryByExampleIT {
         Address almostParis = new Address();
         almostParis.setCity("ris");
 
-        assertSize(new Account(almostParis), new SearchParameters().endingLike(), 1);
+        assertSize(new Account(almostParis), new FluentSearchParameters().searchMode().endingLike(), 1);
     }
 
     @Test
     public void byEntiySelector() {
-        assertSize(new SearchParameters().entity(newEntitySelector(Account_.homeAddress, adminHomeAddress())), 1);
+        assertSize(new FluentSearchParameters().entities().add(newEntitySelector(Account_.homeAddress, adminHomeAddress())), 1);
     }
 
     @Test
     public void byEntiySelectorAndIncludingNull() {
-        assertSize(new SearchParameters().entity(newEntitySelector(Account_.homeAddress, adminHomeAddress()).includeNull()), 2);
+        assertSize(new FluentSearchParameters().entities().add(newEntitySelector(Account_.homeAddress, adminHomeAddress()).includeNull()), 2);
     }
 
     @Test
     public void byEntiySelectorIncludingNull() {
-        assertSize(new SearchParameters().entity(newEntitySelector(Account_.homeAddress).includeNull()), 1);
+        assertSize(new FluentSearchParameters().entities().add(newEntitySelector(Account_.homeAddress).includeNull()), 1);
     }
 
     @Test
     public void byEntiySelectorNotIncludingNull() {
-        assertSize(new SearchParameters().entity(newEntitySelector(Account_.homeAddress).withoutNull()), NB_ACCOUNTS - 1);
+        assertSize(new FluentSearchParameters().entities().add(newEntitySelector(Account_.homeAddress).withoutNull()), NB_ACCOUNTS - 1);
     }
 
     @Test
@@ -196,7 +194,7 @@ public class AccountQueryByExampleIT {
         EntitySelector<Account, Address, Integer> role = newEntitySelectorInCpk(Account_.homeAddress, Address_.id);
         role.add(adminHomeAddress());
 
-        assertSize(new SearchParameters().entity(role), 1);
+        assertSize(new FluentSearchParameters().entities().add(role), 1);
     }
 
     @Test
@@ -204,7 +202,7 @@ public class AccountQueryByExampleIT {
         PropertySelector<Address, String> city = newPropertySelector(Account_.homeAddress, Address_.city);
         city.add("Paris");
 
-        assertSize(new SearchParameters().property(city), 1);
+        assertSize(new FluentSearchParameters().properties().add(city), 1);
     }
 
     @Test
@@ -212,22 +210,22 @@ public class AccountQueryByExampleIT {
         Account adminOnly = new Account(adminRole());
         assertSize(adminOnly, 1);
         assertSize(adminOnly, new SearchParameters(), 1);
-        assertSize(adminOnly, new SearchParameters().distinct(), 1);
+        assertSize(adminOnly, new FluentSearchParameters().distinct(), 1);
 
         Account users = new Account(userRole());
         assertSize(users, 3);
-        assertSize(users, new SearchParameters().distinct(), 3);
+        assertSize(users, new FluentSearchParameters().distinct(), 3);
 
         Account userOrAdmin = new Account(adminRole(), userRole());
         assertSize(userOrAdmin, 1);
         assertSize(userOrAdmin, new SearchParameters(), 1);
-        assertSize(userOrAdmin, new SearchParameters().distinct(), 1);
-        assertSize(userOrAdmin, new SearchParameters().useORInManyToMany(), 4);
-        assertSize(userOrAdmin, new SearchParameters().useORInManyToMany().distinct(), 3);
+        assertSize(userOrAdmin, new FluentSearchParameters().distinct(), 1);
+        assertSize(userOrAdmin, new FluentSearchParameters().inManyToMany().useOR(), 4);
+        assertSize(userOrAdmin, new FluentSearchParameters().inManyToMany().useOR().distinct(), 3);
 
         Account unassigned = new Account(unassignedRole());
         assertEmpty(unassigned);
-        assertEmpty(unassigned, new SearchParameters().distinct());
+        assertEmpty(unassigned, new FluentSearchParameters().distinct());
     }
 
     @Test
@@ -238,76 +236,76 @@ public class AccountQueryByExampleIT {
     @Test
     public void orderByFieldname() {
         assertFirstUsername(new SearchParameters(), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(), "admin");
-        assertFirstUsername(new SearchParameters().orderBy("username", Account.class), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(ASC, "username", Account.class), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(DESC, "username", Account.class), "user");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(), "admin");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add("username", Account.class), "admin");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(ASC, "username", Account.class), "admin");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(DESC, "username", Account.class), "user");
     }
 
     @Test
     public void orderByAttribute() {
         assertFirstUsername(new SearchParameters(), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(username), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(ASC, username), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(DESC, username), "user");
-        assertFirstUsername(new SearchParameters().orderBy(new OrderBy(ASC, username)), "admin");
-        assertFirstUsername(new SearchParameters().orderBy(new OrderBy(DESC, username)), "user");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(), "admin");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(username), "admin");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(ASC, username), "admin");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(DESC, username), "user");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(new OrderBy(ASC, username)), "admin");
+        assertFirstUsername(new FluentSearchParameters().orderBy().add(new OrderBy(DESC, username)), "user");
     }
 
     @Test
     public void orderByManyToOneAttribute() {
-        SearchParameters searchParameter = new SearchParameters().orderBy(ASC, Account_.homeAddress, Address_.city);
+        SearchParameters searchParameter = new FluentSearchParameters().orderBy().add(ASC, Account_.homeAddress, Address_.city);
         assertSize(searchParameter, NB_ACCOUNTS);
         assertFirstUsername(searchParameter, "homeless");
     }
 
     @Test
     public void orderByManyToOneString() {
-        SearchParameters searchParameter = new SearchParameters().orderBy(ASC, "homeAddress.city", Account.class);
+        SearchParameters searchParameter = new FluentSearchParameters().orderBy().add(ASC, "homeAddress.city", Account.class);
         assertSize(searchParameter, NB_ACCOUNTS);
         assertFirstUsername(searchParameter, "homeless");
     }
 
     @Test
     public void bySearchPatternOnAllStringFields() {
-        assertSize(new SearchParameters().searchPattern("admin"), 1);
-        assertEmpty(new SearchParameters().searchPattern("dmin"));
-        assertEmpty(new SearchParameters().searchPattern("no_match"));
+        assertSize(new FluentSearchParameters().searchPattern("admin"), 1);
+        assertEmpty(new FluentSearchParameters().searchPattern("dmin"));
+        assertEmpty(new FluentSearchParameters().searchPattern("no_match"));
     }
 
     @Test
     public void maxResults() {
         assertSize(new SearchParameters(), NB_ACCOUNTS);
-        assertThat(accountQBE.find(new SearchParameters().maxResults(-1))).hasSize(NB_ACCOUNTS);
-        assertThat(accountQBE.find(new SearchParameters().maxResults(1))).hasSize(1);
-        assertThat(accountQBE.find(new SearchParameters().maxResults(4))).hasSize(4);
-        assertThat(accountQBE.find(new SearchParameters().maxResults(NB_ACCOUNTS + 1))).hasSize(NB_ACCOUNTS);
-        assertFirstUsername(new SearchParameters().maxResults(1), "admin");
+        assertThat(accountQBE.find(new FluentSearchParameters().pagination().maxResults(-1))).hasSize(NB_ACCOUNTS);
+        assertThat(accountQBE.find(new FluentSearchParameters().pagination().maxResults(1))).hasSize(1);
+        assertThat(accountQBE.find(new FluentSearchParameters().pagination().maxResults(4))).hasSize(4);
+        assertThat(accountQBE.find(new FluentSearchParameters().pagination().maxResults(NB_ACCOUNTS + 1))).hasSize(NB_ACCOUNTS);
+        assertFirstUsername(new FluentSearchParameters().pagination().maxResults(1), "admin");
     }
 
     @Test
     public void maxResultsDoesNotImpactFindCount() {
-        assertThat(accountQBE.findCount(new SearchParameters().maxResults(4))).isEqualTo(NB_ACCOUNTS);
+        assertThat(accountQBE.findCount(new FluentSearchParameters().pagination().maxResults(4))).isEqualTo(NB_ACCOUNTS);
     }
 
     @Test
     public void firstResult() {
         assertFirstUsername(new SearchParameters(), "admin");
-        assertFirstUsername(new SearchParameters().first(0), "admin");
-        assertFirstUsername(new SearchParameters().first(1), "user");
-        assertFirstUsername(new SearchParameters().first(2), "demo");
+        assertFirstUsername(new FluentSearchParameters().pagination().first(0), "admin");
+        assertFirstUsername(new FluentSearchParameters().pagination().first(1), "user");
+        assertFirstUsername(new FluentSearchParameters().pagination().first(2), "demo");
     }
 
     @Test
     public void firstResultDoesNotImpactFindCount() {
-        assertThat(accountQBE.findCount(new SearchParameters().first(4))).isEqualTo(NB_ACCOUNTS);
+        assertThat(accountQBE.findCount(new FluentSearchParameters().pagination().first(4))).isEqualTo(NB_ACCOUNTS);
     }
 
     @Test
     public void firstAndMaxResultCombined() {
-        assertThat(accountQBE.find(new SearchParameters().first(4).maxResults(2))).hasSize(2);
-        assertThat(accountQBE.findCount(new SearchParameters().first(4).maxResults(2))).isEqualTo(NB_ACCOUNTS);
+        assertThat(accountQBE.find(new FluentSearchParameters().pagination().firstAnd(4).maxResults(2))).hasSize(2);
+        assertThat(accountQBE.findCount(new FluentSearchParameters().pagination().firstAnd(4).maxResults(2))).isEqualTo(NB_ACCOUNTS);
     }
 
     private Role adminRole() {
