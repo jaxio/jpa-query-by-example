@@ -30,9 +30,13 @@ import javax.persistence.metamodel.SingularAttribute;
  * 
  * @see SearchParameters
  */
-public class FluentSearchParameters extends SearchParameters {
+public class FluentSearchParameters {
 
-    private static final long serialVersionUID = 1L;
+    private final SearchParameters searchParameters = new SearchParameters();
+
+    public SearchParameters toSearchParameters() {
+        return searchParameters;
+    }
 
     // -----------------------------------
     // SearchMode
@@ -49,7 +53,7 @@ public class FluentSearchParameters extends SearchParameters {
          * @see SearchMode#EQUALS
          */
         public FluentSearchParameters set(SearchMode searchMode) {
-            setSearchMode(searchMode);
+            searchParameters.setSearchMode(searchMode);
             return FluentSearchParameters.this;
         }
 
@@ -99,7 +103,7 @@ public class FluentSearchParameters extends SearchParameters {
         }
 
         public boolean is(SearchMode searchMode) {
-            return getSearchMode() == searchMode;
+            return searchParameters.getSearchMode() == searchMode;
         }
 
     }
@@ -121,7 +125,7 @@ public class FluentSearchParameters extends SearchParameters {
          * use <code>and</code> to build the final predicate
          */
         public FluentSearchParameters andMode() {
-            setAndMode(true);
+            searchParameters.setAndMode(true);
             return FluentSearchParameters.this;
         }
 
@@ -129,7 +133,7 @@ public class FluentSearchParameters extends SearchParameters {
          * use <code>or</code> to build the final predicate
          */
         public FluentSearchParameters orMode() {
-            setAndMode(false);
+            searchParameters.setAndMode(false);
             return FluentSearchParameters.this;
         }
 
@@ -158,14 +162,14 @@ public class FluentSearchParameters extends SearchParameters {
          * default.
          */
         private FluentNamedQuery(String namedQuery) {
-            setNamedQuery(namedQuery);
+            searchParameters.setNamedQuery(namedQuery);
         }
 
         /**
          * Fluently set the parameters for the named query.
          */
         public FluentNamedQuery parameters(Map<String, Object> parameters) {
-            setNamedQueryParameters(parameters);
+            searchParameters.setNamedQueryParameters(parameters);
             return this;
         }
 
@@ -173,7 +177,7 @@ public class FluentSearchParameters extends SearchParameters {
          * Fluently set the parameters for the named query.
          */
         public FluentNamedQuery parameter(String name, Object value) {
-            addNamedQueryParameter(name, value);
+            searchParameters.addNamedQueryParameter(name, value);
             return this;
         }
 
@@ -197,7 +201,7 @@ public class FluentSearchParameters extends SearchParameters {
      * properties. Null by default.
      */
     public FluentSearchParameters searchPattern(String searchPattern) {
-        setSearchPattern(searchPattern);
+        searchParameters.setSearchPattern(searchPattern);
         return this;
     }
 
@@ -216,7 +220,7 @@ public class FluentSearchParameters extends SearchParameters {
          * @param caseSensitive
          */
         public FluentSearchParameters set(boolean caseSensitive) {
-            setCaseSensitive(caseSensitive);
+            searchParameters.setCaseSensitive(caseSensitive);
             return FluentSearchParameters.this;
         }
 
@@ -224,24 +228,22 @@ public class FluentSearchParameters extends SearchParameters {
          * Fluently set the case sensitiveness to true.
          */
         public FluentSearchParameters sensitive() {
-            setCaseSensitive(true);
-            return FluentSearchParameters.this;
+            return set(true);
         }
 
         /**
          * Fluently set the case sensitiveness to false.
          */
         public FluentSearchParameters insensitive() {
-            setCaseSensitive(false);
-            return FluentSearchParameters.this;
+            return set(false);
         }
 
         public boolean isSensitive() {
-            return !isCaseSensitive();
+            return !searchParameters.isCaseSensitive();
         }
 
         public boolean isInsensitive() {
-            return !isCaseSensitive();
+            return !isSensitive();
         }
 
     }
@@ -260,7 +262,7 @@ public class FluentSearchParameters extends SearchParameters {
         }
 
         public FluentOrderBy add(OrderBy orderBy) {
-            addOrderBy(orderBy);
+            searchParameters.addOrderBy(orderBy);
             return this;
         }
 
@@ -300,7 +302,7 @@ public class FluentSearchParameters extends SearchParameters {
 
     public FluentSearchParameters addRanges(Range<?, ?>... ranges) {
         for (Range<?, ?> range : checkNotNull(ranges)) {
-            addRange(range);
+            searchParameters.addRange(range);
         }
         return this;
     }
@@ -316,7 +318,7 @@ public class FluentSearchParameters extends SearchParameters {
 
         public FluentPropertySelector add(PropertySelector<?, ?>... propertySelectors) {
             for (PropertySelector<?, ?> propertySelector : checkNotNull(propertySelectors)) {
-                addProperty(propertySelector);
+                searchParameters.addProperty(propertySelector);
             }
             return this;
         }
@@ -350,7 +352,7 @@ public class FluentSearchParameters extends SearchParameters {
          */
         public FluentEntitySelector add(EntitySelector<?, ?, ?>... entitySelectors) {
             for (EntitySelector<?, ?, ?> entitySelector : checkNotNull(entitySelectors)) {
-                addEntity(entitySelector);
+                searchParameters.addEntity(entitySelector);
             }
             return this;
         }
@@ -380,27 +382,25 @@ public class FluentSearchParameters extends SearchParameters {
         }
 
         public FluentPagination maxResults(int maxResults) {
-            setMaxResults(maxResults);
+            searchParameters.setMaxResults(maxResults);
             return this;
         }
 
         public FluentPagination noLimitAnd() {
-            setMaxResults(-1);
-            return this;
+            return maxResults(-1);
         }
 
         public FluentPagination limitBroadSearch() {
-            setMaxResults(500);
-            return this;
+            return maxResults(500);
         }
 
         public FluentPagination first(int first) {
-            setFirst(first);
+            searchParameters.setFirst(first);
             return this;
         }
 
         public FluentPagination pageSize(int pageSize) {
-            setPageSize(pageSize);
+            searchParameters.setPageSize(pageSize);
             return this;
         }
 
@@ -428,7 +428,7 @@ public class FluentSearchParameters extends SearchParameters {
          */
         public FluentLeftJoin add(SingularAttribute<?, ?>... xToOneAttributes) {
             for (SingularAttribute<?, ?> xToOneAttribute : checkNotNull(xToOneAttributes)) {
-                addLeftJoin(xToOneAttribute);
+                searchParameters.addLeftJoin(xToOneAttribute);
             }
             return this;
         }
@@ -453,7 +453,7 @@ public class FluentSearchParameters extends SearchParameters {
         }
 
         public FluentCaching set(boolean cacheable) {
-            setCacheable(cacheable);
+            searchParameters.setCacheable(cacheable);
             return this;
         }
 
@@ -466,7 +466,7 @@ public class FluentSearchParameters extends SearchParameters {
         }
 
         public FluentCaching region(String cacheRegion) {
-            setCacheRegion(checkNotNull(cacheRegion));
+            searchParameters.setCacheRegion(checkNotNull(cacheRegion));
             return this;
         }
 
@@ -493,7 +493,7 @@ public class FluentSearchParameters extends SearchParameters {
          * add additionnal parameter.
          */
         public FluentExtraParameters addExtraParameter(String key, Object o) {
-            getExtraParameters().put(checkNotNull(key), o);
+            searchParameters.getExtraParameters().put(checkNotNull(key), o);
             return this;
         }
 
@@ -525,7 +525,7 @@ public class FluentSearchParameters extends SearchParameters {
         }
 
         public FluentSearchParameters useAND(boolean useANDInNNSearch) {
-            setUseANDInManyToMany(useANDInNNSearch);
+            searchParameters.setUseANDInManyToMany(useANDInNNSearch);
             return FluentSearchParameters.this;
         }
     }
@@ -539,7 +539,7 @@ public class FluentSearchParameters extends SearchParameters {
     // ---------------------------------
 
     public FluentSearchParameters distinct(boolean useDistinct) {
-        setDistinct(useDistinct);
+        searchParameters.setDistinct(useDistinct);
         return this;
     }
 
