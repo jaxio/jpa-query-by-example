@@ -117,7 +117,7 @@ public class JpaUtil {
     }
 
     public static <E> Predicate stringPredicate(Expression<String> path, Object attrValue, SearchMode searchMode, SearchParameters sp, CriteriaBuilder builder) {
-        if (sp.isCaseInsensitive()) {
+        if (!sp.isCaseSensitive()) {
             path = builder.lower(path);
             attrValue = ((String) attrValue).toLowerCase(LocaleContextHolder.getLocale());
         }
