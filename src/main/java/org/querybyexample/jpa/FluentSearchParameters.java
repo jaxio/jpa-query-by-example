@@ -153,47 +153,18 @@ public class FluentSearchParameters extends SearchParameters {
 
     public class FluentNamedQuery {
 
-        private FluentNamedQuery() {
-        }
-
         /**
          * Fluently set the named query to be used by the DAO layer. Null by
          * default.
          */
-        public FluentSearchParameters set(String namedQuery) {
+        private FluentNamedQuery(String namedQuery) {
             setNamedQuery(namedQuery);
-            return FluentSearchParameters.this;
         }
 
         /**
          * Fluently set the parameters for the named query.
          */
-        public FluentSearchParameters parameters(Map<String, Object> parameters) {
-            setNamedQueryParameters(parameters);
-            return FluentSearchParameters.this;
-        }
-
-        /**
-         * Fluently set the parameters for the named query.
-         */
-        public FluentSearchParameters parameter(String name, Object value) {
-            addNamedQueryParameter(name, value);
-            return FluentSearchParameters.this;
-        }
-
-        /**
-         * Fluently set the named query to be used by the DAO layer. Null by
-         * default.
-         */
-        public FluentNamedQuery setAnd(String namedQuery) {
-            setNamedQuery(namedQuery);
-            return this;
-        }
-
-        /**
-         * Fluently set the parameters for the named query.
-         */
-        public FluentNamedQuery parametersAnd(Map<String, Object> parameters) {
+        public FluentNamedQuery parameters(Map<String, Object> parameters) {
             setNamedQueryParameters(parameters);
             return this;
         }
@@ -201,15 +172,19 @@ public class FluentSearchParameters extends SearchParameters {
         /**
          * Fluently set the parameters for the named query.
          */
-        public FluentNamedQuery parameterAnd(String name, Object value) {
+        public FluentNamedQuery parameter(String name, Object value) {
             addNamedQueryParameter(name, value);
             return this;
+        }
+
+        public FluentSearchParameters endNamedQuery() {
+            return FluentSearchParameters.this;
         }
 
     }
 
-    public FluentNamedQuery namedQuery() {
-        return new FluentNamedQuery();
+    public FluentNamedQuery namedQuery(String namedQuery) {
+        return new FluentNamedQuery(namedQuery);
     }
 
     // -----------------------------------
@@ -284,33 +259,33 @@ public class FluentSearchParameters extends SearchParameters {
         private FluentOrderBy() {
         }
 
-        public FluentSearchParameters add(OrderBy orderBy) {
+        public FluentOrderBy add(OrderBy orderBy) {
             addOrderBy(orderBy);
-            return FluentSearchParameters.this;
+            return this;
         }
 
-        public FluentSearchParameters add(Attribute<?, ?>... attributes) {
+        public FluentOrderBy add(Attribute<?, ?>... attributes) {
             return add(new OrderBy(OrderByDirection.ASC, attributes));
         }
 
-        public FluentSearchParameters add(OrderByDirection orderByDirection, List<Attribute<?, ?>> attributes) {
+        public FluentOrderBy add(OrderByDirection orderByDirection, List<Attribute<?, ?>> attributes) {
             return add(new OrderBy(orderByDirection, attributes));
         }
 
-        public FluentSearchParameters add(OrderByDirection orderByDirection, Attribute<?, ?>... attributes) {
+        public FluentOrderBy add(OrderByDirection orderByDirection, Attribute<?, ?>... attributes) {
             return add(new OrderBy(orderByDirection, attributes));
         }
 
-        public FluentSearchParameters add(String property, Class<?> clazz) {
+        public FluentOrderBy add(String property, Class<?> clazz) {
             return add(new OrderBy(OrderByDirection.ASC, toAttributes(property, clazz)));
         }
 
-        public FluentSearchParameters add(OrderByDirection orderByDirection, String property, Class<?> clazz) {
+        public FluentOrderBy add(OrderByDirection orderByDirection, String property, Class<?> clazz) {
             return add(new OrderBy(orderByDirection, toAttributes(property, clazz)));
         }
 
-        public boolean has() {
-            return !getOrders().isEmpty();
+        public FluentSearchParameters endOrderBy() {
+            return FluentSearchParameters.this;
         }
 
     }
@@ -339,19 +314,19 @@ public class FluentSearchParameters extends SearchParameters {
         private FluentPropertySelector() {
         }
 
-        public FluentSearchParameters add(PropertySelector<?, ?>... propertySelectors) {
+        public FluentPropertySelector add(PropertySelector<?, ?>... propertySelectors) {
             for (PropertySelector<?, ?> propertySelector : checkNotNull(propertySelectors)) {
                 addProperty(propertySelector);
             }
-            return FluentSearchParameters.this;
+            return this;
         }
 
-        public FluentSearchParameters add(SearchMode searchMode, Attribute<?, ?>... attributes) {
+        public FluentPropertySelector add(SearchMode searchMode, Attribute<?, ?>... attributes) {
             return add(PropertySelector.newPropertySelector(searchMode, attributes));
         }
 
-        public boolean has() {
-            return !getProperties().isEmpty();
+        public FluentSearchParameters endProperties() {
+            return FluentSearchParameters.this;
         }
 
     }
@@ -373,16 +348,20 @@ public class FluentSearchParameters extends SearchParameters {
          * Add the given {@link EntitySelector}s to construct predicate for the
          * underlying foreign key.
          */
-        public FluentSearchParameters add(EntitySelector<?, ?, ?>... entitySelectors) {
+        public FluentEntitySelector add(EntitySelector<?, ?, ?>... entitySelectors) {
             for (EntitySelector<?, ?, ?> entitySelector : checkNotNull(entitySelectors)) {
                 addEntity(entitySelector);
             }
-            return FluentSearchParameters.this;
+            return this;
         }
 
         @SuppressWarnings("unchecked")
-        public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> FluentSearchParameters add(SingularAttribute<E2, T2> field, T2... selected) {
+        public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> FluentEntitySelector add(SingularAttribute<E2, T2> field, T2... selected) {
             return add(EntitySelector.newEntitySelector(field, selected));
+        }
+
+        public FluentSearchParameters endEntities() {
+            return FluentSearchParameters.this;
         }
 
     }
@@ -400,32 +379,7 @@ public class FluentSearchParameters extends SearchParameters {
         private FluentPagination() {
         }
 
-        public FluentSearchParameters maxResults(int maxResults) {
-            setMaxResults(maxResults);
-            return FluentSearchParameters.this;
-        }
-
-        public FluentSearchParameters noLimit() {
-            setMaxResults(-1);
-            return FluentSearchParameters.this;
-        }
-
-        public FluentSearchParameters limitBroadSearch() {
-            setMaxResults(500);
-            return FluentSearchParameters.this;
-        }
-
-        public FluentSearchParameters first(int first) {
-            setFirst(first);
-            return FluentSearchParameters.this;
-        }
-
-        public FluentSearchParameters pageSize(int pageSize) {
-            setPageSize(pageSize);
-            return FluentSearchParameters.this;
-        }
-
-        public FluentPagination maxResultsAnd(int maxResults) {
+        public FluentPagination maxResults(int maxResults) {
             setMaxResults(maxResults);
             return this;
         }
@@ -435,19 +389,23 @@ public class FluentSearchParameters extends SearchParameters {
             return this;
         }
 
-        public FluentPagination limitBroadSearchAnd() {
+        public FluentPagination limitBroadSearch() {
             setMaxResults(500);
             return this;
         }
 
-        public FluentPagination firstAnd(int first) {
+        public FluentPagination first(int first) {
             setFirst(first);
             return this;
         }
 
-        public FluentPagination pageSizeAnd(int pageSize) {
+        public FluentPagination pageSize(int pageSize) {
             setPageSize(pageSize);
             return this;
+        }
+
+        public FluentSearchParameters endPagination() {
+            return FluentSearchParameters.this;
         }
 
     }
@@ -468,10 +426,14 @@ public class FluentSearchParameters extends SearchParameters {
         /**
          * Fluently set the join attribute
          */
-        public FluentSearchParameters add(SingularAttribute<?, ?>... xToOneAttributes) {
+        public FluentLeftJoin add(SingularAttribute<?, ?>... xToOneAttributes) {
             for (SingularAttribute<?, ?> xToOneAttribute : checkNotNull(xToOneAttributes)) {
                 addLeftJoin(xToOneAttribute);
             }
+            return this;
+        }
+
+        public FluentSearchParameters endLeftJoins() {
             return FluentSearchParameters.this;
         }
 
@@ -490,21 +452,25 @@ public class FluentSearchParameters extends SearchParameters {
         private FluentCaching() {
         }
 
-        public FluentSearchParameters set(boolean cacheable) {
+        public FluentCaching set(boolean cacheable) {
             setCacheable(cacheable);
-            return FluentSearchParameters.this;
+            return this;
         }
 
-        public FluentSearchParameters enable() {
+        public FluentCaching enable() {
             return set(true);
         }
 
-        public FluentSearchParameters disable() {
+        public FluentCaching disable() {
             return set(false);
         }
 
-        public FluentSearchParameters region(String cacheRegion) {
+        public FluentCaching region(String cacheRegion) {
             setCacheRegion(checkNotNull(cacheRegion));
+            return this;
+        }
+
+        public FluentSearchParameters endCaching() {
             return FluentSearchParameters.this;
         }
 
@@ -526,17 +492,13 @@ public class FluentSearchParameters extends SearchParameters {
         /**
          * add additionnal parameter.
          */
-        public FluentSearchParameters addExtraParameter(String key, Object o) {
-            getExtraParameters().put(checkNotNull(key), o);
-            return FluentSearchParameters.this;
-        }
-
-        /**
-         * add additionnal parameter.
-         */
-        public FluentExtraParameters addExtraParameterAnd(String key, Object o) {
+        public FluentExtraParameters addExtraParameter(String key, Object o) {
             getExtraParameters().put(checkNotNull(key), o);
             return this;
+        }
+
+        public FluentSearchParameters endExtraParameters() {
+            return FluentSearchParameters.this;
         }
 
     }
