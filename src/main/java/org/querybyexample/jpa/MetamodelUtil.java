@@ -1,13 +1,14 @@
 package org.querybyexample.jpa;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Lists.*;
+import static com.google.common.collect.Maps.*;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.PluralAttribute;
 
 import com.google.common.base.Splitter;
 
@@ -23,7 +24,11 @@ public class MetamodelUtil {
                 Field field = metamodelClass.getField(pathItem);
                 Attribute<?, ?> attribute = (Attribute<?, ?>) field.get(null);
                 attributes.add(attribute);
-                current = attribute.getJavaType();
+                if (attribute instanceof PluralAttribute) {
+                    current = ((PluralAttribute<?, ?, ?>) attribute).getElementType().getJavaType();
+                } else {
+                    current = attribute.getJavaType();
+                }
             }
             return attributes;
         } catch (Exception e) {
