@@ -357,7 +357,6 @@ public class FluentSearchParameters {
             return this;
         }
 
-        @SuppressWarnings("unchecked")
         public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> FluentEntitySelector add(SingularAttribute<E2, T2> field, T2... selected) {
             return add(EntitySelector.newEntitySelector(field, selected));
         }
