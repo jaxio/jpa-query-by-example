@@ -121,17 +121,11 @@ public class FluentSearchParameters {
         private FluentPredicateMode() {
         }
 
-        /**
-         * use <code>and</code> to build the final predicate
-         */
         public FluentSearchParameters andMode() {
             searchParameters.setAndMode(true);
             return FluentSearchParameters.this;
         }
 
-        /**
-         * use <code>or</code> to build the final predicate
-         */
         public FluentSearchParameters orMode() {
             searchParameters.setAndMode(false);
             return FluentSearchParameters.this;
@@ -157,25 +151,15 @@ public class FluentSearchParameters {
 
     public class FluentNamedQuery {
 
-        /**
-         * Fluently set the named query to be used by the DAO layer. Null by
-         * default.
-         */
         private FluentNamedQuery(String namedQuery) {
             searchParameters.setNamedQuery(namedQuery);
         }
 
-        /**
-         * Fluently set the parameters for the named query.
-         */
         public FluentNamedQuery parameters(Map<String, Object> parameters) {
             searchParameters.setNamedQueryParameters(parameters);
             return this;
         }
 
-        /**
-         * Fluently set the parameters for the named query.
-         */
         public FluentNamedQuery parameter(String name, Object value) {
             searchParameters.addNamedQueryParameter(name, value);
             return this;
@@ -214,26 +198,15 @@ public class FluentSearchParameters {
         private FluentCaseSensitiveness() {
         }
 
-        /**
-         * Fluently set the case sensitiveness. Defaults to false.
-         * 
-         * @param caseSensitive
-         */
         public FluentSearchParameters set(boolean caseSensitive) {
             searchParameters.setCaseSensitive(caseSensitive);
             return FluentSearchParameters.this;
         }
 
-        /**
-         * Fluently set the case sensitiveness to true.
-         */
         public FluentSearchParameters sensitive() {
             return set(true);
         }
 
-        /**
-         * Fluently set the case sensitiveness to false.
-         */
         public FluentSearchParameters insensitive() {
             return set(false);
         }
@@ -346,10 +319,6 @@ public class FluentSearchParameters {
         private FluentEntitySelector() {
         }
 
-        /**
-         * Add the given {@link EntitySelector}s to construct predicate for the
-         * underlying foreign key.
-         */
         public FluentEntitySelector add(EntitySelector<?, ?, ?>... entitySelectors) {
             for (EntitySelector<?, ?, ?> entitySelector : checkNotNull(entitySelectors)) {
                 searchParameters.addEntity(entitySelector);
@@ -422,9 +391,6 @@ public class FluentSearchParameters {
         private FluentLeftJoin() {
         }
 
-        /**
-         * Fluently set the join attribute
-         */
         public FluentLeftJoin add(SingularAttribute<?, ?>... xToOneAttributes) {
             for (SingularAttribute<?, ?> xToOneAttribute : checkNotNull(xToOneAttributes)) {
                 searchParameters.addLeftJoin(xToOneAttribute);
@@ -488,9 +454,6 @@ public class FluentSearchParameters {
         private FluentExtraParameters() {
         }
 
-        /**
-         * add additionnal parameter.
-         */
         public FluentExtraParameters addExtraParameter(String key, Object o) {
             searchParameters.getExtraParameters().put(checkNotNull(key), o);
             return this;
