@@ -39,8 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
- * JPA 2 {@link GenericRepository} implementation
+ * JPA 2 {@link GenericRepository} implementation 
  */
 public abstract class GenericRepository<E extends Identifiable<PK>, PK extends Serializable> {
     @Inject
@@ -64,7 +65,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     protected String cacheRegion;
 
     /**
-     * This constructor needs the real type of the generic type E so it can be passed to the {@link EntityManager}.
+     * This constructor needs the real type of the generic type E so it can be given to the {@link EntityManager}.
      */
     public GenericRepository(Class<E> type) {
         this.type = type;
@@ -95,7 +96,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Gets from the repository the E entity instance.
      * 
-     * DAO for the local database will typically use the primary key or unique fields of the passed entity, while DAO for external repository may use a unique
+     * DAO for the local database will typically use the primary key or unique fields of the given entity, while DAO for external repository may use a unique
      * field present in the entity as they probably have no knowledge of the primary key. Hence, passing the entity as an argument instead of the primary key
      * allows you to switch the DAO more easily.
      * 
@@ -121,7 +122,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     /**
-     * Refresh the passed entity with up to date data. Does nothing if the passed entity is a new entity (not yet managed).
+     * Refresh the given entity with up to date data. Does nothing if the given entity is a new entity (not yet managed).
      * 
      * @param entity the entity to refresh.
      */
@@ -132,16 +133,31 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
     }
 
+    /**
+     * Find and load all instances.
+     */
     @Transactional(readOnly = true)
     public List<E> find() {
         return find(getNew(), new SearchParameters());
     }
 
+    /**
+     * Find and load a list of E instance.
+     * 
+     * @param entity a sample entity whose non-null properties may be used as search hints
+     * @return the entities matching the search.
+     */
     @Transactional(readOnly = true)
     public List<E> find(E e) {
         return find(e, new SearchParameters());
     }
 
+    /**
+     * Find and load a list of E instance.
+     * 
+     * @param searchParameters carries additional search information
+     * @return the entities matching the search.
+     */
     @Transactional(readOnly = true)
     public List<E> find(SearchParameters searchParameters) {
         return find(getNew(), searchParameters);
@@ -168,7 +184,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         Root<E> root = criteriaQuery.from(type);
 
         // predicate
-        Predicate predicate = getPredicate(root, criteriaQuery, builder, entity, sp);
+        Predicate predicate = getPredicate(root, builder, entity, sp);
         if (predicate != null) {
             criteriaQuery = criteriaQuery.where(predicate);
         }
@@ -182,20 +198,20 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         criteriaQuery.orderBy(orderByUtil.buildJpaOrders(sp.getOrders(), root, builder, sp));
 
         TypedQuery<E> typedQuery = entityManager.createQuery(criteriaQuery);
-
-        // cache
-        setCacheHints(typedQuery, sp);
-
-        // pagination
+        applyCacheHints(typedQuery, sp);
         applyPagination(typedQuery, sp);
-
-        // execution
         List<E> entities = typedQuery.getResultList();
         log.debug("Returned {} elements", entities.size());
 
         return entities;
     }
 
+    /**
+     * Count the number of E instances.
+     * 
+     * @param searchParameters carries additional search information
+     * @return the number of entities matching the search.
+     */
     @Transactional(readOnly = true)
     public int findCount(SearchParameters sp) {
         return findCount(getNew(), sp);
@@ -205,7 +221,6 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
      * Count the number of E instances.
      * 
      * @param entity a sample entity whose non-null properties may be used as search hint
-     * @param searchParameters carries additional search information
      * @return the number of entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -213,6 +228,13 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return findCount(entity, new SearchParameters());
     }
 
+    /**
+     * Count the number of E instances.
+     * 
+     * @param entity a sample entity whose non-null properties may be used as search hint
+     * @param searchParameters carries additional search information
+     * @return the number of entities matching the search.
+     */
     @Transactional(readOnly = true)
     public int findCount(E entity, SearchParameters sp) {
         checkNotNull(entity, "The entity cannot be null");
@@ -233,7 +255,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
 
         // predicate
-        Predicate predicate = getPredicate(root, criteriaQuery, builder, entity, sp);
+        Predicate predicate = getPredicate(root, builder, entity, sp);
         if (predicate != null) {
             criteriaQuery = criteriaQuery.where(predicate);
         }
@@ -242,10 +264,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
 
         TypedQuery<Long> typedQuery = entityManager.createQuery(criteriaQuery);
 
-        // cache
-        setCacheHints(typedQuery, sp);
-
-        // execution
+        applyCacheHints(typedQuery, sp);
         Long count = typedQuery.getSingleResult();
 
         if (count != null) {
@@ -269,12 +288,10 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     @Transactional(readOnly = true)
     public E findUnique(E entity, SearchParameters sp) {
         E result = findUniqueOrNone(entity, sp);
-
-        if (result == null) {
-            throw new NoResultException("Developper: You expected 1 result but we found none ! sample: " + entity);
-        } else {
+        if (result != null) {
             return result;
         }
+        throw new NoResultException("Developper: You expected 1 result but found none !");
     }
 
     @Transactional(readOnly = true)
@@ -303,15 +320,21 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
     }
 
-    protected <R> Predicate getPredicate(Root<E> root, CriteriaQuery<R> query, CriteriaBuilder builder, E entity, SearchParameters sp) {
+    protected <R> Predicate getPredicate(Root<E> root, CriteriaBuilder builder, E entity, SearchParameters sp) {
+        return JpaUtil.andPredicate(builder, // 
+                bySearchPredicate(root, builder, entity, sp), //
+                byMandatoryPredicate(root, builder, entity, sp));
+    }
+
+    protected <R> Predicate bySearchPredicate(Root<E> root, CriteriaBuilder builder, E entity, SearchParameters sp) {
         return JpaUtil.concatPredicate(sp, builder, //
                 byRanges(root, builder, sp, type), //
                 byPropertySelectors(root, builder, sp), //
                 byEntitySelectors(root, builder, sp), //
                 byExample(root, builder, sp, entity), //
-                byPattern(root, builder, sp, type), //
-                byExtraPredicate(root, builder, sp, entity));
+                byPattern(root, builder, sp, type));
     }
+
 
     protected Predicate byEntitySelectors(Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
         return byEntitySelectorUtil.byEntitySelectors(root, builder, sp);
@@ -336,12 +359,12 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * You may override this method to add a Predicate to the default find method.
      */
-    protected <R> Predicate byExtraPredicate(Root<E> root, CriteriaBuilder builder, SearchParameters sp, E entity) {
+    protected <R> Predicate byMandatoryPredicate(Root<E> root, CriteriaBuilder builder, E entity, SearchParameters sp) {
         return null;
     }
 
     /**
-     * Save or update the passed entity E to the repository. Assume that the entity is already present in the persistence context. No merge is done.
+     * Save or update the given entity E to the repository. Assume that the entity is already present in the persistence context. No merge is done.
      * 
      * @param entity the entity to be saved or updated.
      */
@@ -362,11 +385,11 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
         // other cases are update
         // the simple fact to invoke this method, from a service method annotated with @Transactional,
-        // does the job (assuming the passed entity is present in the persistence context)
+        // does the job (assuming the give entity is present in the persistence context)
     }
 
     /**
-     * Persist the passed entity.
+     * Persist the given entity.
      */
     @Transactional
     public void persist(E entity) {
@@ -382,7 +405,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     /**
-     * Delete the passed entity E from the repository.
+     * Delete the given entity E from the repository.
      * 
      * @param entity the entity to be deleted.
      */
@@ -440,7 +463,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Set hints for 2d level cache.
      */
-    protected void setCacheHints(TypedQuery<?> typedQuery, SearchParameters sp) {
+    protected void applyCacheHints(TypedQuery<?> typedQuery, SearchParameters sp) {
         if (sp.isCacheable()) {
             typedQuery.setHint("org.hibernate.cacheable", true);
 
