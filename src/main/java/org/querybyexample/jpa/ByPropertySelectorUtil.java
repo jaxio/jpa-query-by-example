@@ -15,7 +15,7 @@
  */
 package org.querybyexample.jpa;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.*;
 
 import java.util.List;
 
@@ -46,8 +46,7 @@ public class ByPropertySelectorUtil {
         return JpaUtil.concatPredicate(sp, builder, predicates);
     }
 
-    private static <E> void byBooleanSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp,
-            PropertySelector<? super E, Boolean> selector) {
+    private static <E> void byBooleanSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp, PropertySelector<? super E, Boolean> selector) {
         if (selector.isNotEmpty()) {
             List<Predicate> selectorPredicates = newArrayList();
 
@@ -63,8 +62,7 @@ public class ByPropertySelectorUtil {
         }
     }
 
-    private static <E> void byObjectSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp,
-            PropertySelector<? super E, ?> selector) {
+    private static <E> void byObjectSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp, PropertySelector<? super E, ?> selector) {
         if (selector.isNotEmpty()) {
             List<Predicate> selectorPredicates = newArrayList();
 
@@ -72,12 +70,17 @@ public class ByPropertySelectorUtil {
                 if (selection instanceof String) {
                     Path<String> path = JpaUtil.getPath(root, selector.getAttributes());
                     selectorPredicates.add(JpaUtil.stringPredicate(path, selection, selector.getSearchMode(), sp, builder));
+                } else if (selection instanceof Identifiable) {
+                    Path<?> path = JpaUtil.getPath(root, selector.getAttributes()).get("id");
+                    selectorPredicates.add(selection == null ? builder.isNull(path) : builder.equal(path, ((Identifiable<?>) selection).getId()));
                 } else {
                     Path<?> path = JpaUtil.getPath(root, selector.getAttributes());
                     selectorPredicates.add(selection == null ? builder.isNull(path) : builder.equal(path, selection));
                 }
             }
             predicates.add(JpaUtil.orPredicate(builder, selectorPredicates));
+        } else if (selector.isNotIncludingNullSet()) {
+            predicates.add(builder.isNotNull(JpaUtil.getPath(root, selector.getAttributes())));
         }
     }
 }

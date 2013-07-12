@@ -1,5 +1,11 @@
 DROP ALL OBJECTS;
 
+CREATE TABLE LEGACY (
+    id                      char(32) not null,
+    label                   varchar(100) not null,
+    primary key (id)
+);
+
 CREATE TABLE ADDRESS (
     id                          int not null IDENTITY,
     street_name                 varchar(100),
@@ -21,6 +27,7 @@ CREATE TABLE ACCOUNT (
     birth_date               timestamp,
     favorite_number          int,
     address_id               int,
+    legacy_id                char(32),
     creation_date            timestamp,
     creation_author          varchar(200),
     last_modification_date   timestamp,
@@ -30,6 +37,7 @@ CREATE TABLE ACCOUNT (
     constraint account_unique_1 unique (login),
     constraint account_unique_2 unique (email),
     constraint account_fk_1 foreign key (address_id) references ADDRESS,
+    constraint account_fk_2 foreign key (legacy_id) references LEGACY,
     primary key (id)
 );
 
@@ -50,6 +58,7 @@ CREATE TABLE ACCOUNT_ROLE (
     primary key (account_id, role_id)
 );
 
+INSERT INTO LEGACY (id, label) values ('0000000000000000000000000000001', 'test');
 
 INSERT INTO ADDRESS (street_name, city) values('Avenue des champs Elysées', 'Paris');
 INSERT INTO ADDRESS (street_name, city) values('Park avenue', 'New-York');
@@ -63,6 +72,7 @@ INSERT INTO ACCOUNT (id, login, password, email, favorite_number, is_enabled, ad
 INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000005', 'homer',  'homer',  'homer@example.com', 666, 'MR', 4, PARSEDATETIME('01/01/1972','dd/mm/yyyy'));
 INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000006', 'maggy',  'maggy',  'maggy@example.com', 42, 'MS', 4, PARSEDATETIME('01/01/1982','dd/mm/yyyy'));
 INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date) VALUES ('000000000000000000000000000007', 'homeless',  'homeless',  'homeless@example.com', 42, 'MS', null, PARSEDATETIME('01/01/1982','dd/mm/yyyy'));
+INSERT INTO ACCOUNT (id, login, password, email, favorite_number, civility, address_id, birth_date, legacy_id) VALUES ('000000000000000000000000000008', 'legacy',  'legacy',  'legacy@example.com', 42, 'MS', null, PARSEDATETIME('01/01/1982','dd/mm/yyyy'), '0000000000000000000000000000001');
 
 INSERT INTO ROLE (role_name) VALUES ('ROLE_ADMIN');
 INSERT INTO ROLE (role_name) VALUES ('ROLE_USER');

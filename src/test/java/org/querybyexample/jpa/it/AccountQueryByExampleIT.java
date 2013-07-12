@@ -16,10 +16,11 @@
 package org.querybyexample.jpa.it;
 
 import static org.fest.assertions.Assertions.*;
-import static org.querybyexample.jpa.EntitySelector.*;
 import static org.querybyexample.jpa.OrderByDirection.*;
 import static org.querybyexample.jpa.PropertySelector.*;
 import static org.querybyexample.jpa.app.Account_.*;
+
+import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -27,7 +28,6 @@ import javax.persistence.PersistenceContext;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.querybyexample.jpa.EntitySelector;
 import org.querybyexample.jpa.OrderBy;
 import org.querybyexample.jpa.PropertySelector;
 import org.querybyexample.jpa.SearchMode;
@@ -37,6 +37,8 @@ import org.querybyexample.jpa.app.AccountQueryByExample;
 import org.querybyexample.jpa.app.Account_;
 import org.querybyexample.jpa.app.Address;
 import org.querybyexample.jpa.app.Address_;
+import org.querybyexample.jpa.app.Legacy;
+import org.querybyexample.jpa.app.Legacy_;
 import org.querybyexample.jpa.app.Role;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -57,7 +59,7 @@ public class AccountQueryByExampleIT {
     @Inject
     private AccountQueryByExample accountQBE;
 
-    private static final int NB_ACCOUNTS = 7;
+    private static final int NB_ACCOUNTS = 8;
 
     @Test
     public void noRestriction() {
@@ -186,37 +188,35 @@ public class AccountQueryByExampleIT {
     @Test
     public void byEntiySelector() {
         SearchParameters sp = new SearchParameters();
-        sp.addEntity(newEntitySelector(Account_.homeAddress, adminHomeAddress()));
+        sp.addProperty(newPropertySelector(Arrays.asList(adminHomeAddress()), Account_.homeAddress));
         assertSize(sp, 1);
     }
 
     @Test
     public void byEntiySelectorAndIncludingNull() {
         SearchParameters sp = new SearchParameters();
-        sp.addEntity(newEntitySelector(Account_.homeAddress, adminHomeAddress()).includeNull());
-        assertSize(sp, 2);
+        sp.addProperty(newPropertySelector(Arrays.asList(adminHomeAddress(), null), Account_.homeAddress));
+        assertSize(sp, 3);
     }
 
     @Test
     public void byEntiySelectorIncludingNull() {
         SearchParameters sp = new SearchParameters();
-        sp.addEntity(newEntitySelector(Account_.homeAddress).includeNull());
-        assertSize(sp, 1);
+        sp.addProperty(newPropertySelector(Arrays.asList((Address) null), Account_.homeAddress));
+        assertSize(sp, 2);
     }
 
     @Test
     public void byEntiySelectorNotIncludingNull() {
         SearchParameters sp = new SearchParameters();
-        sp.addEntity(newEntitySelector(Account_.homeAddress).withoutNull());
-        assertSize(sp, NB_ACCOUNTS - 1);
+        sp.addProperty(newPropertySelector(Account_.homeAddress).withoutNull());
+        assertSize(sp, NB_ACCOUNTS - 2);
     }
 
     @Test
     public void byEntiySelectorInnerPk() {
-        EntitySelector<Account, Address, Integer> role = newEntitySelectorInCpk(Account_.homeAddress, Address_.id);
-        role.add(adminHomeAddress());
         SearchParameters sp = new SearchParameters();
-        sp.addEntity(role);
+        sp.addProperty(newPropertySelector(Arrays.asList(legacyAccount().getId()), Account_.legacy, Legacy_.id));
         assertSize(sp, 1);
     }
 
@@ -379,6 +379,12 @@ public class AccountQueryByExampleIT {
         Account admin = new Account();
         admin.setUsername("admin");
         return accountQBE.find(admin).get(0).getHomeAddress();
+    }
+
+    private Legacy legacyAccount() {
+        Account admin = new Account();
+        admin.setUsername("legacy");
+        return accountQBE.find(admin).get(0).getLegacy();
     }
 
     private void assertEmpty(Account account) {

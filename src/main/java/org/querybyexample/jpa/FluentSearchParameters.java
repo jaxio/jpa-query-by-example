@@ -18,7 +18,6 @@ package org.querybyexample.jpa;
 import static com.google.common.base.Preconditions.*;
 import static org.querybyexample.jpa.MetamodelUtil.*;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -308,36 +307,6 @@ public class FluentSearchParameters {
 
     public FluentPropertySelector properties() {
         return new FluentPropertySelector();
-    }
-
-    // -----------------------------------
-    // Search by entity selector support
-    // -----------------------------------
-
-    public class FluentEntitySelector {
-
-        private FluentEntitySelector() {
-        }
-
-        public FluentEntitySelector add(EntitySelector<?, ?, ?>... entitySelectors) {
-            for (EntitySelector<?, ?, ?> entitySelector : checkNotNull(entitySelectors)) {
-                searchParameters.addEntity(entitySelector);
-            }
-            return this;
-        }
-
-        public <E2, T2 extends Identifiable<TPK2>, TPK2 extends Serializable> FluentEntitySelector add(SingularAttribute<E2, T2> field, T2... selected) {
-            return add(EntitySelector.newEntitySelector(field, selected));
-        }
-
-        public FluentSearchParameters endEntities() {
-            return FluentSearchParameters.this;
-        }
-
-    }
-
-    public FluentEntitySelector entities() {
-        return new FluentEntitySelector();
     }
 
     // -----------------------------------

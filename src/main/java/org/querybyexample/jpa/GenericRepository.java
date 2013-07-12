@@ -15,8 +15,8 @@
  */
 package org.querybyexample.jpa;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.querybyexample.jpa.JpaUtil.applyPagination;
+import static com.google.common.base.Preconditions.*;
+import static org.querybyexample.jpa.JpaUtil.*;
 
 import java.io.Serializable;
 import java.util.List;
@@ -39,15 +39,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-
 /**
- * JPA 2 {@link GenericRepository} implementation 
+ * JPA 2 {@link GenericRepository} implementation
  */
 public abstract class GenericRepository<E extends Identifiable<PK>, PK extends Serializable> {
     @Inject
     protected ByExampleUtil byExampleUtil;
-    @Inject
-    protected ByEntitySelectorUtil byEntitySelectorUtil;
     @Inject
     protected ByPatternUtil byPatternUtil;
     @Inject
@@ -65,7 +62,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     protected String cacheRegion;
 
     /**
-     * This constructor needs the real type of the generic type E so it can be given to the {@link EntityManager}.
+     * This constructor needs the real type of the generic type E so it can be
+     * given to the {@link EntityManager}.
      */
     public GenericRepository(Class<E> type) {
         this.type = type;
@@ -96,12 +94,16 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Gets from the repository the E entity instance.
      * 
-     * DAO for the local database will typically use the primary key or unique fields of the given entity, while DAO for external repository may use a unique
-     * field present in the entity as they probably have no knowledge of the primary key. Hence, passing the entity as an argument instead of the primary key
-     * allows you to switch the DAO more easily.
+     * DAO for the local database will typically use the primary key or unique
+     * fields of the given entity, while DAO for external repository may use a
+     * unique field present in the entity as they probably have no knowledge of
+     * the primary key. Hence, passing the entity as an argument instead of the
+     * primary key allows you to switch the DAO more easily.
      * 
-     * @param entity an E instance having a primary key set
-     * @return the corresponding E persistent instance or null if none could be found.
+     * @param entity
+     *            an E instance having a primary key set
+     * @return the corresponding E persistent instance or null if none could be
+     *         found.
      */
     @Transactional(readOnly = true)
     public E get(E entity) {
@@ -122,9 +124,11 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     /**
-     * Refresh the given entity with up to date data. Does nothing if the given entity is a new entity (not yet managed).
+     * Refresh the given entity with up to date data. Does nothing if the given
+     * entity is a new entity (not yet managed).
      * 
-     * @param entity the entity to refresh.
+     * @param entity
+     *            the entity to refresh.
      */
     @Transactional(readOnly = true)
     public void refresh(E entity) {
@@ -144,7 +148,9 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Find and load a list of E instance.
      * 
-     * @param entity a sample entity whose non-null properties may be used as search hints
+     * @param entity
+     *            a sample entity whose non-null properties may be used as
+     *            search hints
      * @return the entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -155,7 +161,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Find and load a list of E instance.
      * 
-     * @param searchParameters carries additional search information
+     * @param searchParameters
+     *            carries additional search information
      * @return the entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -166,8 +173,11 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Find and load a list of E instance.
      * 
-     * @param entity a sample entity whose non-null properties may be used as search hints
-     * @param searchParameters carries additional search information
+     * @param entity
+     *            a sample entity whose non-null properties may be used as
+     *            search hints
+     * @param searchParameters
+     *            carries additional search information
      * @return the entities matching the search.
      */
     @SuppressWarnings("unchecked")
@@ -209,7 +219,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Count the number of E instances.
      * 
-     * @param searchParameters carries additional search information
+     * @param searchParameters
+     *            carries additional search information
      * @return the number of entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -220,7 +231,9 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Count the number of E instances.
      * 
-     * @param entity a sample entity whose non-null properties may be used as search hint
+     * @param entity
+     *            a sample entity whose non-null properties may be used as
+     *            search hint
      * @return the number of entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -231,8 +244,11 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Count the number of E instances.
      * 
-     * @param entity a sample entity whose non-null properties may be used as search hint
-     * @param searchParameters carries additional search information
+     * @param entity
+     *            a sample entity whose non-null properties may be used as
+     *            search hint
+     * @param searchParameters
+     *            carries additional search information
      * @return the number of entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -300,7 +316,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     /**
-     * We request at most 2, if there's more than one then we throw a {@link NonUniqueResultException}
+     * We request at most 2, if there's more than one then we throw a
+     * {@link NonUniqueResultException}
      * 
      * @throws NonUniqueResultException
      */
@@ -311,7 +328,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         sp.setMaxResults(2);
         List<E> results = find(entity, sp);
 
-        if (results == null || results.isEmpty()) {
+        if ((results == null) || results.isEmpty()) {
             return null;
         } else if (results.size() > 1) {
             throw new NonUniqueResultException("Developper: You expected 1 result but we found more ! sample: " + entity);
@@ -321,7 +338,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     protected <R> Predicate getPredicate(Root<E> root, CriteriaBuilder builder, E entity, SearchParameters sp) {
-        return JpaUtil.andPredicate(builder, // 
+        return JpaUtil.andPredicate(builder, //
                 bySearchPredicate(root, builder, entity, sp), //
                 byMandatoryPredicate(root, builder, entity, sp));
     }
@@ -330,14 +347,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return JpaUtil.concatPredicate(sp, builder, //
                 byRanges(root, builder, sp, type), //
                 byPropertySelectors(root, builder, sp), //
-                byEntitySelectors(root, builder, sp), //
                 byExample(root, builder, sp, entity), //
                 byPattern(root, builder, sp, type));
-    }
-
-
-    protected Predicate byEntitySelectors(Root<E> root, CriteriaBuilder builder, SearchParameters sp) {
-        return byEntitySelectorUtil.byEntitySelectors(root, builder, sp);
     }
 
     protected Predicate byExample(Root<E> root, CriteriaBuilder builder, SearchParameters sp, E entity) {
@@ -357,16 +368,19 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     /**
-     * You may override this method to add a Predicate to the default find method.
+     * You may override this method to add a Predicate to the default find
+     * method.
      */
     protected <R> Predicate byMandatoryPredicate(Root<E> root, CriteriaBuilder builder, E entity, SearchParameters sp) {
         return null;
     }
 
     /**
-     * Save or update the given entity E to the repository. Assume that the entity is already present in the persistence context. No merge is done.
+     * Save or update the given entity E to the repository. Assume that the
+     * entity is already present in the persistence context. No merge is done.
      * 
-     * @param entity the entity to be saved or updated.
+     * @param entity
+     *            the entity to be saved or updated.
      */
     @Transactional
     public void save(E entity) {
@@ -384,8 +398,10 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
             return;
         }
         // other cases are update
-        // the simple fact to invoke this method, from a service method annotated with @Transactional,
-        // does the job (assuming the give entity is present in the persistence context)
+        // the simple fact to invoke this method, from a service method
+        // annotated with @Transactional,
+        // does the job (assuming the give entity is present in the persistence
+        // context)
     }
 
     /**
@@ -407,7 +423,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Delete the given entity E from the repository.
      * 
-     * @param entity the entity to be deleted.
+     * @param entity
+     *            the entity to be deleted.
      */
     @Transactional
     public void delete(E entity) {
@@ -445,7 +462,9 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * _HACK_ too bad that JPA does not provide this entityType.getVersion();
      * 
-     * @see http://stackoverflow.com/questions/13265094/generic-way-to-get-jpa-entity-version
+     * @see http
+     *      ://stackoverflow.com/questions/13265094/generic-way-to-get-jpa-entity
+     *      -version
      */
     private SingularAttribute<? super E, ?> getVersionAttribute(EntityType<E> entityType) {
         for (SingularAttribute<? super E, ?> sa : entityType.getSingularAttributes()) {
