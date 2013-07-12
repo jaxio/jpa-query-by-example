@@ -325,6 +325,14 @@ public class SearchParameters implements Serializable {
         return maxResults;
     }
 
+    public void setNoLimit() {
+        setMaxResults(-1);
+    }
+
+    public void setLimitBroadSearch() {
+        setMaxResults(500);
+    }
+
     /**
      * Set the position of the first result to retrieve.
      * 
@@ -415,6 +423,10 @@ public class SearchParameters implements Serializable {
 
     public Map<String, Object> getExtraParameters() {
         return extraParameters;
+    }
+
+    public void addExtraParameter(String key, Object value) {
+        extraParameters.put(key, value);
     }
 
     /**
