@@ -36,6 +36,9 @@ public abstract class Account_ {
     // Technical attributes for query by example
     public static volatile SingularAttribute<Account, Integer> addressId;
 
+    // One to one
+    public static volatile SingularAttribute<Account, Legacy> legacy;
+    
     // Many to one
     public static volatile SingularAttribute<Account, Address> homeAddress;
 

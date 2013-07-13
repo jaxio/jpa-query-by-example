@@ -87,9 +87,6 @@ public class SearchParameters implements Serializable {
     // property selectors
     private final List<PropertySelector<?, ?>> properties = newArrayList();
 
-    // entity selectors
-    private final List<EntitySelector<?, ?, ?>> entities = newArrayList();
-
     // pattern to match against all strings.
     private String searchPattern;
 
@@ -291,23 +288,6 @@ public class SearchParameters implements Serializable {
 
     public boolean hasProperties() {
         return !properties.isEmpty();
-    }
-
-    // -----------------------------------
-    // Search by entity selector support
-    // -----------------------------------
-
-    public List<EntitySelector<?, ?, ?>> getEntities() {
-        return entities;
-    }
-
-    public void addEntity(EntitySelector<?, ?, ?> entitySelector) {
-        checkNotNull(entitySelector);
-        entities.add(entitySelector);
-    }
-
-    public boolean hasEntities() {
-        return !entities.isEmpty();
     }
 
     // -----------------------------------

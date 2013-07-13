@@ -37,6 +37,15 @@ public class PropertySelector<E, F> implements Serializable {
     /**
      * {@link PropertySelector} builder
      */
+    public static <E, F> PropertySelector<E, F> newPropertySelector(List<F> selecteds, Attribute<?, ?>... fields) {
+        PropertySelector<E, F> ps = new PropertySelector<E, F>(checkNotNull(fields));
+        ps.setSelected(selecteds);
+        return ps;
+    }
+
+    /**
+     * {@link PropertySelector} builder
+     */
     public static <E, F> PropertySelector<E, F> newPropertySelector(SearchMode searchMode, Attribute<?, ?>... fields) {
         PropertySelector<E, F> ps = new PropertySelector<E, F>(checkNotNull(fields));
         ps.setSearchMode(searchMode);
@@ -48,6 +57,7 @@ public class PropertySelector<E, F> implements Serializable {
     private final List<Attribute<?, ?>> attributes;
     private List<F> selected = newArrayList();
     private SearchMode searchMode; // for string property only.
+    private Boolean notIncludingNull;
 
     public PropertySelector(Attribute<?, ?>... attributes) {
         this.attributes = newArrayList(checkNotNull(attributes));
@@ -100,6 +110,19 @@ public class PropertySelector<E, F> implements Serializable {
 
     public boolean isBoolean() {
         return attributes.get(attributes.size() - 1).getJavaType().isAssignableFrom(Boolean.class);
+    }
+    
+    public PropertySelector<E, F> withoutNull() {
+        this.notIncludingNull = true;
+        return this;
+    }
+    
+    public Boolean isNotIncludingNull() {
+        return notIncludingNull;
+    }
+    
+    public boolean isNotIncludingNullSet() {
+        return notIncludingNull != null;
     }
 
     public SearchMode getSearchMode() {

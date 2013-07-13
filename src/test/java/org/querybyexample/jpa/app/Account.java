@@ -32,6 +32,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Transient;
@@ -56,6 +57,9 @@ public class Account implements Identifiable<String>, Serializable {
     // Technical attributes for query by example
     private Integer addressId;
 
+    // One to one
+    private Legacy legacy;
+    
     // Many to one
     private Address homeAddress; // (addressId)
 
@@ -204,7 +208,25 @@ public class Account implements Identifiable<String>, Serializable {
             setAddressId(null);
         }
     }
+    
+    // --------------------------------------------------------------------
+    // One to One
+    // --------------------------------------------------------------------
 
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // one-to-one: account ==> legacy
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    @JoinColumn(name = "LEGACY_ID")
+    @OneToOne(cascade = PERSIST, fetch = LAZY)
+    public Legacy getLegacy() {
+        return legacy;
+    }
+
+    public void setLegacy(Legacy legacy) {
+        this.legacy = legacy;
+    }
+    
     // --------------------------------------------------------------------
     // Many to Many
     // --------------------------------------------------------------------

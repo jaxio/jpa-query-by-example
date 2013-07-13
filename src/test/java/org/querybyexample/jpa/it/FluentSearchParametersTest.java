@@ -23,7 +23,6 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.querybyexample.jpa.EntitySelector;
 import org.querybyexample.jpa.FluentSearchParameters;
 import org.querybyexample.jpa.OrderBy;
 import org.querybyexample.jpa.OrderByDirection;
@@ -33,7 +32,6 @@ import org.querybyexample.jpa.SearchMode;
 import org.querybyexample.jpa.SearchParameters;
 import org.querybyexample.jpa.app.Account;
 import org.querybyexample.jpa.app.Account_;
-import org.querybyexample.jpa.app.Address;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +48,6 @@ public class FluentSearchParametersTest {
     public void full() {
         Range<Account, Date> range = new Range<>(Account_.birthDate);
         String cacheRegion = "toto";
-        EntitySelector<Account, Address, Integer> entitySelector = new EntitySelector<>(Account_.homeAddress);
         String key1 = "K1";
         String value1 = "V1";
         SingularAttribute<?, ?> leftJoin = Account_.addressId;
@@ -70,7 +67,6 @@ public class FluentSearchParametersTest {
         searchParameters.setCacheRegion(cacheRegion);
         searchParameters.setCaseSensitive(false);
         searchParameters.setDistinct(true);
-        searchParameters.addEntity(entitySelector);
         searchParameters.addExtraParameter(key1, value1);
         searchParameters.setUseANDInManyToMany(false);
         searchParameters.addLeftJoin(leftJoin);
@@ -90,7 +86,6 @@ public class FluentSearchParametersTest {
                 .caching().enable().region(cacheRegion).endCaching() //
                 .caseSensitiveness().insensitive() //
                 .distinct() //
-                .entities().add(entitySelector).endEntities() //
                 .extraParameters().addExtraParameter(key1, value1).endExtraParameters() //
                 .inManyToMany().useOR() //
                 .leftJoins().add(leftJoin).endLeftJoins() //
@@ -108,7 +103,6 @@ public class FluentSearchParametersTest {
         assertThat(fluentSearchParameters.getCacheRegion()).isEqualTo(searchParameters.getCacheRegion());
         assertThat(fluentSearchParameters.isCaseSensitive()).isEqualTo(searchParameters.isCaseSensitive());
         assertThat(fluentSearchParameters.getDistinct()).isEqualTo(searchParameters.getDistinct());
-        assertThat(fluentSearchParameters.getEntities()).isEqualTo(searchParameters.getEntities());
         assertThat(fluentSearchParameters.getExtraParameters()).isEqualTo(searchParameters.getExtraParameters());
         assertThat(fluentSearchParameters.getUseANDInManyToMany()).isEqualTo(searchParameters.getUseANDInManyToMany());
         assertThat(fluentSearchParameters.getLeftJoins()).isEqualTo(searchParameters.getLeftJoins());
