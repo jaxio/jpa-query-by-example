@@ -101,10 +101,6 @@ public class FluentSearchParameters {
             return set(SearchMode.ENDING_LIKE);
         }
 
-        public boolean is(SearchMode searchMode) {
-            return searchParameters.getSearchMode() == searchMode;
-        }
-
     }
 
     public FluentSearchMode searchMode() {
@@ -128,14 +124,6 @@ public class FluentSearchParameters {
         public FluentSearchParameters orMode() {
             searchParameters.setAndMode(false);
             return FluentSearchParameters.this;
-        }
-
-        public boolean isAndMode() {
-            return isAndMode();
-        }
-
-        public boolean isOrMode() {
-            return !isAndMode();
         }
 
     }
@@ -208,14 +196,6 @@ public class FluentSearchParameters {
 
         public FluentSearchParameters insensitive() {
             return set(false);
-        }
-
-        public boolean isSensitive() {
-            return !searchParameters.isCaseSensitive();
-        }
-
-        public boolean isInsensitive() {
-            return !isSensitive();
         }
 
     }
@@ -323,12 +303,14 @@ public class FluentSearchParameters {
             return this;
         }
 
-        public FluentPagination noLimitAnd() {
-            return maxResults(-1);
+        public FluentPagination noLimit() {
+            searchParameters.setNoLimit();
+            return this;
         }
 
         public FluentPagination limitBroadSearch() {
-            return maxResults(500);
+            searchParameters.setLimitBroadSearch();
+            return this;
         }
 
         public FluentPagination first(int first) {
