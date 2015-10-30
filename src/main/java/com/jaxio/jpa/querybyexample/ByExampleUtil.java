@@ -24,7 +24,6 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.*;
-import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.PluralAttribute;
 import javax.persistence.metamodel.SingularAttribute;
@@ -84,7 +83,7 @@ public class ByExampleUtil {
         return jpaUtil.andPredicate(builder, byExample(mt, embeddablePath, embeddableValue, sp, builder));
     }
 
-    /**
+    /*
      * Add a predicate for each simple property whose value is not null.
      */
     public <T> List<Predicate> byExample(ManagedType<T> mt, Path<T> mtPath, T mtValue, SearchParameters sp, CriteriaBuilder builder) {
@@ -110,13 +109,13 @@ public class ByExampleUtil {
         return predicates;
     }
 
-    /**
+    /*
      * Invoke byExample method for each not null x-to-one association when their pk is not set. This allows you to search entities based on an associated
      * entity's properties value.
      */
     @SuppressWarnings("unchecked")
     public <T extends Identifiable<?>, M2O extends Identifiable<?>> List<Predicate> byExampleOnXToOne(ManagedType<T> mt, Root<T> mtPath, T mtValue,
-            SearchParameters sp, CriteriaBuilder builder) {
+                                                                                                      SearchParameters sp, CriteriaBuilder builder) {
         List<Predicate> predicates = newArrayList();
         for (SingularAttribute<? super T, ?> attr : mt.getSingularAttributes()) {
             if (attr.getPersistentAttributeType() == MANY_TO_ONE || attr.getPersistentAttributeType() == ONE_TO_ONE) {
@@ -136,7 +135,7 @@ public class ByExampleUtil {
         return predicates;
     }
 
-    /**
+    /*
      * Construct a join predicate on collection (eg many to many, List)
      */
     public <T> List<Predicate> byExampleOnXToMany(ManagedType<T> mt, Root<T> mtPath, T mtValue, SearchParameters sp, CriteriaBuilder builder) {

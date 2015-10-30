@@ -33,11 +33,11 @@ import static com.google.common.collect.Sets.newHashSet;
 import static com.jaxio.jpa.querybyexample.PropertySelector.newPropertySelector;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
-/**
+/*
  * The SearchParameters is used to pass search parameters to the DAO layer.
- * 
+ * <p>
  * Its usage keeps 'find' method signatures in the DAO/Service layer simple.
- * 
+ * <p>
  * A SearchParameters helps you drive your search in the following areas:
  * <ul>
  * <li>Configure the search mode (EQUALS, LIKE, ...)</li>
@@ -49,16 +49,13 @@ import static org.apache.commons.lang.StringUtils.isNotBlank;
  * <li>Named query: if you set a named query it will be executed. Named queries can be defined in annotation or src/main/resources/META-INF/orm.xml</li>
  * <li>FullTextSearch: simply set the term property (requires Hibernate Search)</li>
  * </ul>
- * 
+ * <p>
  * Note : All requests are limited to a maximum number of elements to prevent resource exhaustion.
- * 
- * @see GenericDao
+ *
  * @see SearchMode
  * @see OrderBy
  * @see Range
- * @see NamedQueryUtil
  * @see PropertySelector
- * @see EntitySelector
  */
 public class SearchParameters implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -113,18 +110,19 @@ public class SearchParameters implements Serializable {
     // SearchMode
     // -----------------------------------
 
-    /**
+    /*
      * Fluently set the @{link SearchMode}. It defaults to EQUALS.
-     * 
+     *
+     * @param searchMode searchmode
      * @see SearchMode#EQUALS
      */
     public void setSearchMode(SearchMode searchMode) {
         this.searchMode = checkNotNull(searchMode);
     }
 
-    /**
+    /*
      * Return the @{link SearchMode}. It defaults to EQUALS.
-     * 
+     *
      * @see SearchMode#EQUALS
      */
     public SearchMode getSearchMode() {
@@ -135,9 +133,10 @@ public class SearchParameters implements Serializable {
         return getSearchMode() == searchMode;
     }
 
-    /**
+    /*
      * Fluently set the @{link SearchMode}. It defaults to EQUALS.
-     * 
+     *
+     * @param searchMode searchmode
      * @see SearchMode#EQUALS
      */
     public SearchParameters searchMode(SearchMode searchMode) {
@@ -145,45 +144,47 @@ public class SearchParameters implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Use the EQUALS @{link SearchMode}.
-     * 
+     *
+     * @param searchMode searchmode
      * @see SearchMode#EQUALS
      */
     public SearchParameters equals() {
         return searchMode(SearchMode.EQUALS);
     }
 
-    /**
+    /*
      * Use the ANYWHERE @{link SearchMode}.
-     * 
+     *
+     * @param searchMode searchmode
      * @see SearchMode#ANYWHERE
      */
     public SearchParameters anywhere() {
         return searchMode(SearchMode.ANYWHERE);
     }
 
-    /**
+    /*
      * Use the STARTING_LIKE @{link SearchMode}.
-     * 
+     *
      * @see SearchMode#STARTING_LIKE
      */
     public SearchParameters startingLike() {
         return searchMode(SearchMode.STARTING_LIKE);
     }
 
-    /**
+    /*
      * Use the LIKE @{link SearchMode}.
-     * 
+     *
      * @see SearchMode#LIKE
      */
     public SearchParameters like() {
         return searchMode(SearchMode.LIKE);
     }
 
-    /**
+    /*
      * Use the ENDING_LIKE @{link SearchMode}.
-     * 
+     *
      * @see SearchMode#ENDING_LIKE
      */
     public SearchParameters endingLike() {
@@ -202,7 +203,7 @@ public class SearchParameters implements Serializable {
         return andMode;
     }
 
-    /**
+    /*
      * use <code>and</code> to build the final predicate
      */
     public SearchParameters andMode() {
@@ -210,7 +211,7 @@ public class SearchParameters implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * use <code>or</code> to build the final predicate
      */
     public SearchParameters orMode() {
@@ -222,56 +223,56 @@ public class SearchParameters implements Serializable {
     // Named query support
     // -----------------------------------
 
-    /**
+    /*
      * Returns true if a named query has been set, false otherwise. When it returns true, the DAO layer will call the namedQuery.
      */
     public boolean hasNamedQuery() {
         return isNotBlank(namedQuery);
     }
 
-    /**
+    /*
      * Set the named query to be used by the DAO layer. Null by default.
      */
     public void setNamedQuery(String namedQuery) {
         this.namedQuery = namedQuery;
     }
 
-    /**
+    /*
      * Return the name of the named query to be used by the DAO layer.
      */
     public String getNamedQuery() {
         return namedQuery;
     }
 
-    /**
+    /*
      * Set the parameters for the named query.
      */
     public void setNamedQueryParameters(Map<String, Object> parameters) {
         this.parameters = checkNotNull(parameters);
     }
 
-    /**
+    /*
      * Set the parameters for the named query.
      */
     public void addNamedQueryParameter(String name, Object value) {
         parameters.put(checkNotNull(name), checkNotNull(value));
     }
 
-    /**
+    /*
      * The parameters associated with the named query, if any.
      */
     public Map<String, Object> getNamedQueryParameters() {
         return parameters;
     }
 
-    /**
+    /*
      * Return the value of the given parameter name.
      */
     public Object getNamedQueryParameter(String parameterName) {
         return parameters.get(checkNotNull(parameterName));
     }
 
-    /**
+    /*
      * Fluently set the named query to be used by the DAO layer. Null by default.
      */
     public SearchParameters namedQuery(String namedQuery) {
@@ -279,7 +280,7 @@ public class SearchParameters implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Fluently set the parameters for the named query.
      */
     public SearchParameters namedQueryParameters(Map<String, Object> parameters) {
@@ -287,7 +288,7 @@ public class SearchParameters implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Fluently set the parameter for the named query.
      */
     public SearchParameters namedQueryParameter(String name, Object value) {
@@ -299,16 +300,16 @@ public class SearchParameters implements Serializable {
     // Search pattern support
     // -----------------------------------
 
-    /**
+    /*
      * When it returns true, it indicates to the DAO layer to use the given searchPattern on all string properties.
      */
     public boolean hasSearchPattern() {
         return isNotBlank(searchPattern);
     }
 
-    /**
+    /*
      * Set the pattern which may contains wildcards (ex: <code>e%r%ka</code> ).
-     * <p> 
+     * <p>
      * The given searchPattern is used by the DAO layer on all string properties. Null by default.
      */
     public void setSearchPattern(String searchPattern) {
@@ -371,7 +372,7 @@ public class SearchParameters implements Serializable {
         return term(new TermSelector(attribute).selected(selected));
     }
 
-    /**
+    /*
      * Specify the similarity for the indexed properties, {@link #searchSimilarity} is between 0f and 1f
      */
     public SearchParameters searchSimilarity(Float searchSimilarity) {
@@ -388,10 +389,10 @@ public class SearchParameters implements Serializable {
     // Case sensitiveness support
     // -----------------------------------
 
-    /**
+    /*
      * Set the case sensitiveness. Defaults to false.
-     * 
-     * @param caseSensitive
+     *
+     * @param caseSensitive caseSensitive
      */
     public void setCaseSensitive(boolean caseSensitive) {
         this.caseSensitive = caseSensitive;
@@ -405,24 +406,24 @@ public class SearchParameters implements Serializable {
         return !caseSensitive;
     }
 
-    /**
+    /*
      * Fluently set the case sensitiveness. Defaults to false.
-     * 
-     * @param caseSensitive
+     *
+     * @param caseSensitive caseSensitive
      */
     public SearchParameters caseSensitive(boolean caseSensitive) {
         setCaseSensitive(caseSensitive);
         return this;
     }
 
-    /**
+    /*
      * Fluently set the case sensitiveness to true.
      */
     public SearchParameters caseSensitive() {
         return caseSensitive(true);
     }
 
-    /**
+    /*
      * Fluently set the case sensitiveness to false.
      */
     public SearchParameters caseInsensitive() {
@@ -536,7 +537,7 @@ public class SearchParameters implements Serializable {
     // Pagination support
     // -----------------------------------
 
-    /**
+    /*
      * Set the maximum number of results to retrieve. Pass -1 for no limits.
      */
     public void setMaxResults(int maxResults) {
@@ -547,9 +548,9 @@ public class SearchParameters implements Serializable {
         return maxResults;
     }
 
-    /**
+    /*
      * Set the position of the first result to retrieve.
-     * 
+     *
      * @param first position of the first result, numbered from 0
      */
     public void setFirst(int first) {
@@ -560,7 +561,7 @@ public class SearchParameters implements Serializable {
         return first;
     }
 
-    /**
+    /*
      * Set the page size, that is the maximum number of result to retrieve.
      */
     public void setPageSize(int pageSize) {
@@ -600,7 +601,7 @@ public class SearchParameters implements Serializable {
     // Fetch associated entity using a LEFT Join
     // -----------------------------------------
 
-    /**
+    /*
      * Returns the attributes (x-to-one association) which must be fetched with a left join.
      */
     public List<List<Attribute<?, ?>>> getFetches() {
@@ -615,7 +616,7 @@ public class SearchParameters implements Serializable {
         return !fetches.isEmpty();
     }
 
-    /**
+    /*
      * The given attribute (x-to-one association) will be fetched with a left join.
      */
     public void addFetch(Attribute<?, ?>... attributes) {
@@ -626,7 +627,7 @@ public class SearchParameters implements Serializable {
         fetches.add(new PathHolder(attributes));
     }
 
-    /**
+    /*
      * Fluently set the fetch attribute
      */
     public SearchParameters fetch(Attribute<?, ?>... attributes) {
@@ -634,7 +635,7 @@ public class SearchParameters implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Fluently set the fetch attribute
      */
     public SearchParameters fetch(List<Attribute<?, ?>> attributes) {
@@ -646,7 +647,7 @@ public class SearchParameters implements Serializable {
     // Caching support
     // -----------------------------------
 
-    /**
+    /*
      * Default to false. Please read https://hibernate.atlassian.net/browse/HHH-1523 before using cache.
      */
     public void setCacheable(boolean cacheable) {
@@ -693,7 +694,7 @@ public class SearchParameters implements Serializable {
     // Extra parameters
     // -----------------------------------
 
-    /**
+    /*
      * Set additionnal parameters.
      */
     public void setExtraParameters(Map<String, Object> extraParameters) {
@@ -704,7 +705,7 @@ public class SearchParameters implements Serializable {
         return extraParameters;
     }
 
-    /**
+    /*
      * add additionnal parameter.
      */
     public SearchParameters addExtraParameter(String key, Object o) {
@@ -712,7 +713,7 @@ public class SearchParameters implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * get additionnal parameter.
      */
     @SuppressWarnings("unchecked")

@@ -29,22 +29,22 @@ import static com.google.common.collect.Lists.newArrayList;
  * all entities E having a given property set to one of the selected values.
  */
 public class PropertySelector<E, F> implements Serializable {
-    /**
-     * {@link PropertySelector} builder
+    /*
+     * PropertySelector builder
      */
     public static <E, F> PropertySelector<E, F> newPropertySelector(Attribute<?, ?>... fields) {
         return new PropertySelector<E, F>(checkNotNull(fields));
     }
 
-    /**
-     * {@link PropertySelector} builder
+    /*
+     * PropertySelector builder
      */
     public static <E, F> PropertySelector<E, F> newPropertySelector(String path, Class<E> from) {
         return new PropertySelector<E, F>(path, from);
     }
 
-    /**
-     * {@link PropertySelector} builder
+    /*
+     * PropertySelector builder
      */
     public static <E, F> PropertySelector<E, F> newPropertySelector(boolean orMode, Attribute<?, ?>... fields) {
         PropertySelector<E, F> ps = new PropertySelector<E, F>(checkNotNull(fields));
@@ -84,7 +84,7 @@ public class PropertySelector<E, F> implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Get the possible candidates for property.
      */
     public List<F> getSelected() {
@@ -96,7 +96,7 @@ public class PropertySelector<E, F> implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Set the possible candidates for property.
      */
     public void setSelected(List<F> selected) {
@@ -151,7 +151,7 @@ public class PropertySelector<E, F> implements Serializable {
         return searchMode;
     }
 
-    /**
+    /*
      * In case, the field's type is a String, you can set a searchMode to use. It is null by default.
      */
     public void setSearchMode(SearchMode searchMode) {

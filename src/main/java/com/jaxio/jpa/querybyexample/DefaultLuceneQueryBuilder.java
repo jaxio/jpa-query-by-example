@@ -160,8 +160,8 @@ public class DefaultLuceneQueryBuilder implements LuceneQueryBuilder {
     /**
      * Apply same filtering as "custom" analyzer. Lowercase is done by QueryParser for fuzzy search.
      * 
-     * @param word
-     * @return
+     * @param word word
+     * @return word escaped
      */
     private String escapeForFuzzy(String word) {
         int length = word.length();

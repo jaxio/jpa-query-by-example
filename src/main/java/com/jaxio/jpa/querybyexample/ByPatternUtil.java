@@ -40,7 +40,7 @@ public class ByPatternUtil {
     @Inject
     private JpaUtil jpaUtil;
 
-    /**
+    /*
      * Lookup entities having at least one String attribute matching the passed sp's pattern
      */
     @SuppressWarnings("unchecked")

@@ -25,7 +25,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.*;
 import javax.persistence.criteria.*;
-import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.ManagedType;
 import javax.persistence.metamodel.PluralAttribute;
@@ -132,18 +131,18 @@ public class JpaUtil {
         }
 
         switch (searchMode != null ? searchMode : sp.getSearchMode()) {
-        case EQUALS:
-            return builder.equal(path, attrValue);
-        case ENDING_LIKE:
-            return builder.like(path, "%" + attrValue);
-        case STARTING_LIKE:
-            return builder.like(path, attrValue + "%");
-        case ANYWHERE:
-            return builder.like(path, "%" + attrValue + "%");
-        case LIKE:
-            return builder.like(path, (String) attrValue); // assume user provide the wild cards
-        default:
-            throw new IllegalStateException("expecting a search mode!");
+            case EQUALS:
+                return builder.equal(path, attrValue);
+            case ENDING_LIKE:
+                return builder.like(path, "%" + attrValue);
+            case STARTING_LIKE:
+                return builder.like(path, attrValue + "%");
+            case ANYWHERE:
+                return builder.like(path, "%" + attrValue + "%");
+            case LIKE:
+                return builder.like(path, (String) attrValue); // assume user provide the wild cards
+            default:
+                throw new IllegalStateException("expecting a search mode!");
         }
     }
 
@@ -151,7 +150,7 @@ public class JpaUtil {
         return stringPredicate(path, attrValue, null, sp, builder);
     }
 
-    /**
+    /*
      * Convert the passed propertyPath into a JPA path.
      * <p>
      * Note: JPA will do joins if the property is in an associated entity.

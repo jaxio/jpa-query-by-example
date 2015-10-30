@@ -42,7 +42,7 @@ public class JpaUniqueUtil {
     @Inject
     private JpaUtil jpaUtil;
 
-    /**
+    /*
      * Return the error code if the given property is already present in the database, returns null otherwise.
      */
     public String validateSimpleUnique(Identifiable<?> entity, String property, Object value) {
@@ -51,7 +51,7 @@ public class JpaUniqueUtil {
         return existsInDatabaseOnAllObjects(entity, values) ? simpleUniqueConstraintError(entity, property) : null;
     }
 
-    /**
+    /*
      * Return a list of error codes for all composite unique and simple unique constraints violations.
      */
     public List<String> validateUniques(Identifiable<?> entity) {

@@ -34,7 +34,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.emptyList;
 
 /**
- *
  * @author Nicolas Romanetti
  * @author Florent Ramière
  * @author Sébastien Péralta
@@ -52,7 +51,7 @@ public class ByFullTextUtil {
     private JpaUtil jpaUtil;
 
     public <T extends Identifiable<?>> Predicate byFullText(Root<T> root, CriteriaBuilder builder, SearchParameters sp, T entity,
-            List<SingularAttribute<?, ?>> indexedAttributes) {
+                                                            List<SingularAttribute<?, ?>> indexedAttributes) {
         if (!hasNonEmptyTerms(sp)) {
             return null;
         }
@@ -74,7 +73,7 @@ public class ByFullTextUtil {
     }
 
     private <T extends Identifiable<?>> Predicate onCompositePrimaryKeys(Root<T> root, CriteriaBuilder builder, SearchParameters sp,
-            List<SingularAttribute<?, ?>> properties) {
+                                                                         List<SingularAttribute<?, ?>> properties) {
         List<? extends T> found = hibernateSearchUtil.find(root.getJavaType(), sp, properties);
         if (found == null) {
             return null;
@@ -133,7 +132,7 @@ public class ByFullTextUtil {
         return jpaUtil.orPredicate(builder, byExample(mt, embeddablePath, embeddableValue, sp, builder));
     }
 
-    /**
+    /*
      * Add a predicate for each simple property whose value is not null.
      */
     public <T> List<Predicate> byExample(ManagedType<T> mt, Path<T> mtPath, T mtValue, SearchParameters sp, CriteriaBuilder builder) {

@@ -21,7 +21,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * The EntityGraphLoader is used to load within a single read-only transaction all the desired associations that 
+ * The EntityGraphLoader is used to load within a single read-only transaction all the desired associations that
  * are normally lazily loaded.
  */
 public abstract class EntityGraphLoader<T extends Identifiable<PK>, PK extends Serializable> {
@@ -36,7 +36,7 @@ public abstract class EntityGraphLoader<T extends Identifiable<PK>, PK extends S
         this.repository = repository;
     }
 
-    /**
+    /*
      * Get the entity by id and load its graph using loadGraph.
      */
     @Transactional(readOnly = true)
@@ -46,7 +46,7 @@ public abstract class EntityGraphLoader<T extends Identifiable<PK>, PK extends S
         return entity;
     }
 
-    /**
+    /*
      * Merge the passed entity and load the graph of the merged entity using loadGraph.
      */
     @Transactional(readOnly = true)
@@ -56,12 +56,12 @@ public abstract class EntityGraphLoader<T extends Identifiable<PK>, PK extends S
         return mergedEntity;
     }
 
-    /**
+    /*
      * Load whatever is needed in the graph of the passed entity, for example x-to-many collection, x-to-one object, etc.
      */
     public abstract void loadGraph(T entity);
 
-    /**
+    /*
      * Load the passed 'x-to-many' association.
      */
     protected void loadCollection(Collection<?> collection) {
@@ -70,7 +70,7 @@ public abstract class EntityGraphLoader<T extends Identifiable<PK>, PK extends S
         }
     }
 
-    /**
+    /*
      * Load the passed 'x-to-one' association.
      */
     protected void loadSingular(Object association) {

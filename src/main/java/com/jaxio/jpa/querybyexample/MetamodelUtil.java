@@ -102,7 +102,8 @@ public class MetamodelUtil {
 
     /**
      * Retrieves cascade from metamodel attribute
-     * 
+     *
+     * @param attribute given pluaral attribute
      * @return an empty collection if no jpa relation annotation can be found.
      */
     public Collection<CascadeType> getCascades(PluralAttribute<?, ?, ?> attribute) {
@@ -122,7 +123,8 @@ public class MetamodelUtil {
 
     /**
      * Retrieves cascade from metamodel attribute on a xToMany relation.
-     * 
+     *
+     * @param attribute given singular attribute
      * @return an empty collection if no jpa relation annotation can be found.
      */
     public Collection<CascadeType> getCascades(SingularAttribute<?, ?> attribute) {

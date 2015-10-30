@@ -24,7 +24,6 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.*;
 import javax.persistence.criteria.*;
-import javax.persistence.criteria.Path;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.PluralAttribute;
@@ -65,7 +64,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     protected Logger log;
     protected String cacheRegion;
 
-    /**
+    /*
      * This constructor needs the real type of the generic type E so it can be given to the {@link javax.persistence.EntityManager}.
      */
     public GenericRepository(Class<E> type) {
@@ -101,7 +100,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
 
     /**
      * Gets from the repository the E entity instance.
-     *
+     * <p>
      * DAO for the local database will typically use the primary key or unique fields of the given entity, while DAO for external repository may use a unique
      * field present in the entity as they probably have no knowledge of the primary key. Hence, passing the entity as an argument instead of the primary key
      * allows you to switch the DAO more easily.
@@ -139,7 +138,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
     }
 
-    /**
+    /*
      * Find and load all instances.
      */
     @Transactional(readOnly = true)
@@ -154,8 +153,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
      * @return the entities matching the search.
      */
     @Transactional(readOnly = true)
-    public List<E> find(E e) {
-        return find(e, new SearchParameters());
+    public List<E> find(E entity) {
+        return find(entity, new SearchParameters());
     }
 
     /**
@@ -173,7 +172,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
      * Find and load a list of E instance.
      *
      * @param entity a sample entity whose non-null properties may be used as search hints
-     * @param searchParameters carries additional search information
+     * @param sp     carries additional search information
      * @return the entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -209,13 +208,13 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return entities;
     }
 
-    /**
+    /*
      * Find a list of E property.
      *
      * @param propertyType type of the property
-     * @param entity a sample entity whose non-null properties may be used as search hints
-     * @param searchParameters carries additional search information
-     * @param path the path to the property
+     * @param entity       a sample entity whose non-null properties may be used as search hints
+     * @param sp           carries additional search information
+     * @param path         the path to the property
      * @return the entities property matching the search.
      */
     @Transactional(readOnly = true)
@@ -223,13 +222,13 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return findProperty(propertyType, entity, sp, metamodelUtil.toAttributes(path, type));
     }
 
-    /**
+    /*
      * Find a list of E property.
      *
      * @param propertyType type of the property
-     * @param entity a sample entity whose non-null properties may be used as search hints
-     * @param searchParameters carries additional search information
-     * @param attributes the list of attributes to the property
+     * @param entity       a sample entity whose non-null properties may be used as search hints
+     * @param sp           carries additional search information
+     * @param attributes   the list of attributes to the property
      * @return the entities property matching the search.
      */
     @Transactional(readOnly = true)
@@ -237,13 +236,13 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return findProperty(propertyType, entity, sp, newArrayList(attributes));
     }
 
-    /**
+    /*
      * Find a list of E property.
      *
      * @param propertyType type of the property
-     * @param entity a sample entity whose non-null properties may be used as search hints
-     * @param searchParameters carries additional search information
-     * @param attributes the list of attributes to the property
+     * @param entity       a sample entity whose non-null properties may be used as search hints
+     * @param sp           carries additional search information
+     * @param attributes   the list of attributes to the property
      * @return the entities property matching the search.
      */
     @Transactional(readOnly = true)
@@ -285,7 +284,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Count the number of E instances.
      *
-     * @param searchParameters carries additional search information
+     * @param sp carries additional search information
      * @return the number of entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -308,7 +307,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
      * Count the number of E instances.
      *
      * @param entity a sample entity whose non-null properties may be used as search hint
-     * @param searchParameters carries additional search information
+     * @param sp     carries additional search information
      * @return the number of entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -349,8 +348,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
      * Count the number of E instances.
      *
      * @param entity a sample entity whose non-null properties may be used as search hint
-     * @param searchParameters carries additional search information
-     * @param path the path to the property
+     * @param sp     carries additional search information
+     * @param path   the path to the property
      * @return the number of entities matching the search.
      */
     @Transactional(readOnly = true)
@@ -361,8 +360,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Count the number of E instances.
      *
-     * @param entity a sample entity whose non-null properties may be used as search hint
-     * @param searchParameters carries additional search information
+     * @param entity     a sample entity whose non-null properties may be used as search hint
+     * @param sp         carries additional search information
      * @param attributes the list of attributes to the property
      * @return the number of entities matching the search.
      */
@@ -374,8 +373,8 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     /**
      * Count the number of E instances.
      *
-     * @param entity a sample entity whose non-null properties may be used as search hint
-     * @param searchParameters carries additional search information
+     * @param entity     a sample entity whose non-null properties may be used as search hint
+     * @param sp         carries additional search information
      * @param attributes the list of attributes to the property
      * @return the number of entities matching the search.
      */
@@ -439,7 +438,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return findUniqueOrNone(entity, new SearchParameters());
     }
 
-    /**
+    /*
      * We request at most 2, if there's more than one then we throw a {@link javax.persistence.NonUniqueResultException}
      *
      * @throws javax.persistence.NonUniqueResultException
@@ -496,7 +495,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     }
 
     protected <T extends Identifiable<?>> Predicate byFullText(Root<T> root, CriteriaBuilder builder, SearchParameters sp, T entity,
-            List<SingularAttribute<?, ?>> indexedAttributes) {
+                                                               List<SingularAttribute<?, ?>> indexedAttributes) {
         return byFullTextUtil.byFullText(root, builder, sp, entity, indexedAttributes);
     }
 
@@ -516,7 +515,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return byPatternUtil.byPattern(root, builder, sp, type);
     }
 
-    /**
+    /*
      * You may override this method to add a Predicate to the default find method.
      */
     protected <R> Predicate byMandatoryPredicate(CriteriaQuery<?> criteriaQuery, Root<E> root, CriteriaBuilder builder, E entity, SearchParameters sp) {
@@ -525,7 +524,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
 
     /**
      * Save or update the given entity E to the repository. Assume that the entity is already present in the persistence context. No merge is done.
-     * 
+     *
      * @param entity the entity to be saved or updated.
      */
     @Transactional
@@ -548,7 +547,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         // does the job (assuming the give entity is present in the persistence context)
     }
 
-    /**
+    /*
      * Persist the given entity.
      */
     @Transactional
@@ -556,7 +555,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         entityManager.persist(entity);
     }
 
-    /**
+    /*
      * Merge the state of the given entity into the current persistence context.
      */
     @Transactional
@@ -564,9 +563,9 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return entityManager.merge(entity);
     }
 
-    /**
+    /*
      * Delete the given entity E from the repository.
-     * 
+     *
      * @param entity the entity to be deleted.
      */
     @Transactional
@@ -603,9 +602,10 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     // Util
     // -----------------
 
-    /**
-     * Helper to determine if the passed given property is null. Used mainly on binary lazy loaded property. 
-     * @param id the entity id
+    /*
+     * Helper to determine if the passed given property is null. Used mainly on binary lazy loaded property.
+     *
+     * @param id       the entity id
      * @param property the property to check
      */
     @Transactional(readOnly = true)
@@ -626,7 +626,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return typedQuery.getSingleResult().intValue() == 1;
     }
 
-    /**
+    /*
      * Return the optimistic version value, if any.
      */
     @SuppressWarnings("unchecked")
@@ -639,10 +639,10 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         return (Comparable<Object>) jpaUtil.getValue(entity, getVersionAttribute(entityType));
     }
 
-    /**
+    /*
      * _HACK_ too bad that JPA does not provide this entityType.getVersion();
-     * 
-     * @see http://stackoverflow.com/questions/13265094/generic-way-to-get-jpa-entity-version
+     * <p>
+     * http://stackoverflow.com/questions/13265094/generic-way-to-get-jpa-entity-version
      */
     protected SingularAttribute<? super E, ?> getVersionAttribute(EntityType<E> entityType) {
         for (SingularAttribute<? super E, ?> sa : entityType.getSingularAttributes()) {
@@ -657,7 +657,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
     // Commons
     // -----------------
 
-    /**
+    /*
      * Set hints for 2d level cache.
      */
     protected void applyCacheHints(TypedQuery<?> typedQuery, SearchParameters sp) {
@@ -672,7 +672,7 @@ public abstract class GenericRepository<E extends Identifiable<PK>, PK extends S
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void fetches(SearchParameters sp, Root<E> root) {
         for (List<Attribute<?, ?>> args : sp.getFetches()) {
             FetchParent<?, ?> from = root;

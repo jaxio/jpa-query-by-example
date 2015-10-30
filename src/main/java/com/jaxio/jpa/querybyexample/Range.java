@@ -25,8 +25,8 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 public class Range<E, D extends Comparable> implements Serializable {
 
-    /**
-     * {@link Range} builder
+    /*
+     * Range builder
      */
     public static <E, D extends Comparable> Range<E, D> newRange(Attribute<?, ?>... fields) {
         return new Range<E, D>(fields);
@@ -40,7 +40,8 @@ public class Range<E, D extends Comparable> implements Serializable {
     private Boolean includeNull;
 
     /**
-     * Constructs a new {@link Range} with no boundaries and no restrictions on field's nullability.
+     * Constructs a new Range with no boundaries and no restrictions on field's nullability.
+     *
      * @param attributes the path to the attribute of an existing entity.
      */
     public Range(Attribute<?, ?>... attributes) {
@@ -50,8 +51,8 @@ public class Range<E, D extends Comparable> implements Serializable {
     /**
      * Constructs a new Range.
      *
-     * @param from the lower boundary of this range. Null means no lower boundary.
-     * @param to the upper boundary of this range. Null means no upper boundary.
+     * @param from       the lower boundary of this range. Null means no lower boundary.
+     * @param to         the upper boundary of this range. Null means no upper boundary.
      * @param attributes the path to the attribute of an existing entity.
      */
     public Range(D from, D to, Attribute<?, ?>... attributes) {
@@ -63,17 +64,17 @@ public class Range<E, D extends Comparable> implements Serializable {
     /**
      * Constructs a new Range.
      *
-     * @param from the lower boundary of this range. Null means no lower boundary.
-     * @param to the upper boundary of this range. Null means no upper boundary.
+     * @param from        the lower boundary of this range. Null means no lower boundary.
+     * @param to          the upper boundary of this range. Null means no upper boundary.
      * @param includeNull tells whether null should be filtered out or not.
-     * @param attributes the path to the attribute of an existing entity.
+     * @param attributes  the path to the attribute of an existing entity.
      */
     public Range(D from, D to, Boolean includeNull, Attribute<?, ?>... attributes) {
         this(from, to, attributes);
         this.includeNull = includeNull;
     }
 
-    /**
+    /*
      * Constructs a new Range by copy.
      */
     public Range(Range<E, D> other) {
@@ -84,7 +85,7 @@ public class Range<E, D extends Comparable> implements Serializable {
     }
 
     /**
-     * @return the entity's attribute this {@link Range} refers to.
+     * @return the entity's attribute this Range refers to.
      */
     public List<Attribute<?, ?>> getAttributes() {
         return pathHolder.getAttributes();
@@ -97,7 +98,7 @@ public class Range<E, D extends Comparable> implements Serializable {
         return from;
     }
 
-    /**
+    /*
      * Sets the lower range boundary. Accepts null for unbound lower range.
      */
     public void setFrom(D from) {
@@ -125,7 +126,7 @@ public class Range<E, D extends Comparable> implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Sets the upper range boundary. Accepts null for unbound upper range.
      */
     public void setTo(D to) {

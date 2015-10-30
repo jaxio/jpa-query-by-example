@@ -42,7 +42,7 @@ public class HibernateSearchUtil {
 
     @SuppressWarnings("unchecked")
     public <T> List<T> find(Class<T> clazz, SearchParameters sp, List<SingularAttribute<?, ?>> availableProperties) {
-        log.info("Searching {} with terms : {} with available Properties: {}", new Object[] { clazz.getSimpleName(), sp.getTerms(), availableProperties });
+        log.info("Searching {} with terms : {} with available Properties: {}", new Object[]{clazz.getSimpleName(), sp.getTerms(), availableProperties});
         FullTextEntityManager fullTextEntityManager = getFullTextEntityManager(entityManager);
         Query query = sp.getLuceneQueryBuilder().build(fullTextEntityManager, sp, availableProperties);
 
@@ -58,12 +58,12 @@ public class HibernateSearchUtil {
         return ftq.getResultList();
     }
 
-    /**
-     * Same as {@link #find(Class, SearchParameters, String[])} but will return only the id 
+    /*
+     * Same as {@link #find(Class, SearchParameters, List)} but will return only the id
      */
     @SuppressWarnings("unchecked")
     public <T> List<Serializable> findId(Class<T> clazz, SearchParameters sp, List<SingularAttribute<?, ?>> availableProperties) {
-        log.info("Searching {} with terms : {} with available Properties: {}", new Object[] { clazz.getSimpleName(), sp.getTerms(), availableProperties });
+        log.info("Searching {} with terms : {} with available Properties: {}", new Object[]{clazz.getSimpleName(), sp.getTerms(), availableProperties});
         FullTextEntityManager fullTextEntityManager = getFullTextEntityManager(entityManager);
         Query query = sp.getLuceneQueryBuilder().build(fullTextEntityManager, sp, availableProperties);
 

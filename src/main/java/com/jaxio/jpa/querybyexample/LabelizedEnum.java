@@ -18,7 +18,7 @@ package com.jaxio.jpa.querybyexample;
 public interface LabelizedEnum {
 
     /**
-     * The localized label for this enum value.
+     * @return The localized label for this enum value.
      */
     String getLabel();
 }

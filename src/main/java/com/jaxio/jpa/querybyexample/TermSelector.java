@@ -59,7 +59,7 @@ public class TermSelector implements Serializable {
         return this;
     }
 
-    /**
+    /*
      * Get the possible candidates for property.
      */
     public List<String> getSelected() {
@@ -70,7 +70,7 @@ public class TermSelector implements Serializable {
         this.selected = newArrayList(selected);
     }
 
-    /**
+    /*
      * Set the possible candidates for property.
      */
     public void setSelected(List<String> selected) {
