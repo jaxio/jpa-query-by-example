@@ -55,7 +55,7 @@ public class ByPropertySelectorUtil {
     }
 
     private <E> void byBooleanSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp,
-            PropertySelector<? super E, Boolean> selector) {
+                                       PropertySelector<? super E, Boolean> selector) {
         if (selector.isNotEmpty()) {
             List<Predicate> selectorPredicates = newArrayList();
 
@@ -76,7 +76,7 @@ public class ByPropertySelectorUtil {
     }
 
     private <E> void byStringSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp,
-            PropertySelector<? super E, String> selector) {
+                                      PropertySelector<? super E, String> selector) {
         if (selector.isNotEmpty()) {
             List<Predicate> selectorPredicates = newArrayList();
 
@@ -93,7 +93,7 @@ public class ByPropertySelectorUtil {
     }
 
     private <E> void byObjectSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp,
-            PropertySelector<? super E, ?> selector) {
+                                      PropertySelector<? super E, ?> selector) {
         if (selector.isNotEmpty()) {
             if (selector.isOrMode()) {
                 byObjectOrModeSelector(root, builder, predicates, sp, selector);
@@ -106,7 +106,7 @@ public class ByPropertySelectorUtil {
     }
 
     private <E> void byObjectOrModeSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp,
-            PropertySelector<? super E, ?> selector) {
+                                            PropertySelector<? super E, ?> selector) {
         List<Predicate> selectorPredicates = newArrayList();
         Path<?> path = jpaUtil.getPath(root, selector.getAttributes());
         List<?> selected = selector.getSelected();
@@ -130,7 +130,7 @@ public class ByPropertySelectorUtil {
     }
 
     private <E> void byObjectAndModeSelector(Root<E> root, CriteriaBuilder builder, List<Predicate> predicates, SearchParameters sp,
-            PropertySelector<? super E, ?> selector) {
+                                             PropertySelector<? super E, ?> selector) {
         List<Predicate> selectorPredicates = newArrayList();
         List<?> selected = selector.getSelected();
         if (selector.getSelected().contains(null)) {

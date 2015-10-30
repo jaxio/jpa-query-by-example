@@ -78,7 +78,7 @@ public class DefaultLuceneQueryBuilder implements LuceneQueryBuilder {
     }
 
     private String getClause(SearchParameters sp, List<String> terms, SingularAttribute<?, ?> property, boolean orMode,
-            List<SingularAttribute<?, ?>> availableProperties) {
+                             List<SingularAttribute<?, ?>> availableProperties) {
         if (property != null) {
             checkArgument(availableProperties.contains(property), property + " is not indexed");
             StringBuilder subQuery = new StringBuilder();
@@ -130,7 +130,7 @@ public class DefaultLuceneQueryBuilder implements LuceneQueryBuilder {
     }
 
     private String getOnAnyClause(SearchParameters sp, List<String> terms, List<SingularAttribute<?, ?>> properties, boolean orMode,
-            List<SingularAttribute<?, ?>> availableProperties) {
+                                  List<SingularAttribute<?, ?>> availableProperties) {
         List<String> subClauses = newArrayList();
         for (SingularAttribute<?, ?> property : properties) {
             String clause = getClause(sp, terms, property, orMode, availableProperties);
@@ -159,7 +159,7 @@ public class DefaultLuceneQueryBuilder implements LuceneQueryBuilder {
 
     /**
      * Apply same filtering as "custom" analyzer. Lowercase is done by QueryParser for fuzzy search.
-     * 
+     *
      * @param word word
      * @return word escaped
      */
