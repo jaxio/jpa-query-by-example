@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <prerequisites>
@@ -14,6 +15,24 @@
     <name>JPA Query by Example</name>
     <url>https://github.com/jaxio/jpa-query-by-example</url>
     <description>This API allows you to construct Query By Example using the JPA 2 Criteria API.</description>
+
+    <developers>
+        <developer>
+            <id>nromanetti</id>
+            <name>Nicolas Romanetti</name>
+            <email>romanetti@gmail.com</email>
+        </developer>
+        <developer>
+            <id>framiere</id>
+            <name>Florent Ramiere</name>
+            <email>florent@ramiere.com</email>
+        </developer>
+        <developer>
+            <id>jeanlouisboudart</id>
+            <name>Jean-Louis Boudart</name>
+            <email>jeanlouis.boudart@gmail.com</email>
+        </developer>
+    </developers>
 
     <organization>
         <name>JAXIO</name>
