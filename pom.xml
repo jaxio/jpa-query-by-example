@@ -10,7 +10,7 @@
     <groupId>com.jaxio</groupId>
     <artifactId>jpa-querybyexample</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>JPA Query by Example</name>
     <url>https://github.com/jaxio/jpa-query-by-example</url>
