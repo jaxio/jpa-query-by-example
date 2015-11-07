@@ -110,7 +110,7 @@ public class ByPropertySelectorUtil {
         List<Predicate> selectorPredicates = newArrayList();
         Path<?> path = jpaUtil.getPath(root, selector.getAttributes());
         List<?> selected = selector.getSelected();
-        if (selector.getSelected().contains(null)) {
+        if (selected.contains(null)) {
             selected = newArrayList(selector.getSelected());
             selected.remove(null);
             selectorPredicates.add(builder.isNull(path));
@@ -133,12 +133,12 @@ public class ByPropertySelectorUtil {
                                              PropertySelector<? super E, ?> selector) {
         List<Predicate> selectorPredicates = newArrayList();
         List<?> selected = selector.getSelected();
-        if (selector.getSelected().contains(null)) {
+        if (selected.contains(null)) {
             selected = newArrayList(selector.getSelected());
             selected.remove(null);
             selectorPredicates.add(builder.isNull(jpaUtil.getPath(root, selector.getAttributes())));
         }
-        for (Object selection : selector.getSelected()) {
+        for (Object selection : selected) {
             Path<?> path = jpaUtil.getPath(root, selector.getAttributes());
             if (selection instanceof Identifiable) {
                 selectorPredicates.add(builder.equal(path.get("id"), ((Identifiable<?>) selection).getId()));
@@ -148,5 +148,4 @@ public class ByPropertySelectorUtil {
         }
         predicates.add(jpaUtil.andPredicate(builder, selectorPredicates));
     }
-
 }
