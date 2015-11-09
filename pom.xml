@@ -9,7 +9,7 @@
     <groupId>com.jaxio</groupId>
     <artifactId>jpa-querybyexample</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <name>JPA Query by Example</name>
     <url>https://github.com/jaxio/jpa-query-by-example</url>
@@ -50,7 +50,7 @@
         <connection>scm:git:git://github.com/jaxio/jpa-query-by-example.git</connection>
         <developerConnection>scm:git:git@github.com:jaxio/jpa-query-by-example.git</developerConnection>
         <url>http://github.com/jaxio/jpa-query-by-example/</url>
-        <tag>HEAD</tag>
+        <tag>jpa-querybyexample-1.0.1</tag>
     </scm>
 
     <issueManagement>
