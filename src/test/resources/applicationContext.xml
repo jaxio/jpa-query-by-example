@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-lazy-init="true" xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   	xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+			http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.2.xsd">
+	<description><![CDATA[
+		Main entry point for spring configuration
+	]]></description>
+
+	<!-- context -->
+    <context:component-scan base-package="com.jaxio.jpa.querybyexample"/>
+	<context:component-scan base-package="demo"/>
+
+	<context:property-placeholder location="classpath*:hibernate.properties" />
+
+	<!-- transaction -->
+	<tx:annotation-driven />
+
+	<jdbc:embedded-database id="dataSource" type="H2">
+		<jdbc:script location="file:./src/test/resources/01-create.sql" />
+	</jdbc:embedded-database>
+</beans>
