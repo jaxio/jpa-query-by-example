@@ -34,13 +34,15 @@ List<Account> result = accountRepository.find(example);
 
 At the SQL level, the resulting query looks like this:
 
-	select
-	    -- skip other fields for clarity
-	    account0_.LAST_NAME as LAST9_3_,
-	from
-	    Account account0_ 
-	where
-	    account0_.LAST_NAME=?
+```sql
+select
+    -- skip other fields for clarity
+    account0_.LAST_NAME as LAST9_3_,
+from
+    Account account0_ 
+where
+    account0_.LAST_NAME=?
+```
 
 The [AccountRepository](https://github.com/jaxio/jpa-query-by-example/blob/master/src/test/java/demo/AccountRepository.java)
 extends a [GenericRepository](https://github.com/jaxio/jpa-query-by-example/blob/master/src/main/java/com/jaxio/jpa/querybyexample/GenericRepository.java)
