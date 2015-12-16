@@ -52,7 +52,7 @@ The first query above involves a String. Let's change it to make it case insensi
 Our `Account` entity does not carry case sensitivity meta information. For this reason, we require some extra parameters 
 for case sensitivity, but also ordering, etc.
 The number of parameters can grow quickly, so we have grouped them in the
-[SearchParameters class](https://github.com/jaxio/jpa-query-by-example/blob/master/src/main/java/com/jaxio/jpa/querybyexample/SearchParameters.java) 
+[SearchParameters](https://github.com/jaxio/jpa-query-by-example/blob/master/src/main/java/com/jaxio/jpa/querybyexample/SearchParameters.java) class 
 which can be passed as a parameter to the accountRepository's methods.
 
 Let's make the first query above `case insensitive` and let's add an `ORDER BY`.
