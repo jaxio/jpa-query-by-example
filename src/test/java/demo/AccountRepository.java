@@ -9,17 +9,13 @@
 package demo;
 
 import com.jaxio.jpa.querybyexample.GenericRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-/**
- * {@link GenericRepository} for {@link Account}
- */
 @Named
 @Singleton
-public class AccountRepository extends GenericRepository<Account, String> {
+public class AccountRepository extends GenericRepository<Account, Integer> {
 
     public AccountRepository() {
         super(Account.class);
@@ -29,18 +25,4 @@ public class AccountRepository extends GenericRepository<Account, String> {
     public Account getNew() {
         return new Account();
     }
-
-    /**
-     * Return the persistent instance of {@link Account} with the given unique property value username,
-     * or null if there is no such persistent instance.
-     *
-     * @param username the unique value
-     * @return the corresponding {@link Account} persistent instance or null
-     */
-    @Transactional(readOnly = true)
-    public Account getByUsername(String username) {
-        return findUniqueOrNone(new Account().username(username));
-    }
-
-
 }

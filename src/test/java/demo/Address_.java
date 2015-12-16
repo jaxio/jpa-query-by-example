@@ -10,17 +10,13 @@ package demo;
 
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
-import java.util.Date;
 
-@StaticMetamodel(Account.class)
-public abstract class Account_ {
+@StaticMetamodel(Address.class)
+public abstract class Address_ {
 
     // Raw attributes
-    public static volatile SingularAttribute<Account, Integer> id;
-    public static volatile SingularAttribute<Account, String> username;
-    public static volatile SingularAttribute<Account, String> lastName;
-    public static volatile SingularAttribute<Account, Date> birthDate;
-
-    // Many to one
-    public static volatile SingularAttribute<Account, Address> homeAddress;
+    public static volatile SingularAttribute<Address, Integer> id;
+    public static volatile SingularAttribute<Address, String> streetName;
+    public static volatile SingularAttribute<Address, String> city;
+    public static volatile SingularAttribute<Address, Integer> version;
 }

@@ -16,45 +16,47 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.Serializable;
 import java.util.Date;
 
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity
 @Table(name = "ACCOUNT")
-public class Account implements Identifiable<String>, Serializable {
+public class Account implements Identifiable<Integer>, Serializable {
     private static final long serialVersionUID = 1L;
     private static final Logger log = LoggerFactory.getLogger(Account.class);
 
     // Raw attributes
-    private String id;
+    private Integer id;
     private String username;
+    private String lastName;
     private Date birthDate;
 
+    // Many to one
+    private Address homeAddress;
+
     @Override
-    @Column(name = "ID", length = 36)
-    @GeneratedValue(generator = "strategy-uuid2")
-    @GenericGenerator(name = "strategy-uuid2", strategy = "uuid2")
+    @Column(name = "ID", precision = 10)
+    @GeneratedValue
     @Id
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
     @Override
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Account id(String id) {
-        setId(id);
-        return this;
     }
 
     @Override
     @Transient
     public boolean isIdSet() {
-        return id != null && !id.isEmpty();
+        return id != null;
     }
 
     // -- [username] ------------------------
@@ -72,6 +74,23 @@ public class Account implements Identifiable<String>, Serializable {
         setUsername(username);
         return this;
     }
+
+    // -- [lastName] ------------------------
+
+    @Column(name = "LAST_NAME", length = 255)
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public Account lastName(String lastName) {
+        setLastName(lastName);
+        return this;
+    }
+
     // -- [birthDate] ------------------------
 
     @Column(name = "BIRTH_DATE", length = 23)
@@ -86,6 +105,32 @@ public class Account implements Identifiable<String>, Serializable {
 
     public Account birthDate(Date birthDate) {
         setBirthDate(birthDate);
+        return this;
+    }
+
+    // -----------------------------------------------------------------
+    // Many to One support
+    // -----------------------------------------------------------------
+
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    // many-to-one: Account.homeAddress ==> Address.id
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    @JoinColumn(name = "ADDRESS_ID")
+    @ManyToOne(cascade = { PERSIST, MERGE }, fetch = LAZY)
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    /**
+     * Set the {@link #homeAddress} without adding this Account instance on the passed {@link #homeAddress}
+     */
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
+    }
+
+    public Account homeAddress(Address homeAddress) {
+        setHomeAddress(homeAddress);
         return this;
     }
 
