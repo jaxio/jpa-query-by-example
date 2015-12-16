@@ -72,12 +72,14 @@ static metamodel, which helps you to keep your query related Java code strongly 
 
 At the SQL level, the resulting FROM clause now looks like this:
 
-	from
-	    ACCOUNT account0_ 
-    where
-        lower(account0_.LAST_NAME)=? 
-    order by
-        account0_.LAST_NAME asc
+```sql
+from
+    ACCOUNT account0_ 
+where
+    lower(account0_.LAST_NAME)=? 
+order by
+    account0_.LAST_NAME asc
+```
 
 #### Pagination
 
@@ -94,13 +96,14 @@ List<Account> result = accountRepository.find(example, sp);
 
 At the SQL level, the resulting FROM clause now looks like this (we use H2 database):
 
-	from
-	    ACCOUNT account0_ 
-	where
-	    account0_.LAST_NAME=? 
-	order by
-	    account0_.LAST_NAME asc limit ? offset ?
-
+```sql
+from
+    ACCOUNT account0_ 
+where
+    account0_.LAST_NAME=? 
+order by
+    account0_.LAST_NAME asc limit ? offset ?
+```
 
 #### LIKE and String
 
@@ -113,8 +116,9 @@ SearchParameters sp = new SearchParameters().startingLike();
 
 to our example above would result in  
 
-	account0_.LAST_NAME LIKE 'Jag%'
-
+```sql
+account0_.LAST_NAME LIKE 'Jag%'
+```
 
 #### Multiple criteria
 
@@ -130,15 +134,17 @@ List<Account> result = accountRepository.find(example, sp);
 
 By default, the FROM clause uses a `AND` predicate. 
 
-    from
-        ACCOUNT account0_ 
-    where
-        account0_.BIRTH_DATE=? 
-        and (
-            account0_.LAST_NAME like ?
-        ) 
-    order by
-        account0_.LAST_NAME asc
+```sql
+from
+    ACCOUNT account0_ 
+where
+    account0_.BIRTH_DATE=? 
+    and (
+        account0_.LAST_NAME like ?
+    ) 
+order by
+    account0_.LAST_NAME asc
+```
 
 To use instead `OR`, use the `.orMode()`, as follow:
 
@@ -148,11 +154,13 @@ SearchParameters sp = new SearchParameters().orMode().orderBy(OrderByDirection.A
 
 And this time we get:
 
-    where
-        account0_.LAST_NAME like ? 
-        or account0_.BIRTH_DATE=? 
-    order by
-        account0_.LAST_NAME asc
+```sql
+where
+    account0_.LAST_NAME like ? 
+    or account0_.BIRTH_DATE=? 
+order by
+    account0_.LAST_NAME asc
+```
 
 #### Is that all ?
 
@@ -192,13 +200,15 @@ Note that you can add ranges of any type: Integer, Long, LocalDate (joda time), 
 
 This codes leads in fine to following `FROM` clause:
 
-	from
-	    ACCOUNT account0_ 
-	where
-	    (
-	        account0_.BIRTH_DATE between ? and ?
-	    ) 
-	    and account0_.LAST_NAME=?
+```sql
+from
+    ACCOUNT account0_ 
+where
+    (
+        account0_.BIRTH_DATE between ? and ?
+    ) 
+    and account0_.LAST_NAME=?
+```
 
 Here is a variation of the same example (depends on need, taste and color :-): 
 
@@ -210,7 +220,6 @@ Date to = dateFormat.parse("1974-12-01");
 SearchParameters sp = new SearchParameters().range(from, to, Account_.birthDate);
 List<Account> accountList = accountRepository.find(sp);
 ```
-
 
 #### Query all string properties in a OR clause
 
@@ -225,15 +234,13 @@ List<Account> result = accountRepository.find(sp);
 
 The FROM clause now includes all string columns:
 
-	from
-	    ACCOUNT account0_ 
-	where
-	    account0_.EMAIL like ? 
-	    or account0_.LAST_NAME like ? 
-	    or account0_.LOGIN like ? 
-	    or account0_.FIRST_NAME like ? 
-	    or account0_.DESCRIPTION like ?
-
+```sql
+from
+    ACCOUNT account0_ 
+where
+    or account0_.LAST_NAME like ? 
+    or account0_.USERNAME like ? 
+```
 
 #### Property Selector
 
@@ -252,6 +259,7 @@ List<Account> result = accountRepository.find(sp);
 
 Here is the corresponding FROM clause: 
 
+```sql
 	from
 	    ACCOUNT account0_ 
 	where
@@ -262,11 +270,14 @@ Here is the corresponding FROM clause:
 	    or account0_.LAST_NAME='Taylor'
 	    or account0_.LAST_NAME='Wyman'
 	    or account0_.LAST_NAME='Wood'
+```
 
 Note that if you use JSF2 with PrimeFaces, you can directly pass a `PropertySelector` to a multiple autoComplete component's value property.
 This way, the autoComplete component fills the PropertySelector. Here is how:
 
-	<p:autoComplete ... multiple="true" value="#{accountSearchForm.lastNameSelector.selected}" ... />
+```xml
+<p:autoComplete ... multiple="true" value="#{accountSearchForm.lastNameSelector.selected}" ... />
+```
 
 Here is a snapshot:
 
@@ -297,14 +308,15 @@ Assert.assertThat(result.size(), is(2));
 
 The FROM clause uses a JOIN:
 
-	from
-	    ACCOUNT account0_ cross 
-	join
-	    ADDRESS address1_ 
-	where
-	    account0_.ADDRESS_ID=address1_.ID 
-	    and address1_.CITY='Paris'
-
+```sql
+from
+    ACCOUNT account0_ cross 
+join
+    ADDRESS address1_ 
+where
+    account0_.ADDRESS_ID=address1_.ID 
+    and address1_.CITY='Paris'
+```
 
 Enjoy!
 
