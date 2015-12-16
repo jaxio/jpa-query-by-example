@@ -57,12 +57,12 @@ which can be passed as a parameter to the accountRepository's methods.
 
 Let's make the first query above `case insensitive` and let's add an `ORDER BY`.
 
-{% highlight java %}
+```java
 Account example = new Account();
 example.setLastName("Jagger"); 
 SearchParameters sp = new SearchParameters().caseSensitive().orderBy(OrderByDirection.ASC, Account_.lastName);
 List<Account> result = accountRepository.find(example, sp);
-{% endhighlight %}
+```
 
 Note the usage of the 
 [Account_](https://github.com/jaxio/jpa-query-by-example/blob/master/src/test/java/demo/Account_.java)* 
