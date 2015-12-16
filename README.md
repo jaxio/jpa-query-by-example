@@ -26,11 +26,11 @@ having a `lastName` property and that we want to query all accounts whose last n
 
 Using QBE, constructing the query is as simple as setting the lastName...:
 
-{% highlight java %}
+```java
 Account example = new Account();
 example.setLastName("Jagger");
 List<Account> result = accountRepository.find(example);
-{% endhighlight %}
+```
 
 At the SQL level, the resulting query looks like this:
 
@@ -82,13 +82,13 @@ At the SQL level, the resulting FROM clause now looks like this:
 In most web application we need to paginate the query results in order to save resources. In the query below, we retrieve only 
 the 3rd page (we assume a page lists 25 rows). The first result is the 50th element and we retrieve at most 25 elements.
 
-{% highlight java %}
+```java
 Account example = new Account();
 example.setLastName("Jagger");
 SearchParameters sp = new SearchParameters().orderBy(OrderByDirection.ASC, Account_.lastName) //
 	.first(50).maxResults(25);
 List<Account> result = accountRepository.find(example, sp);
-{% endhighlight %}
+```
 
 At the SQL level, the resulting FROM clause now looks like this (we use H2 database):
 
@@ -104,10 +104,10 @@ At the SQL level, the resulting FROM clause now looks like this (we use H2 datab
 
 For strings, you can globally control whether a `LIKE` should be used and where the `%` wildcard should be placed. For example, adding :
 
-{% highlight java %}
+```java
 example.setLastName("Jag");
 SearchParameters sp = new SearchParameters().startingLike();
-{% endhighlight %}
+```
 
 to our example above would result in  
 
@@ -118,13 +118,13 @@ to our example above would result in
 
 Until now, we have worked only with one property, lastName, but we can set other properties, for example:
 
-{% highlight java %}
+```java
 Account example = new Account();
 example.setLastName("Jag");
 example.setBirthDate(new Date());
 SearchParameters sp = new SearchParameters().orderBy(OrderByDirection.ASC, Account_.lastName).startingLike();
 List<Account> result = accountRepository.find(example, sp);
-{% endhighlight %}
+```
 
 By default, the FROM clause uses a `AND` predicate. 
 
@@ -140,9 +140,9 @@ By default, the FROM clause uses a `AND` predicate.
 
 To use instead `OR`, use the `.orMode()`, as follow:
 
-{% highlight java %}
+```java
 SearchParameters sp = new SearchParameters().orMode().orderBy(OrderByDirection.ASC, Account_.lastName).startingLike();
-{% endhighlight %}
+```
 
 And this time we get:
 
@@ -169,7 +169,7 @@ parameter.
 
 Here is an example:
 
-{% highlight java %}
+```java
 Account example = new Account();
 example.setLastName("Jagger");
 
@@ -184,7 +184,7 @@ birthDateRange.from(from.getTime()).to(to.getTime());
 
 SearchParameters sp = new SearchParameters().range(birthDateRange);
 List<Account> result = accountRepository.find(example, sp);
-{% endhighlight %}
+```
 
 Note that you can add ranges of any type: Integer, Long, LocalDate (joda time), BigDecimal, etc...
 
@@ -200,14 +200,14 @@ This codes leads in fine to following `FROM` clause:
 
 Here is a variation of the same example (depends on need, taste and color :-): 
 
-{% highlight java %}
+```java
 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 Date from = dateFormat.parse("1920-12-01");
 Date to = dateFormat.parse("1974-12-01");
 
 SearchParameters sp = new SearchParameters().range(from, to, Account_.birthDate);
 List<Account> accountList = accountRepository.find(sp);
-{% endhighlight %}
+```
 
 
 #### Query all string properties in a OR clause
@@ -216,10 +216,10 @@ To find all entities having at least one of their String property matching a giv
 
 Here is an example: 
 
-{% highlight java %}    
+```java    
 SearchParameters sp = new SearchParameters().searchMode(SearchMode.STARTING_LIKE).searchPattern("Jag");
 List<Account> result = accountRepository.find(sp);
-{% endhighlight %}
+```
 
 The FROM clause now includes all string columns:
 
@@ -239,14 +239,14 @@ In order to construct a `OR` clause for a given property we use the `PropertySel
 
 Here is an example:
 
-{% highlight java %}    
+```java    
 PropertySelector<Account, String> lastNameSelector = PropertySelector.newPropertySelector(Account_.lastName);
 lastNameSelector.setSelected(Arrays.asList("Jagger", "Richards", "Jones", "Watts", "taylor", "Wyman", "Wood"));
 
 SearchParameters sp = new SearchParameters().property(lastNameSelector);
 
 List<Account> result = accountRepository.find(sp);
-{% endhighlight %}
+```
 
 Here is the corresponding FROM clause: 
 
@@ -285,13 +285,13 @@ The `Account` entity has a `@ManyToOne` association with the `Address` entity.
 
 Here is how we can retrieve all accounts pointing to an Address having its `city` property set to "Paris":
 
-{% highlight java %}    
+```java    
 Account example = new Account();
 example.setHomeAddress(new Address());
 example.getHomeAddress().setCity("Paris");
 List<Account> result = accountRepository.find(example);
 Assert.assertThat(result.size(), is(2));
-{% endhighlight %}
+```
 
 The FROM clause uses a JOIN:
 
