@@ -10,6 +10,16 @@ Query By Example for JPA is originally inspired from [Hibernate Example criterio
 
 We do not cover here QBE implementation details, instead we explain how to use the Query By Example API.
 
+JPA Query by Example is available on Maven central repository:
+
+```xml
+<dependency>
+	<groupId>com.jaxio</groupId>
+	<artifactId>jpa-querybyexample</artifactId>
+	<version>1.0.1</version>
+</dependency>
+```
+
 #### Resources
 
 * Take a look directly at the [QBE junit tests](https://github.com/jaxio/jpa-query-by-example/blob/master/src/test/java/demo), they are almost self-explanatory.
