@@ -67,7 +67,7 @@
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
         <!-- Version dependencies when used in multiple dependencies -->
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-        <hibernate.version>5.0.2.Final</hibernate.version>
+        <hibernate.version>5.4.24.Final</hibernate.version>
         <spring.version>4.2.2.RELEASE</spring.version>
         <spring-security.version>4.0.2.RELEASE</spring-security.version>
     </properties>
